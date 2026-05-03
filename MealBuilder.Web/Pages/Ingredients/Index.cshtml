@@ -1,0 +1,37 @@
+@page
+@model MealBuilder.Web.Pages.Ingredients.IndexModel
+
+@{
+    ViewData["Title"] = "Ingredients";
+}
+
+<h1>Ingredients</h1>
+
+@if (Model.Ingredients.Count == 0)
+{
+    <p>No ingredients have been added yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Calories per 100g</th>
+                <th>Protein per 100g</th>
+                <th>Fiber per 100g</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ingredient in Model.Ingredients)
+            {
+                <tr>
+                    <td>@ingredient.Name</td>
+                    <td>@ingredient.CaloriesPer100g</td>
+                    <td>@ingredient.ProteinPer100g</td>
+                    <td>@ingredient.FiberPer100g</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
