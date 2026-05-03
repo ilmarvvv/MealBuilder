@@ -24,6 +24,7 @@ else
                 <th>Calories per 100g</th>
                 <th>Protein per 100g</th>
                 <th>Fiber per 100g</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -34,6 +35,9 @@ else
                     <td>@ingredient.CaloriesPer100g</td>
                     <td>@ingredient.ProteinPer100g</td>
                     <td>@ingredient.FiberPer100g</td>
+                    <td>
+                        <a asp-page="./Edit" asp-route-id="@ingredient.Id">Edit</a>
+                    </td>
                 </tr>
             }
         </tbody>
