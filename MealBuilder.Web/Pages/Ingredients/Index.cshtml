@@ -37,7 +37,8 @@ else
                     <td>@ingredient.FiberPer100g</td>
                     <td>
                         <a asp-page="./Details" asp-route-id="@ingredient.Id">Details</a> |
-                        <a asp-page="./Edit" asp-route-id="@ingredient.Id">Edit</a>
+                        <a asp-page="./Edit" asp-route-id="@ingredient.Id">Edit</a> |
+                        <a asp-page="./Delete" asp-route-id="@ingredient.Id">Delete</a>
                     </td>
                 </tr>
             }
