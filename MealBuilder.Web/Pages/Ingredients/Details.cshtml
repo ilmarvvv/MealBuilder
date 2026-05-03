@@ -1,0 +1,25 @@
+﻿@page "{id:int}"
+@model MealBuilder.Web.Pages.Ingredients.DetailsModel
+
+@{
+    ViewData["Title"] = "Ingredient Details";
+}
+
+<h1>Ingredient Details</h1>
+
+<dl class="row">
+    <dt class="col-sm-3">Name</dt>
+    <dd class="col-sm-9">@Model.Ingredient.Name</dd>
+
+    <dt class="col-sm-3">Calories per 100g</dt>
+    <dd class="col-sm-9">@Model.Ingredient.CaloriesPer100g</dd>
+
+    <dt class="col-sm-3">Protein per 100g</dt>
+    <dd class="col-sm-9">@Model.Ingredient.ProteinPer100g</dd>
+
+    <dt class="col-sm-3">Fiber per 100g</dt>
+    <dd class="col-sm-9">@Model.Ingredient.FiberPer100g</dd>
+</dl>
+
+<a asp-page="./Edit" asp-route-id="@Model.Ingredient.Id" class="btn btn-primary">Edit</a>
+<a asp-page="./Index" class="btn btn-secondary">Back to List</a>
