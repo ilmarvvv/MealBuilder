@@ -255,13 +255,14 @@ Goal: create the basic project structure and connect the database.
 
 Goal: allow the user to manage ingredients through the UI.
 
-- [ ] Add Ingredients list page
-- [ ] Add Create Ingredient page
-- [ ] Add Edit Ingredient page
-- [ ] Add Details Ingredient page
-- [ ] Add Delete Ingredient page
-- [ ] Show validation messages
-- [ ] Add navigation link to Ingredients
+- [x] Add Ingredients list page
+- [x] Add Create Ingredient page
+- [x] Add Edit Ingredient page
+- [x] Add Details Ingredient page
+- [x] Add Delete Ingredient page
+- [x] Show validation messages
+- [x] Add navigation link to Ingredients
+- [ ] Add sugar and salt fields to Ingredient
 
 ### Milestone 3: Recipe Models
 
