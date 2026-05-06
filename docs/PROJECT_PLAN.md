@@ -67,6 +67,28 @@ Notes:
 
 A single product with nutrition values. For example: chicken, rice, egg, olive oil, or milk.
 
+Responsibility:
+- store base nutrition values for a product
+- provide reusable nutrition data for recipes and menus
+
+Main data:
+- name
+- calories per 100 g
+- protein per 100 g
+- fiber per 100 g
+- sugar per 100 g
+- salt per 100 g
+
+Relationships:
+- can be used in many recipes through `RecipeIngredient`
+- can be used directly in menus in the future
+
+Notes:
+- values are stored per 100 g
+- values cannot be negative
+- calories per 100 g are limited to 0-900
+- protein, fiber, sugar, and salt per 100 g are limited to 0-100
+
 ### Recipe
 
 A dish, preparation, or reusable recipe that can be cooked and used again. For example: salad, sauce, chicken with rice, or filling.
