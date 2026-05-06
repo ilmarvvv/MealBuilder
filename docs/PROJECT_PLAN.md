@@ -93,9 +93,48 @@ Notes:
 
 A dish, preparation, or reusable recipe that can be cooked and used again. For example: salad, sauce, chicken with rice, or filling.
 
+Responsibility:
+- store basic recipe information
+- group ingredients into a reusable dish or preparation
+- provide a base for future recipe calculations, portions, and menus
+
+Main data:
+- name
+- description
+- servings
+
+Relationships:
+- has many `RecipeIngredient` records
+- can be used in menus in the future
+- can be used as a component of another recipe through `RecipeComponent`
+
+Notes:
+- recipe nutrition values are calculated from its ingredients and components
+- an empty recipe can exist as a draft
+- servings must be greater than 0 when portion calculations are used
+
 ### RecipeIngredient
 
 A connection between a recipe and an ingredient. It describes which ingredient is used in a recipe and in what quantity.
+
+Responsibility:
+- connect one recipe with one ingredient
+- store how much of the ingredient is used in the recipe
+- provide the ingredient weight used for recipe nutrition calculations
+
+Main data:
+- recipe id
+- ingredient id
+- grams
+
+Relationships:
+- belongs to one `Recipe`
+- references one `Ingredient`
+
+Notes:
+- `grams` must be greater than 0
+- all first-version recipe calculations use grams
+- unit support, piece-based products, and milliliters can be added later
 
 ### RecipeComponent
 
