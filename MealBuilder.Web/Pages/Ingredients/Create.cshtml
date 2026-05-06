@@ -32,6 +32,18 @@
         <span asp-validation-for="Ingredient.FiberPer100g" class="text-danger"></span>
     </div>
 
+    <div class="mb-3">
+        <label asp-for="Ingredient.SugarPer100g" class="form-label"></label>
+        <input asp-for="Ingredient.SugarPer100g" class="form-control" />
+        <span asp-validation-for="Ingredient.SugarPer100g" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Ingredient.SaltPer100g" class="form-label"></label>
+        <input asp-for="Ingredient.SaltPer100g" class="form-control" />
+        <span asp-validation-for="Ingredient.SaltPer100g" class="text-danger"></span>
+    </div>
+
     <button type="submit" class="btn btn-primary">Save</button>
     <a asp-page="./Index" class="btn btn-secondary">Cancel</a>
 </form>

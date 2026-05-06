@@ -18,4 +18,10 @@ public class Ingredient
 
     [Range(0, 100)]
     public decimal FiberPer100g { get; set; }
+
+    [Range(0, 100)]
+    public decimal SugarPer100g { get; set; }
+
+    [Range(0, 100)]
+    public decimal SaltPer100g { get; set; }
 }
