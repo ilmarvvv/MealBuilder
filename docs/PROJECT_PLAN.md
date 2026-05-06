@@ -262,7 +262,7 @@ Goal: allow the user to manage ingredients through the UI.
 - [x] Add Delete Ingredient page
 - [x] Show validation messages
 - [x] Add navigation link to Ingredients
-- [ ] Add sugar and salt fields to Ingredient
+- [x] Add sugar and salt fields to Ingredient
 
 ### Milestone 3: Recipe Models
 
