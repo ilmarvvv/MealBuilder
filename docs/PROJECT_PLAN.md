@@ -329,12 +329,12 @@ Goal: allow the user to manage ingredients through the UI.
 
 Goal: create the basic recipe model and the relationship between recipes and ingredients.
 
-- [ ] Refine `Recipe` entity
-- [ ] Refine `RecipeIngredient` entity
-- [ ] Add `Recipe` model
-- [ ] Add `RecipeIngredient` model
-- [ ] Add EF Core relationships
-- [ ] Add migration for recipes
+- [x] Refine `Recipe` entity
+- [x] Refine `RecipeIngredient` entity
+- [x] Add `Recipe` model
+- [x] Add `RecipeIngredient` model
+- [x] Add EF Core relationships
+- [x] Add migration for recipes
 
 ### Milestone 4: Recipes CRUD
 
