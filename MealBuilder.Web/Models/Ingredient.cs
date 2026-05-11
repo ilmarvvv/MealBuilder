@@ -24,4 +24,6 @@ public class Ingredient
 
     [Range(0, 100)]
     public decimal SaltPer100g { get; set; }
+
+    public List<RecipeIngredient> RecipeIngredients { get; set; } = [];
 }
