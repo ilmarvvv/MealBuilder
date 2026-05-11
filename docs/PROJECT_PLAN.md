@@ -416,6 +416,9 @@ This section contains ideas that may be useful for the project in the future, bu
 
 - [ ] Support milliliters or other units
 
+- [ ] Add recipe scaling
+  - Allow scaling recipes up or down without changing the original recipe.
+
 - [ ] Add user accounts and authentication
 
 - [ ] Improve UI
