@@ -1,0 +1,35 @@
+﻿@page
+@model MealBuilder.Web.Pages.Recipes.IndexModel
+
+@{
+    ViewData["Title"] = "Recipes";
+}
+
+<h1>Recipes</h1>
+
+@if (Model.Recipes.Count == 0)
+{
+    <p>No recipes have been added yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Servings</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var recipe in Model.Recipes)
+            {
+                <tr>
+                    <td>@recipe.Name</td>
+                    <td>@recipe.Description</td>
+                    <td>@recipe.Servings</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
