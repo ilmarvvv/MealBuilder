@@ -138,7 +138,36 @@ Notes:
 
 ### RecipeComponent
 
-A connection between one recipe and another recipe. It is needed when a finished recipe is used as part of another recipe, for example a sauce in a burger or a filling in a pie.
+A connection between one recipe and another finished recipe.
+
+It is needed when a finished recipe is used as part of another recipe. For example, a sauce can be created as a separate recipe and then added to a burger, salad, or another dish.
+
+Responsibility:
+- connect a parent recipe with another finished recipe
+- store how much of the finished recipe is used
+- allow finished recipes to be included in another recipe's nutrition calculations
+
+Main data:
+- parent recipe id
+- component recipe id
+- grams
+
+Relationships:
+- one parent `Recipe` can have many `RecipeComponent` records
+- one component `Recipe` can be used in many `RecipeComponent` records
+- the same component `Recipe` can be added only once inside the same parent `Recipe`
+
+Notes:
+- `parent recipe` is the recipe that contains the component
+- `component recipe` is the finished recipe used as part of another recipe
+- `grams` must be greater than 0
+- a recipe must not directly contain itself
+- a recipe must not indirectly contain itself through other recipes
+- duplicate components should be prevented by a unique database index on `ParentRecipeId` and `ComponentRecipeId`
+- the UI should not show the current recipe or already added component recipes in the add-component dropdown
+- server-side validation should protect the same rules even if the UI is bypassed
+- component recipe nutrition values should be included in parent recipe total values
+- in the first UI version, recipe ingredients and recipe components will be shown as two separate tables
 
 ### Menu
 
