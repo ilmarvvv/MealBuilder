@@ -33,5 +33,23 @@ namespace MealBuilder.Web.Pages.Recipes
 
             return Page();
         }
+
+        public async Task<IActionResult> OnPostRemoveIngredientAsync(int recipeIngredientId)
+        {
+            RecipeIngredient? recipeIngredient = await _context.RecipeIngredients
+                .FindAsync(recipeIngredientId);
+
+            if (recipeIngredient is null)
+            {
+                return NotFound();
+            }
+
+            int recipeId = recipeIngredient.RecipeId;
+
+            _context.RecipeIngredients.Remove(recipeIngredient);
+            await _context.SaveChangesAsync();
+
+            return RedirectToPage("./Details", new { id = recipeId });
+        }
     }
 }

@@ -56,6 +56,11 @@ else
                     <td>@fiber</td>
                     <td>
                         <a asp-page="./EditIngredient" asp-route-id="@recipeIngredient.Id">Edit</a>
+
+                        <form method="post" asp-page-handler="RemoveIngredient" class="d-inline">
+                            <input type="hidden" name="recipeIngredientId" value="@recipeIngredient.Id" />
+                            <button type="submit" class="btn btn-link p-0">Remove</button>
+                        </form>
                     </td>
                 </tr>
             }
