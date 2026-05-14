@@ -382,10 +382,17 @@ Goal: allow the user to create and edit recipes.
 
 Goal: allow a finished recipe to be used as part of another recipe.
 
-- [ ] Refine `RecipeComponent` entity
+- [x] Refine `RecipeComponent` entity
 - [ ] Add `RecipeComponent` model
 - [ ] Add EF Core relationship for recipe components
+- [ ] Add unique index for `ParentRecipeId` and `ComponentRecipeId`
+- [ ] Add migration for recipe components
+- [ ] Show recipe components on Recipe Details page
 - [ ] Allow adding a recipe as a component of another recipe
+- [ ] Do not show the current recipe in the add-component dropdown
+- [ ] Do not show already added component recipes in the add-component dropdown
+- [ ] Allow changing recipe component quantity
+- [ ] Allow removing a recipe component from a recipe
 - [ ] Prevent a recipe from containing itself
 - [ ] Include recipe components in nutrition calculations
 
