@@ -38,6 +38,7 @@ else
                 <th>Calories</th>
                 <th>Protein</th>
                 <th>Fiber</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -53,6 +54,9 @@ else
                     <td>@calories</td>
                     <td>@protein</td>
                     <td>@fiber</td>
+                    <td>
+                        <a asp-page="./EditIngredient" asp-route-id="@recipeIngredient.Id">Edit</a>
+                    </td>
                 </tr>
             }
         </tbody>
