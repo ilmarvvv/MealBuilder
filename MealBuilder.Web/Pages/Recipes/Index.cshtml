@@ -35,7 +35,8 @@ else
                     <td>@recipe.Servings</td>
                     <td>
                         <a asp-page="./Details" asp-route-id="@recipe.Id">Details</a> |
-                        <a asp-page="./Edit" asp-route-id="@recipe.Id">Edit</a>
+                        <a asp-page="./Edit" asp-route-id="@recipe.Id">Edit</a> |
+                        <a asp-page="./Delete" asp-route-id="@recipe.Id">Delete</a>
                     </td>
                 </tr>
             }
