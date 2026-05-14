@@ -340,14 +340,14 @@ Goal: create the basic recipe model and the relationship between recipes and ing
 
 Goal: allow the user to create and edit recipes.
 
-- [ ] Add Recipes list page
-- [ ] Add Create Recipe page
-- [ ] Add Edit Recipe page
-- [ ] Add Details Recipe page
-- [ ] Add Delete Recipe page
-- [ ] Allow adding ingredients to a recipe
-- [ ] Allow changing ingredient quantities in a recipe
-- [ ] Allow removing ingredients from a recipe
+- [x] Add Recipes list page
+- [x] Add Create Recipe page
+- [x] Add Edit Recipe page
+- [x] Add Details Recipe page
+- [x] Add Delete Recipe page
+- [x] Allow adding ingredients to a recipe
+- [x] Allow changing ingredient quantities in a recipe
+- [x] Allow removing ingredients from a recipe
 
 ### Milestone 5: Recipe Components
 
