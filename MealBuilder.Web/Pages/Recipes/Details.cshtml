@@ -18,5 +18,42 @@
     <dd class="col-sm-10">@Model.Recipe.Servings</dd>
 </dl>
 
+<h2>Ingredients</h2>
+
+@if (Model.Recipe.RecipeIngredients.Count == 0)
+{
+    <p>No ingredients have been added to this recipe yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Ingredient</th>
+                <th>Grams</th>
+                <th>Calories</th>
+                <th>Protein</th>
+                <th>Fiber</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var recipeIngredient in Model.Recipe.RecipeIngredients)
+            {
+                decimal calories = recipeIngredient.Ingredient.CaloriesPer100g * recipeIngredient.Grams / 100;
+                decimal protein = recipeIngredient.Ingredient.ProteinPer100g * recipeIngredient.Grams / 100;
+                decimal fiber = recipeIngredient.Ingredient.FiberPer100g * recipeIngredient.Grams / 100;
+
+                <tr>
+                    <td>@recipeIngredient.Ingredient.Name</td>
+                    <td>@recipeIngredient.Grams</td>
+                    <td>@calories</td>
+                    <td>@protein</td>
+                    <td>@fiber</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
 <a asp-page="./Edit" asp-route-id="@Model.Recipe.Id" class="btn btn-primary">Edit</a>
 <a asp-page="./Index" class="btn btn-secondary">Back</a>
