@@ -20,6 +20,10 @@
 
 <h2>Ingredients</h2>
 
+<p>
+    <a asp-page="./AddIngredient" asp-route-id="@Model.Recipe.Id" class="btn btn-primary">Add Ingredient</a>
+</p>
+
 @if (Model.Recipe.RecipeIngredients.Count == 0)
 {
     <p>No ingredients have been added to this recipe yet.</p>
