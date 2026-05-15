@@ -15,5 +15,30 @@ namespace MealBuilder.Web.Data
         public DbSet<Recipe> Recipes { get; set; }
 
         public DbSet<RecipeIngredient> RecipeIngredients { get; set; }
+
+        public DbSet<RecipeComponent> RecipeComponents { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<RecipeComponent>()
+                .HasOne(recipeComponent => recipeComponent.ParentRecipe)
+                .WithMany(recipe => recipe.Components)
+                .HasForeignKey(recipeComponent => recipeComponent.ParentRecipeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<RecipeComponent>()
+                .HasOne(recipeComponent => recipeComponent.ComponentRecipe)
+                .WithMany(recipe => recipe.UsedAsComponentInRecipes)
+                .HasForeignKey(recipeComponent => recipeComponent.ComponentRecipeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<RecipeComponent>()
+                .HasIndex(recipeComponent => new
+                {
+                    recipeComponent.ParentRecipeId,
+                    recipeComponent.ComponentRecipeId
+                })
+                .IsUnique();
+        }
     }
 }
