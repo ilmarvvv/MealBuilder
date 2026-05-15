@@ -383,29 +383,29 @@ Goal: allow the user to create and edit recipes.
 Goal: allow a finished recipe to be used as part of another recipe.
 
 - [x] Refine `RecipeComponent` entity
-- [ ] Add `RecipeComponent` model
-- [ ] Add EF Core relationship for recipe components
-- [ ] Add unique index for `ParentRecipeId` and `ComponentRecipeId`
-- [ ] Add migration for recipe components
-- [ ] Show recipe components on Recipe Details page
-- [ ] Allow adding a recipe as a component of another recipe
-- [ ] Do not show the current recipe in the add-component dropdown
-- [ ] Do not show already added component recipes in the add-component dropdown
-- [ ] Allow changing recipe component quantity
-- [ ] Allow removing a recipe component from a recipe
-- [ ] Prevent a recipe from containing itself
-- [ ] Include recipe components in nutrition calculations
+- [x] Add `RecipeComponent` model
+- [x] Add EF Core relationship for recipe components
+- [x] Add unique index for `ParentRecipeId` and `ComponentRecipeId`
+- [x] Add migration for recipe components
+- [x] Show recipe components on Recipe Details page
+- [x] Allow adding a recipe as a component of another recipe
+- [x] Do not show the current recipe in the add-component dropdown
+- [x] Do not show already added component recipes in the add-component dropdown
+- [x] Allow changing recipe component quantity
+- [x] Allow removing a recipe component from a recipe
+- [x] Prevent a recipe from directly containing itself
 
 ### Milestone 6: Recipe Calculations
 
-Goal: automatically calculate recipe nutrition values.
+Goal: automatically calculate total nutrition values for a recipe.
 
-- [ ] Calculate total calories
-- [ ] Calculate total protein
-- [ ] Calculate total fiber
-- [ ] Calculate total sugar
-- [ ] Calculate total salt
-- [ ] Show recipe totals in the UI
+- [ ] Create recipe nutrition totals model
+- [ ] Create recipe calculation service
+- [ ] Calculate nutrition values by grams
+- [ ] Include recipe ingredients in recipe totals
+- [ ] Include recipe components in recipe totals
+- [ ] Calculate total calories, protein, fiber, sugar, and salt
+- [ ] Show recipe totals on Recipe Details page
 
 ### Milestone 7: Portions and Days
 
@@ -454,6 +454,10 @@ This section contains ideas that may be useful for the project in the future, bu
 
 - [ ] Add recipe scaling
   - Allow scaling recipes up or down without changing the original recipe.
+
+- [ ] Add advanced recipe validation
+  - Prevent the same ingredient from being added more than once inside the same recipe.
+  - Prevent indirect recipe component cycles.
 
 - [ ] Add user accounts and authentication
 
