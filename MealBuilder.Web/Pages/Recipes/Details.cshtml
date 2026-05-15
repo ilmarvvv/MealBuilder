@@ -70,6 +70,10 @@ else
 
 <h2>Recipe Components</h2>
 
+<p>
+    <a asp-page="./AddComponent" asp-route-id="@Model.Recipe.Id" class="btn btn-primary">Add Recipe Component</a>
+</p>
+
 @if (Model.Recipe.Components.Count == 0)
 {
     <p>No recipe components have been added to this recipe yet.</p>
