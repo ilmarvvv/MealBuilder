@@ -85,6 +85,7 @@ else
             <tr>
                 <th>Recipe</th>
                 <th>Grams</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -93,6 +94,9 @@ else
                 <tr>
                     <td>@recipeComponent.ComponentRecipe.Name</td>
                     <td>@recipeComponent.Grams</td>
+                    <td>
+                        <a asp-page="./EditComponent" asp-route-id="@recipeComponent.Id">Edit</a>
+                    </td>
                 </tr>
             }
         </tbody>

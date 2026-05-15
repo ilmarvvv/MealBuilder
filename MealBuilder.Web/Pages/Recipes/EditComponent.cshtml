@@ -1,0 +1,29 @@
+﻿@page "{id:int}"
+@model MealBuilder.Web.Pages.Recipes.EditComponentModel
+
+@{
+    ViewData["Title"] = "Edit Recipe Component Quantity";
+}
+
+<h1>Edit Recipe Component Quantity</h1>
+
+<h2>@Model.ComponentRecipeName</h2>
+
+<form method="post">
+    <input type="hidden" asp-for="RecipeComponent.Id" />
+    <input type="hidden" asp-for="RecipeComponent.ParentRecipeId" />
+    <input type="hidden" asp-for="RecipeComponent.ComponentRecipeId" />
+
+    <div class="mb-3">
+        <label asp-for="RecipeComponent.Grams" class="form-label"></label>
+        <input asp-for="RecipeComponent.Grams" class="form-control" />
+        <span asp-validation-for="RecipeComponent.Grams" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-page="./Details" asp-route-id="@Model.RecipeComponent.ParentRecipeId" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
