@@ -22,6 +22,8 @@ namespace MealBuilder.Web.Pages.Recipes
             Recipe? recipe = await _context.Recipes
                 .Include(recipe => recipe.RecipeIngredients)
                 .ThenInclude(recipeIngredient => recipeIngredient.Ingredient)
+                .Include(recipe => recipe.Components)
+                .ThenInclude(recipeComponent => recipeComponent.ComponentRecipe)
                 .FirstOrDefaultAsync(recipe => recipe.Id == id);
 
             if (recipe is null)

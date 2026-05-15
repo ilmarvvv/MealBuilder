@@ -68,5 +68,32 @@ else
     </table>
 }
 
+<h2>Recipe Components</h2>
+
+@if (Model.Recipe.Components.Count == 0)
+{
+    <p>No recipe components have been added to this recipe yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Recipe</th>
+                <th>Grams</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var recipeComponent in Model.Recipe.Components)
+            {
+                <tr>
+                    <td>@recipeComponent.ComponentRecipe.Name</td>
+                    <td>@recipeComponent.Grams</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
 <a asp-page="./Edit" asp-route-id="@Model.Recipe.Id" class="btn btn-primary">Edit</a>
 <a asp-page="./Index" class="btn btn-secondary">Back</a>
