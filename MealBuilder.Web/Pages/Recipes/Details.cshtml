@@ -96,6 +96,11 @@ else
                     <td>@recipeComponent.Grams</td>
                     <td>
                         <a asp-page="./EditComponent" asp-route-id="@recipeComponent.Id">Edit</a>
+
+                        <form method="post" asp-page-handler="RemoveComponent" class="d-inline">
+                            <input type="hidden" name="recipeComponentId" value="@recipeComponent.Id" />
+                            <button type="submit" class="btn btn-link p-0">Remove</button>
+                        </form>
                     </td>
                 </tr>
             }
