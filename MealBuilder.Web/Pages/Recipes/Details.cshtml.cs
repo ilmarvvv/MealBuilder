@@ -1,5 +1,6 @@
 using MealBuilder.Web.Data;
 using MealBuilder.Web.Models;
+using MealBuilder.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -10,12 +11,17 @@ namespace MealBuilder.Web.Pages.Recipes
     {
         private readonly AppDbContext _context;
 
-        public DetailsModel(AppDbContext context)
+        private readonly RecipeCalculationService _recipeCalculationService;
+
+        public DetailsModel(AppDbContext context, RecipeCalculationService recipeCalculationService)
         {
             _context = context;
+            _recipeCalculationService = recipeCalculationService;
         }
 
         public Recipe Recipe { get; set; } = new();
+
+        public RecipeNutritionTotals Totals { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
@@ -32,6 +38,7 @@ namespace MealBuilder.Web.Pages.Recipes
             }
 
             Recipe = recipe;
+            Totals = _recipeCalculationService.Calculate(recipe);
 
             return Page();
         }

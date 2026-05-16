@@ -18,6 +18,29 @@
     <dd class="col-sm-10">@Model.Recipe.Servings</dd>
 </dl>
 
+<h2>Totals</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Calories</th>
+            <th>Protein</th>
+            <th>Fiber</th>
+            <th>Sugar</th>
+            <th>Salt</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@Model.Totals.Calories</td>
+            <td>@Model.Totals.Protein</td>
+            <td>@Model.Totals.Fiber</td>
+            <td>@Model.Totals.Sugar</td>
+            <td>@Model.Totals.Salt</td>
+        </tr>
+    </tbody>
+</table>
+
 <h2>Ingredients</h2>
 
 <p>
