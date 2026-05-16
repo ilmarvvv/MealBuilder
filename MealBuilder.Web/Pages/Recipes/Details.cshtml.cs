@@ -30,6 +30,8 @@ namespace MealBuilder.Web.Pages.Recipes
                 .ThenInclude(recipeIngredient => recipeIngredient.Ingredient)
                 .Include(recipe => recipe.Components)
                 .ThenInclude(recipeComponent => recipeComponent.ComponentRecipe)
+                .ThenInclude(componentRecipe => componentRecipe.RecipeIngredients)
+                .ThenInclude(recipeIngredient => recipeIngredient.Ingredient)
                 .FirstOrDefaultAsync(recipe => recipe.Id == id);
 
             if (recipe is null)

@@ -32,11 +32,11 @@
     </thead>
     <tbody>
         <tr>
-            <td>@Model.Totals.Calories</td>
-            <td>@Model.Totals.Protein</td>
-            <td>@Model.Totals.Fiber</td>
-            <td>@Model.Totals.Sugar</td>
-            <td>@Model.Totals.Salt</td>
+            <td>@Model.Totals.Calories.ToString("0.00")</td>
+            <td>@Model.Totals.Protein.ToString("0.00")</td>
+            <td>@Model.Totals.Fiber.ToString("0.00")</td>
+            <td>@Model.Totals.Sugar.ToString("0.00")</td>
+            <td>@Model.Totals.Salt.ToString("0.00")</td>
         </tr>
     </tbody>
 </table>
