@@ -455,6 +455,12 @@ This section contains ideas that may be useful for the project in the future, bu
 - [ ] Add recipe scaling
   - Allow scaling recipes up or down without changing the original recipe.
 
+- [ ] Add editable final recipe weight
+  - By default, the system can estimate recipe weight from all ingredients and components.
+  - The default estimate does not account for trimming, peeling, evaporation, or other preparation and cooking weight changes.
+  - Allow users to override the estimated weight with their own final recipe weight.
+  - Use the final recipe weight for more accurate per-gram recipe component calculations.
+
 - [ ] Add advanced recipe validation
   - Prevent the same ingredient from being added more than once inside the same recipe.
   - Prevent indirect recipe component cycles.
