@@ -399,13 +399,13 @@ Goal: allow a finished recipe to be used as part of another recipe.
 
 Goal: automatically calculate total nutrition values for a recipe.
 
-- [ ] Create recipe nutrition totals model
-- [ ] Create recipe calculation service
-- [ ] Calculate nutrition values by grams
-- [ ] Include recipe ingredients in recipe totals
-- [ ] Include recipe components in recipe totals
-- [ ] Calculate total calories, protein, fiber, sugar, and salt
-- [ ] Show recipe totals on Recipe Details page
+- [x] Create recipe nutrition totals model
+- [x] Create recipe calculation service
+- [x] Calculate nutrition values by grams
+- [x] Include recipe ingredients in recipe totals
+- [x] Include recipe components in recipe totals
+- [x] Calculate total calories, protein, fiber, sugar, and salt
+- [x] Show recipe totals on Recipe Details page
 
 ### Milestone 7: Portions and Days
 
