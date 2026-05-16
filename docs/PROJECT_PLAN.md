@@ -417,6 +417,7 @@ Goal: calculate recipe nutrition values per serving and per day.
 - [ ] Allow editing days count in recipe forms
 - [ ] Calculate nutrition values per serving
 - [ ] Calculate nutrition values per day
+- [ ] Show servings per day on Recipe Details page
 - [ ] Show per-serving and per-day values on Recipe Details page
 
 ### Milestone 8: Menus
