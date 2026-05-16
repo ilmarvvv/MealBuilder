@@ -409,13 +409,15 @@ Goal: automatically calculate total nutrition values for a recipe.
 
 ### Milestone 7: Portions and Days
 
-Goal: calculate values for one portion or one day.
+Goal: calculate recipe nutrition values per serving and per day.
 
-- [ ] Add portions count to recipes
+- [ ] Use recipe servings for per-serving calculations
 - [ ] Add days count to recipes
-- [ ] Calculate values per portion
-- [ ] Calculate values per day
-- [ ] Show portion and day values in the UI
+- [ ] Add migration for recipe days count
+- [ ] Allow editing days count in recipe forms
+- [ ] Calculate nutrition values per serving
+- [ ] Calculate nutrition values per day
+- [ ] Show per-serving and per-day values on Recipe Details page
 
 ### Milestone 8: Menus
 
