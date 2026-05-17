@@ -411,14 +411,14 @@ Goal: automatically calculate total nutrition values for a recipe.
 
 Goal: calculate recipe nutrition values per serving and per day.
 
-- [ ] Use recipe servings for per-serving calculations
-- [ ] Add days count to recipes
-- [ ] Add migration for recipe days count
-- [ ] Allow editing days count in recipe forms
-- [ ] Calculate nutrition values per serving
-- [ ] Calculate nutrition values per day
-- [ ] Show servings per day on Recipe Details page
-- [ ] Show per-serving and per-day values on Recipe Details page
+- [x] Use recipe servings for per-serving calculations
+- [x] Add days count to recipes
+- [x] Add migration for recipe days count
+- [x] Allow editing days count in recipe forms
+- [x] Calculate nutrition values per serving
+- [x] Calculate nutrition values per day
+- [x] Show servings per day on Recipe Details page
+- [x] Show per-serving and per-day values on Recipe Details page
 
 ### Milestone 8: Menus
 
