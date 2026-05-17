@@ -28,6 +28,12 @@
         <span asp-validation-for="Recipe.Servings" class="text-danger"></span>
     </div>
 
+    <div class="mb-3">
+        <label asp-for="Recipe.Days" class="form-label"></label>
+        <input asp-for="Recipe.Days" class="form-control" />
+        <span asp-validation-for="Recipe.Days" class="text-danger"></span>
+    </div>
+
     <button type="submit" class="btn btn-primary">Save</button>
     <a asp-page="./Index" class="btn btn-secondary">Cancel</a>
 </form>
