@@ -420,18 +420,55 @@ Goal: calculate recipe nutrition values per serving and per day.
 - [x] Show servings per day on Recipe Details page
 - [x] Show per-serving and per-day values on Recipe Details page
 
-### Milestone 8: Menus
+### Milestone 8: Daily Menus
 
-Goal: allow the user to build menus and see total values.
+Goal: allow the user to plan food for a specific day and see daily nutrition totals.
 
 - [ ] Refine `Menu` entity
 - [ ] Refine `MenuItem` entity
 - [ ] Add `Menu` model
 - [ ] Add `MenuItem` model
+- [ ] Add EF Core relationship for menus
+- [ ] Add migration for menus
 - [ ] Add Menus list page
 - [ ] Add Create Menu page
-- [ ] Allow adding recipes or products to a menu
-- [ ] Calculate total menu values
+- [ ] Add Menu Details page
+- [ ] Allow adding recipes to a menu
+- [ ] Allow adding ingredients to a menu
+- [ ] Allow changing menu item quantity
+- [ ] Allow removing items from a menu
+- [ ] Calculate daily menu totals
+- [ ] Show daily menu totals on Menu Details page
+
+### Milestone 9: Menu Calendar
+
+Goal: allow the user to view planned menus across multiple days.
+
+- [ ] Show menus by date
+- [ ] Add previous and next day navigation
+- [ ] Add weekly menu overview
+- [ ] Show daily totals in calendar view
+- [ ] Highlight days without a menu
+
+### Milestone 10: Meal Prep Batches
+
+Goal: track prepared recipe batches and remaining servings over time.
+
+- [ ] Refine `PreparedRecipeBatch` entity
+- [ ] Add `PreparedRecipeBatch` model
+- [ ] Add migration for prepared recipe batches
+- [ ] Allow marking a recipe as cooked
+- [ ] Store cooked date and total prepared servings
+- [ ] Track servings used in daily menus
+- [ ] Calculate remaining servings
+- [ ] Do not show a prepared batch as available after its servings run out
+- [ ] Allow creating a new batch when the recipe is cooked again
+- [ ] Show when a prepared batch will run out
+- [ ] Show missing daily nutrition when prepared food runs out
+
+### Milestone 11: Menu Planning Improvements
+
+Goal: make menu planning easier and more flexible.
 
 ## 7. Future Ideas
 
