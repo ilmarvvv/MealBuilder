@@ -16,6 +16,9 @@ namespace MealBuilder.Web.Models
         [Range(1, 100)]
         public int Servings { get; set; } = 1;
 
+        [Range(1, 365)]
+        public int Days { get; set; } = 1;
+
         public List<RecipeIngredient> RecipeIngredients { get; set; } = [];
 
         public List<RecipeComponent> Components { get; set; } = [];
