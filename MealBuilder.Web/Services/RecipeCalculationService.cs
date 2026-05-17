@@ -35,6 +35,23 @@ namespace MealBuilder.Web.Services
             return totals;
         }
 
+        public RecipeNutritionTotals Divide(RecipeNutritionTotals totals, int divisor)
+        {
+            if (divisor <= 0)
+            {
+                return new RecipeNutritionTotals();
+            }
+
+            return new RecipeNutritionTotals
+            {
+                Calories = totals.Calories / divisor,
+                Protein = totals.Protein / divisor,
+                Fiber = totals.Fiber / divisor,
+                Sugar = totals.Sugar / divisor,
+                Salt = totals.Salt / divisor
+            };
+        }
+
         private static void AddIngredientTotals(
             RecipeNutritionTotals totals,
             RecipeIngredient recipeIngredient)

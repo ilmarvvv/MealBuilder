@@ -44,6 +44,54 @@
     </tbody>
 </table>
 
+<h2>Per Serving</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Calories</th>
+            <th>Protein</th>
+            <th>Fiber</th>
+            <th>Sugar</th>
+            <th>Salt</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@Model.PerServingTotals.Calories.ToString("0.00")</td>
+            <td>@Model.PerServingTotals.Protein.ToString("0.00")</td>
+            <td>@Model.PerServingTotals.Fiber.ToString("0.00")</td>
+            <td>@Model.PerServingTotals.Sugar.ToString("0.00")</td>
+            <td>@Model.PerServingTotals.Salt.ToString("0.00")</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Per Day</h2>
+
+<p>Servings per day: @Model.ServingsPerDay.ToString("0.00")</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Calories</th>
+            <th>Protein</th>
+            <th>Fiber</th>
+            <th>Sugar</th>
+            <th>Salt</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@Model.PerDayTotals.Calories.ToString("0.00")</td>
+            <td>@Model.PerDayTotals.Protein.ToString("0.00")</td>
+            <td>@Model.PerDayTotals.Fiber.ToString("0.00")</td>
+            <td>@Model.PerDayTotals.Sugar.ToString("0.00")</td>
+            <td>@Model.PerDayTotals.Salt.ToString("0.00")</td>
+        </tr>
+    </tbody>
+</table>
+
 <h2>Ingredients</h2>
 
 <p>
