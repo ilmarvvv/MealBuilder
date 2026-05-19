@@ -199,7 +199,37 @@ Notes:
 
 ### MenuItem
 
-A single item inside a menu. It can represent a recipe, an individual ingredient, or a prepared dish added to the menu.
+A single food item inside a daily menu.
+
+It can represent either a recipe or an individual ingredient planned for a specific day.
+
+Responsibility:
+- connect a menu with one planned food item
+- allow recipes to be added to a daily menu
+- allow individual ingredients to be added to a daily menu
+- store the planned amount for that item
+
+Main data:
+- menu id
+- item type
+- recipe id
+- ingredient id
+- servings count
+- grams
+
+Relationships:
+- belongs to one `Menu`
+- can reference one `Recipe`
+- can reference one `Ingredient`
+
+Notes:
+- `ItemType` defines whether the item is a recipe or an ingredient
+- if `ItemType` is `Recipe`, the item uses `RecipeId` and `ServingsCount`
+- if `ItemType` is `Ingredient`, the item uses `IngredientId` and `Grams`
+- `ServingsCount` must be greater than 0 for recipe items
+- `Grams` must be greater than 0 for ingredient items
+- in the first version, one menu item should not reference both a recipe and an ingredient at the same time
+- prepared recipe batch tracking can be added later
 
 ## 4. Main Scenarios: What the User Can Do
 
