@@ -498,11 +498,14 @@ Goal: allow the user to plan food for a specific day and see daily nutrition tot
 
 Goal: allow the user to view planned menus across multiple days.
 
-- [ ] Show menus by date
-- [ ] Add previous and next day navigation
-- [ ] Add weekly menu overview
-- [ ] Show daily totals in calendar view
-- [ ] Highlight days without a menu
+- [ ] Add Menu Calendar page
+- [ ] Show current week by date
+- [ ] Show menus for each day of the week
+- [ ] Show daily totals in weekly view
+- [ ] Show empty days without a menu
+- [ ] Add previous and next week navigation
+- [ ] Link from calendar days to Menu Details
+- [ ] Allow creating a menu for a selected date
 
 ### Milestone 10: Meal Prep Batches
 
