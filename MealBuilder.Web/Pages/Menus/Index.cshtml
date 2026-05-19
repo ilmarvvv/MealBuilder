@@ -23,6 +23,7 @@ else
                 <th>Date</th>
                 <th>Name</th>
                 <th>Description</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -32,6 +33,9 @@ else
                     <td>@menu.Date</td>
                     <td>@menu.Name</td>
                     <td>@menu.Description</td>
+                    <td>
+                        <a asp-page="./Details" asp-route-id="@menu.Id">Details</a>
+                    </td>
                 </tr>
             }
         </tbody>
