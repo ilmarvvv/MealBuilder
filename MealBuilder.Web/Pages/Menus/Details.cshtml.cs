@@ -35,5 +35,23 @@ namespace MealBuilder.Web.Pages.Menus
 
             return Page();
         }
+
+        public async Task<IActionResult> OnPostRemoveItemAsync(int menuItemId)
+        {
+            MenuItem? menuItem = await _context.MenuItems
+                .FindAsync(menuItemId);
+
+            if (menuItem is null)
+            {
+                return NotFound();
+            }
+
+            int menuId = menuItem.MenuId;
+
+            _context.MenuItems.Remove(menuItem);
+            await _context.SaveChangesAsync();
+
+            return RedirectToPage("./Details", new { id = menuId });
+        }
     }
 }
