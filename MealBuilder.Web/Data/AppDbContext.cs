@@ -18,6 +18,10 @@ namespace MealBuilder.Web.Data
 
         public DbSet<RecipeComponent> RecipeComponents { get; set; }
 
+        public DbSet<Menu> Menus { get; set; }
+
+        public DbSet<MenuItem> MenuItems { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<RecipeComponent>()
@@ -39,6 +43,27 @@ namespace MealBuilder.Web.Data
                     recipeComponent.ComponentRecipeId
                 })
                 .IsUnique();
+
+            modelBuilder.Entity<Menu>()
+                .HasIndex(menu => menu.Date)
+                .IsUnique();
+
+            modelBuilder.Entity<MenuItem>()
+                .HasOne(menuItem => menuItem.Menu)
+                .WithMany(menu => menu.MenuItems)
+                .HasForeignKey(menuItem => menuItem.MenuId);
+
+            modelBuilder.Entity<MenuItem>()
+                .HasOne(menuItem => menuItem.Recipe)
+                .WithMany(recipe => recipe.MenuItems)
+                .HasForeignKey(menuItem => menuItem.RecipeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<MenuItem>()
+                .HasOne(menuItem => menuItem.Ingredient)
+                .WithMany(ingredient => ingredient.MenuItems)
+                .HasForeignKey(menuItem => menuItem.IngredientId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
