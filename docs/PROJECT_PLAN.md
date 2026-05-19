@@ -171,7 +171,31 @@ Notes:
 
 ### Menu
 
-A set of products, recipes, or dishes that the user plans to eat during a day or selected period.
+A daily meal plan for a specific date.
+
+It is needed so the user can plan recipes and individual ingredients for a specific day and see total nutrition values for that day.
+
+Responsibility:
+- represent one daily meal plan
+- group recipes and individual ingredients planned for a specific date
+- provide a base for calculating daily nutrition totals
+- support future weekly and monthly planning views
+
+Main data:
+- name
+- date
+- description
+
+Relationships:
+- has many `MenuItem` records
+
+Notes:
+- one menu represents one specific day
+- menus can be created for future dates to support planning ahead
+- the same date should normally have only one menu
+- menu totals are calculated from its menu items
+- menu does not store nutrition totals directly in the first version
+- weekly and monthly views can be built later by grouping daily menus by date
 
 ### MenuItem
 
