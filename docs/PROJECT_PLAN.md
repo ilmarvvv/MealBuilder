@@ -478,21 +478,21 @@ Goal: calculate recipe nutrition values per serving and per day.
 
 Goal: allow the user to plan food for a specific day and see daily nutrition totals.
 
-- [ ] Refine `Menu` entity
-- [ ] Refine `MenuItem` entity
-- [ ] Add `Menu` model
-- [ ] Add `MenuItem` model
-- [ ] Add EF Core relationship for menus
-- [ ] Add migration for menus
-- [ ] Add Menus list page
-- [ ] Add Create Menu page
-- [ ] Add Menu Details page
-- [ ] Allow adding recipes to a menu
-- [ ] Allow adding ingredients to a menu
-- [ ] Allow changing menu item quantity
-- [ ] Allow removing items from a menu
-- [ ] Calculate daily menu totals
-- [ ] Show daily menu totals on Menu Details page
+- [x] Refine `Menu` entity
+- [x] Refine `MenuItem` entity
+- [x] Add `Menu` model
+- [x] Add `MenuItem` model
+- [x] Add EF Core relationship for menus
+- [x] Add migration for menus
+- [x] Add Menus list page
+- [x] Add Create Menu page
+- [x] Add Menu Details page
+- [x] Allow adding recipes to a menu
+- [x] Allow adding ingredients to a menu
+- [x] Allow changing menu item quantity
+- [x] Allow removing items from a menu
+- [x] Calculate daily menu totals
+- [x] Show daily menu totals on Menu Details page
 
 ### Milestone 9: Menu Calendar
 
