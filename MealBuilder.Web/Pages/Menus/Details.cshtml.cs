@@ -1,5 +1,6 @@
 using MealBuilder.Web.Data;
 using MealBuilder.Web.Models;
+using MealBuilder.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -10,20 +11,35 @@ namespace MealBuilder.Web.Pages.Menus
     {
         private readonly AppDbContext _context;
 
-        public DetailsModel(AppDbContext context)
+        private readonly MenuCalculationService _menuCalculationService;
+
+        public DetailsModel(
+            AppDbContext context,
+            MenuCalculationService menuCalculationService)
         {
             _context = context;
+            _menuCalculationService = menuCalculationService;
         }
 
         public Menu Menu { get; set; } = new();
+
+        public RecipeNutritionTotals Totals { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
             Menu? menu = await _context.Menus
                 .Include(menu => menu.MenuItems)
-                .ThenInclude(menuItem => menuItem.Recipe)
-                .Include(menu => menu.MenuItems)
                 .ThenInclude(menuItem => menuItem.Ingredient)
+                .Include(menu => menu.MenuItems)
+                .ThenInclude(menuItem => menuItem.Recipe)
+                .ThenInclude(recipe => recipe!.RecipeIngredients)
+                .ThenInclude(recipeIngredient => recipeIngredient.Ingredient)
+                .Include(menu => menu.MenuItems)
+                .ThenInclude(menuItem => menuItem.Recipe)
+                .ThenInclude(recipe => recipe!.Components)
+                .ThenInclude(recipeComponent => recipeComponent.ComponentRecipe)
+                .ThenInclude(componentRecipe => componentRecipe.RecipeIngredients)
+                .ThenInclude(recipeIngredient => recipeIngredient.Ingredient)
                 .FirstOrDefaultAsync(menu => menu.Id == id);
 
             if (menu is null)
@@ -32,6 +48,7 @@ namespace MealBuilder.Web.Pages.Menus
             }
 
             Menu = menu;
+            Totals = _menuCalculationService.Calculate(menu);
 
             return Page();
         }
