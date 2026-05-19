@@ -20,6 +20,10 @@
 
 <h2>Items</h2>
 
+<p>
+    <a asp-page="./AddRecipe" asp-route-id="@Model.Menu.Id" class="btn btn-primary">Add Recipe</a>
+</p>
+
 @if (Model.Menu.MenuItems.Count == 0)
 {
     <p>No items have been added to this menu yet.</p>
