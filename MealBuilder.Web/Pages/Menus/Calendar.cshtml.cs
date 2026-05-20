@@ -3,6 +3,7 @@ using MealBuilder.Web.Models;
 using MealBuilder.Web.Services;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace MealBuilder.Web.Pages.Menus
 {
@@ -21,10 +22,23 @@ namespace MealBuilder.Web.Pages.Menus
 
         public List<MenuCalendarDay> Days { get; set; } = [];
 
+        public DateOnly WeekStart { get; set; }
+
+        public DateOnly PreviousWeekStart => WeekStart.AddDays(-7);
+
+        public DateOnly NextWeekStart => WeekStart.AddDays(7);
+        public string PreviousWeekStartRouteValue =>
+    PreviousWeekStart.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+
+        public string NextWeekStartRouteValue =>
+            NextWeekStart.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+
         public async Task OnGetAsync(DateOnly? startDate)
         {
             DateOnly weekStart = GetWeekStart(startDate ?? DateOnly.FromDateTime(DateTime.Today));
             DateOnly weekEnd = weekStart.AddDays(6);
+
+            WeekStart = weekStart;
 
             List<Menu> menus = await _context.Menus
                 .Include(menu => menu.MenuItems)

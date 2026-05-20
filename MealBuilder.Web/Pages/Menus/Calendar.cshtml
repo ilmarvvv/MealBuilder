@@ -7,6 +7,15 @@
 
 <h1>Menu Calendar</h1>
 
+<p>
+    Week: @Model.WeekStart - @Model.WeekStart.AddDays(6)
+</p>
+
+<p>
+    <a asp-page="./Calendar" asp-route-startDate="@Model.PreviousWeekStartRouteValue" class="btn btn-secondary">Previous Week</a>
+    <a asp-page="./Calendar" asp-route-startDate="@Model.NextWeekStartRouteValue" class="btn btn-secondary">Next Week</a>
+</p>
+
 <table class="table">
     <thead>
         <tr>
