@@ -17,8 +17,9 @@ namespace MealBuilder.Web.Pages.Menus
         [BindProperty]
         public Menu Menu { get; set; } = new();
 
-        public void OnGet()
+        public void OnGet(DateOnly? date)
         {
+            Menu.Date = date ?? DateOnly.FromDateTime(DateTime.Today);
         }
 
         public async Task<IActionResult> OnPostAsync()

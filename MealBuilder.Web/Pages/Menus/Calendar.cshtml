@@ -36,7 +36,7 @@
                 <td>
                     @if (day.Menu is null)
                     {
-                        <span>No menu</span>
+                        <a asp-page="./Create" asp-route-date="@day.Date.ToString("yyyy-MM-dd")">Create menu</a>
                     }
                     else
                     {
