@@ -66,6 +66,12 @@ namespace MealBuilder.Web.Data
                 .WithMany(ingredient => ingredient.MenuItems)
                 .HasForeignKey(menuItem => menuItem.IngredientId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<MenuItem>()
+                .HasOne(menuItem => menuItem.PreparedRecipeBatch)
+                .WithMany(preparedRecipeBatch => preparedRecipeBatch.MenuItems)
+                .HasForeignKey(menuItem => menuItem.PreparedRecipeBatchId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

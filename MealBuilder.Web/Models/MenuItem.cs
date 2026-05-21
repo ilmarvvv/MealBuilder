@@ -16,6 +16,10 @@ namespace MealBuilder.Web.Models
 
         public Recipe? Recipe { get; set; }
 
+        public int? PreparedRecipeBatchId { get; set; }
+
+        public PreparedRecipeBatch? PreparedRecipeBatch { get; set; }
+
         public int? IngredientId { get; set; }
 
         public Ingredient? Ingredient { get; set; }
