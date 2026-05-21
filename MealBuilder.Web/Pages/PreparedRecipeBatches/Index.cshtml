@@ -17,15 +17,19 @@
             <th>Recipe</th>
             <th>Cooked Date</th>
             <th>Total Servings</th>
+            <th>Used Servings</th>
+            <th>Remaining Servings</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var preparedRecipeBatch in Model.PreparedRecipeBatches)
+        @foreach (var summary in Model.PreparedRecipeBatchSummaries)
         {
             <tr>
-                <td>@preparedRecipeBatch.Recipe?.Name</td>
-                <td>@preparedRecipeBatch.CookedDate</td>
-                <td>@preparedRecipeBatch.TotalServings</td>
+                <td>@summary.PreparedRecipeBatch.Recipe?.Name</td>
+                <td>@summary.PreparedRecipeBatch.CookedDate</td>
+                <td>@summary.PreparedRecipeBatch.TotalServings</td>
+                <td>@summary.UsedServings</td>
+                <td>@summary.RemainingServings</td>
             </tr>
         }
     </tbody>

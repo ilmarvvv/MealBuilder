@@ -14,14 +14,22 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
             _context = context;
         }
 
-        public List<PreparedRecipeBatch> PreparedRecipeBatches { get; set; } = [];
+        public List<PreparedRecipeBatchSummary> PreparedRecipeBatchSummaries { get; set; } = [];
 
         public async Task OnGetAsync()
         {
-            PreparedRecipeBatches = await _context.PreparedRecipeBatches
+            List<PreparedRecipeBatch> preparedRecipeBatches = await _context.PreparedRecipeBatches
                 .Include(preparedRecipeBatch => preparedRecipeBatch.Recipe)
                 .OrderByDescending(preparedRecipeBatch => preparedRecipeBatch.CookedDate)
                 .ToListAsync();
+
+            PreparedRecipeBatchSummaries = preparedRecipeBatches
+                .Select(preparedRecipeBatch => new PreparedRecipeBatchSummary
+                {
+                    PreparedRecipeBatch = preparedRecipeBatch,
+                    UsedServings = 0
+                })
+                .ToList();
         }
     }
 }
