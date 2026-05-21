@@ -22,6 +22,8 @@ namespace MealBuilder.Web.Data
 
         public DbSet<MenuItem> MenuItems { get; set; }
 
+        public DbSet<PreparedRecipeBatch> PreparedRecipeBatches { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<RecipeComponent>()
