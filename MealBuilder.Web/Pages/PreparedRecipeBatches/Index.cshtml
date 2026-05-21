@@ -1,0 +1,32 @@
+﻿@page
+@model MealBuilder.Web.Pages.PreparedRecipeBatches.IndexModel
+
+@{
+    ViewData["Title"] = "Prepared Batches";
+}
+
+<h1>Prepared Batches</h1>
+
+<p>
+    <a asp-page="./Create" class="btn btn-primary">Create Prepared Batch</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Recipe</th>
+            <th>Cooked Date</th>
+            <th>Total Servings</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var preparedRecipeBatch in Model.PreparedRecipeBatches)
+        {
+            <tr>
+                <td>@preparedRecipeBatch.Recipe?.Name</td>
+                <td>@preparedRecipeBatch.CookedDate</td>
+                <td>@preparedRecipeBatch.TotalServings</td>
+            </tr>
+        }
+    </tbody>
+</table>
