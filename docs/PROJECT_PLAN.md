@@ -231,6 +231,36 @@ Notes:
 - in the first version, one menu item should not reference both a recipe and an ingredient at the same time
 - prepared recipe batch tracking can be added later
 
+### PreparedRecipeBatch
+
+A specific cooked batch of a recipe.
+
+For example, the user can create a `Burger` recipe and then cook one batch of it on 21/05/2026 with 8 servings. This cooked batch can be used in menus across multiple days until the servings run out.
+
+Responsibility:
+- represent a cooked batch of one recipe
+- store when the recipe was cooked
+- store how many servings were prepared
+- allow menu planning based on available prepared food
+- help calculate how many servings are already used and how many remain
+
+Main data:
+- recipe id
+- cooked date
+- total servings
+
+Relationships:
+- belongs to one `Recipe`
+- can be used by many `MenuItem` records
+
+Notes:
+- `TotalServings` must be greater than 0
+- used servings are calculated from menu items that reference this batch
+- remaining servings are calculated as: total servings - used servings
+- a prepared batch should not be shown as available when remaining servings are 0
+- in the first version, batch nutrition values come from the related recipe
+- if the recipe changes later, we may need to decide whether old batches keep old nutrition values or use updated recipe values
+
 ## 4. Main Scenarios: What the User Can Do
 
 This section describes the main user workflows. The exact UI and technical implementation may change later.
