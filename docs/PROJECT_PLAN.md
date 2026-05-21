@@ -539,19 +539,22 @@ Goal: allow the user to view planned menus across multiple days.
 
 ### Milestone 10: Meal Prep Batches
 
-Goal: track prepared recipe batches and remaining servings over time.
+Goal: track cooked recipe batches and remaining servings over time.
 
-- [ ] Refine `PreparedRecipeBatch` entity
+- [x] Refine `PreparedRecipeBatch` entity
 - [ ] Add `PreparedRecipeBatch` model
+- [ ] Add `PreparedRecipeBatch` relationship to `Recipe`
+- [ ] Add optional `PreparedRecipeBatch` relationship to `MenuItem`
 - [ ] Add migration for prepared recipe batches
-- [ ] Allow marking a recipe as cooked
+- [ ] Add Prepared Batches list page
+- [ ] Add Create Prepared Batch page
+- [ ] Allow selecting a recipe when creating a prepared batch
 - [ ] Store cooked date and total prepared servings
-- [ ] Track servings used in daily menus
-- [ ] Calculate remaining servings
+- [ ] Show used and remaining servings for each prepared batch
+- [ ] Allow adding a prepared batch serving to a menu
+- [ ] Prevent using more servings than remain in the prepared batch
 - [ ] Do not show a prepared batch as available after its servings run out
 - [ ] Allow creating a new batch when the recipe is cooked again
-- [ ] Show when a prepared batch will run out
-- [ ] Show missing daily nutrition when prepared food runs out
 
 ### Milestone 11: Menu Planning Improvements
 
@@ -591,6 +594,10 @@ This section contains ideas that may be useful for the project in the future, bu
 - [ ] Add advanced recipe validation
   - Prevent the same ingredient from being added more than once inside the same recipe.
   - Prevent indirect recipe component cycles.
+
+- [ ] Show when a prepared recipe batch will run out
+
+- [ ] Show missing daily nutrition when prepared food runs out
 
 - [ ] Add user accounts and authentication
 
