@@ -1,0 +1,37 @@
+﻿@page
+@model MealBuilder.Web.Pages.PreparedRecipeBatches.CreateModel
+
+@{
+    ViewData["Title"] = "Create Prepared Batch";
+}
+
+<h1>Create Prepared Batch</h1>
+
+<form method="post">
+    <div class="mb-3">
+        <label asp-for="PreparedRecipeBatch.RecipeId" class="form-label">Recipe</label>
+        <select asp-for="PreparedRecipeBatch.RecipeId" asp-items="Model.RecipeSelectList" class="form-select">
+            <option value="">Select recipe</option>
+        </select>
+        <span asp-validation-for="PreparedRecipeBatch.RecipeId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="PreparedRecipeBatch.CookedDate" class="form-label"></label>
+        <input asp-for="PreparedRecipeBatch.CookedDate" class="form-control" type="date" />
+        <span asp-validation-for="PreparedRecipeBatch.CookedDate" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="PreparedRecipeBatch.TotalServings" class="form-label"></label>
+        <input asp-for="PreparedRecipeBatch.TotalServings" class="form-control" />
+        <span asp-validation-for="PreparedRecipeBatch.TotalServings" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-page="./Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
