@@ -80,7 +80,7 @@ else
                         }
                         else if (menuItem.ItemType == MealBuilder.Web.Models.MenuItemType.PreparedRecipeBatch)
                         {
-                            @menuItem.PreparedRecipeBatch?.Recipe?.Name
+                            @($"{menuItem.PreparedRecipeBatch?.Recipe?.Name} | cooked {menuItem.PreparedRecipeBatch?.CookedDate}")
                         }
                     </td>
                     <td>
