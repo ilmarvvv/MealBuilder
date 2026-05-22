@@ -558,7 +558,33 @@ Goal: track cooked recipe batches and remaining servings over time.
 
 ### Milestone 11: Menu Planning Improvements
 
-Goal: make menu planning easier and more flexible.
+Goal: make menu planning easier and more understandable.
+
+- [ ] Improve prepared batch dropdown labels
+- [ ] Show recipe name, cooked date, and remaining servings in prepared batch dropdown
+- [ ] Show prepared batch details in Menu Details
+- [ ] Show weekly nutrition totals in Menu Calendar
+- [ ] Add Edit Menu page
+- [ ] Add Delete Menu page
+- [ ] Add Details Prepared Batch page
+- [ ] Add Delete Prepared Batch page
+- [ ] Prevent deleting a prepared batch that is already used in menus
+
+### Milestone 12: Business Logic and Domain Review
+
+Goal: review, rebuild, and improve the business logic and domain model before adding larger features.
+
+### Milestone 13: Users and Authentication
+
+Goal: make the app ready for multiple users.
+
+### Milestone 14: Existing Feature Improvements
+
+Goal: improve the features that already exist.
+
+### Milestone 15: API and Frontend Planning
+
+Goal: plan the transition from Razor Pages to an API-based application and choose the future frontend technology.
 
 ## 7. Future Ideas
 
