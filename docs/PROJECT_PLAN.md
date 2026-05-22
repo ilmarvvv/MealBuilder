@@ -560,15 +560,15 @@ Goal: track cooked recipe batches and remaining servings over time.
 
 Goal: make menu planning easier and more understandable.
 
-- [ ] Improve prepared batch dropdown labels
-- [ ] Show recipe name, cooked date, and remaining servings in prepared batch dropdown
-- [ ] Show prepared batch details in Menu Details
-- [ ] Show daily average nutrition in Menu Calendar
-- [ ] Add Edit Menu page
-- [ ] Add Delete Menu page
-- [ ] Add Details Prepared Batch page
-- [ ] Add Delete Prepared Batch page
-- [ ] Prevent deleting a prepared batch that is already used in menus
+- [x] Improve prepared batch dropdown labels
+- [x] Show recipe name, cooked date, and remaining servings in prepared batch dropdown
+- [x] Show prepared batch details in Menu Details
+- [x] Show daily average nutrition in Menu Calendar
+- [x] Add Edit Menu page
+- [x] Add Delete Menu page
+- [x] Add Details Prepared Batch page
+- [x] Add Delete Prepared Batch page
+- [x] Prevent deleting a prepared batch that is already used in menus
 
 ### Milestone 12: Business Logic and Domain Review
 
