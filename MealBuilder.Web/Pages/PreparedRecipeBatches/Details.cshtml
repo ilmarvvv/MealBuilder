@@ -1,0 +1,27 @@
+﻿@page "{id:int}"
+@model MealBuilder.Web.Pages.PreparedRecipeBatches.DetailsModel
+
+@{
+    ViewData["Title"] = "Prepared Batch Details";
+}
+
+<h1>Prepared Batch Details</h1>
+
+<dl class="row">
+    <dt class="col-sm-3">Recipe</dt>
+    <dd class="col-sm-9">@Model.PreparedRecipeBatchSummary.PreparedRecipeBatch.Recipe?.Name</dd>
+
+    <dt class="col-sm-3">Cooked Date</dt>
+    <dd class="col-sm-9">@Model.PreparedRecipeBatchSummary.PreparedRecipeBatch.CookedDate</dd>
+
+    <dt class="col-sm-3">Total Servings</dt>
+    <dd class="col-sm-9">@Model.PreparedRecipeBatchSummary.PreparedRecipeBatch.TotalServings</dd>
+
+    <dt class="col-sm-3">Used Servings</dt>
+    <dd class="col-sm-9">@Model.PreparedRecipeBatchSummary.UsedServings</dd>
+
+    <dt class="col-sm-3">Remaining Servings</dt>
+    <dd class="col-sm-9">@Model.PreparedRecipeBatchSummary.RemainingServings</dd>
+</dl>
+
+<a asp-page="./Index" class="btn btn-secondary">Back</a>
