@@ -33,6 +33,7 @@
                 <td>@summary.RemainingServings</td>
                 <td>
                     <a asp-page="./Details" asp-route-id="@summary.PreparedRecipeBatch.Id">Details</a>
+                    <a asp-page="./Delete" asp-route-id="@summary.PreparedRecipeBatch.Id">Delete</a>
                 </td>
             </tr>
         }
