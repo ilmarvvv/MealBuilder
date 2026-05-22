@@ -111,12 +111,26 @@ namespace MealBuilder.Web.Pages.Menus
         {
             List<PreparedRecipeBatch> preparedRecipeBatches = await _context.PreparedRecipeBatches
                 .Include(preparedRecipeBatch => preparedRecipeBatch.Recipe)
+                .Include(preparedRecipeBatch => preparedRecipeBatch.MenuItems)
                 .OrderBy(preparedRecipeBatch => preparedRecipeBatch.Recipe!.Name)
                 .ThenByDescending(preparedRecipeBatch => preparedRecipeBatch.CookedDate)
                 .ToListAsync();
 
+            List<PreparedRecipeBatch> availablePreparedRecipeBatches = preparedRecipeBatches
+                .Where(preparedRecipeBatch =>
+                {
+                    decimal usedServings = preparedRecipeBatch.MenuItems
+                        .Where(menuItem => menuItem.ServingsCount is not null)
+                        .Sum(menuItem => menuItem.ServingsCount!.Value);
+
+                    decimal remainingServings = preparedRecipeBatch.TotalServings - usedServings;
+
+                    return remainingServings > 0;
+                })
+                .ToList();
+
             PreparedRecipeBatches = new SelectList(
-                preparedRecipeBatches,
+                availablePreparedRecipeBatches,
                 "Id",
                 "Recipe.Name");
         }
