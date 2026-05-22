@@ -46,6 +46,7 @@
 <p>
     <a asp-page="./AddRecipe" asp-route-id="@Model.Menu.Id" class="btn btn-primary">Add Recipe</a>
     <a asp-page="./AddIngredient" asp-route-id="@Model.Menu.Id" class="btn btn-primary">Add Ingredient</a>
+    <a asp-page="./AddPreparedBatch" asp-route-id="@Model.Menu.Id" class="btn btn-primary">Add Prepared Batch</a>
 </p>
 
 @if (Model.Menu.MenuItems.Count == 0)
@@ -77,6 +78,10 @@ else
                         {
                             @menuItem.Ingredient?.Name
                         }
+                        else if (menuItem.ItemType == MealBuilder.Web.Models.MenuItemType.PreparedRecipeBatch)
+                        {
+                            @menuItem.PreparedRecipeBatch?.Recipe?.Name
+                        }
                     </td>
                     <td>
                         @if (menuItem.ItemType == MealBuilder.Web.Models.MenuItemType.Recipe)
@@ -86,6 +91,10 @@ else
                         else if (menuItem.ItemType == MealBuilder.Web.Models.MenuItemType.Ingredient)
                         {
                             @($"{menuItem.Grams} g")
+                        }
+                        else if (menuItem.ItemType == MealBuilder.Web.Models.MenuItemType.PreparedRecipeBatch)
+                        {
+                            @($"{menuItem.ServingsCount} servings")
                         }
                     </td>
                     <td>

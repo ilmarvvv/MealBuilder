@@ -21,6 +21,19 @@ namespace MealBuilder.Web.Services
                 {
                     AddRecipeItemTotals(totals, menuItem);
                 }
+                else if (menuItem.ItemType == MenuItemType.PreparedRecipeBatch &&
+                     menuItem.PreparedRecipeBatch?.Recipe is not null &&
+                     menuItem.ServingsCount is not null)
+                {
+                    RecipeNutritionTotals recipeTotals = _recipeCalculationService.Calculate(menuItem.PreparedRecipeBatch.Recipe);
+                    RecipeNutritionTotals perServingTotals = _recipeCalculationService.Divide(recipeTotals, menuItem.PreparedRecipeBatch.Recipe.Servings);
+
+                    totals.Calories += perServingTotals.Calories * menuItem.ServingsCount.Value;
+                    totals.Protein += perServingTotals.Protein * menuItem.ServingsCount.Value;
+                    totals.Fiber += perServingTotals.Fiber * menuItem.ServingsCount.Value;
+                    totals.Sugar += perServingTotals.Sugar * menuItem.ServingsCount.Value;
+                    totals.Salt += perServingTotals.Salt * menuItem.ServingsCount.Value;
+                }
                 else if (menuItem.ItemType == MenuItemType.Ingredient && menuItem.Ingredient is not null)
                 {
                     AddIngredientItemTotals(totals, menuItem);

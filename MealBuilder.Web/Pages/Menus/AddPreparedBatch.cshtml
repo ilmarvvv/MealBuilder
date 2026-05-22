@@ -1,0 +1,36 @@
+﻿@page "{id:int}"
+@model MealBuilder.Web.Pages.Menus.AddPreparedBatchModel
+
+@{
+    ViewData["Title"] = "Add Prepared Batch to Menu";
+}
+
+<h1>Add Prepared Batch to Menu</h1>
+
+<h2>@Model.Menu.Name - @Model.Menu.Date</h2>
+
+<form method="post">
+    <input type="hidden" asp-for="MenuItem.MenuId" />
+    <input type="hidden" asp-for="MenuItem.ItemType" />
+
+    <div class="mb-3">
+        <label asp-for="MenuItem.PreparedRecipeBatchId" class="form-label">Prepared Batch</label>
+        <select asp-for="MenuItem.PreparedRecipeBatchId" asp-items="Model.PreparedRecipeBatches" class="form-control">
+            <option value="">Select prepared batch</option>
+        </select>
+        <span asp-validation-for="MenuItem.PreparedRecipeBatchId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="MenuItem.ServingsCount" class="form-label">Servings</label>
+        <input asp-for="MenuItem.ServingsCount" class="form-control" />
+        <span asp-validation-for="MenuItem.ServingsCount" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add</button>
+    <a asp-page="./Details" asp-route-id="@Model.Menu.Id" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
