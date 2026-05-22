@@ -25,6 +25,8 @@ namespace MealBuilder.Web.Pages.Menus
             MenuItem? menuItem = await _context.MenuItems
                 .Include(menuItem => menuItem.Recipe)
                 .Include(menuItem => menuItem.Ingredient)
+                .Include(menuItem => menuItem.PreparedRecipeBatch)
+                .ThenInclude(preparedRecipeBatch => preparedRecipeBatch!.Recipe)
                 .FirstOrDefaultAsync(menuItem => menuItem.Id == id);
 
             if (menuItem is null)
@@ -43,9 +45,21 @@ namespace MealBuilder.Web.Pages.Menus
             ModelState.Remove("MenuItem.Menu");
             ModelState.Remove("MenuItem.Recipe");
             ModelState.Remove("MenuItem.Ingredient");
+            ModelState.Remove("MenuItem.PreparedRecipeBatch");
 
             if (MenuItem.ItemType == MenuItemType.Recipe)
             {
+                MenuItem.IngredientId = null;
+                MenuItem.Grams = null;
+
+                if (MenuItem.ServingsCount is null || MenuItem.ServingsCount <= 0)
+                {
+                    ModelState.AddModelError("MenuItem.ServingsCount", "Servings count must be greater than 0.");
+                }
+            }
+            else if (MenuItem.ItemType == MenuItemType.PreparedRecipeBatch)
+            {
+                MenuItem.RecipeId = null;
                 MenuItem.IngredientId = null;
                 MenuItem.Grams = null;
 
@@ -70,6 +84,8 @@ namespace MealBuilder.Web.Pages.Menus
                 MenuItem? existingMenuItem = await _context.MenuItems
                     .Include(menuItem => menuItem.Recipe)
                     .Include(menuItem => menuItem.Ingredient)
+                    .Include(menuItem => menuItem.PreparedRecipeBatch)
+                    .ThenInclude(preparedRecipeBatch => preparedRecipeBatch!.Recipe)
                     .FirstOrDefaultAsync(menuItem => menuItem.Id == MenuItem.Id);
 
                 if (existingMenuItem is not null)
@@ -96,6 +112,11 @@ namespace MealBuilder.Web.Pages.Menus
             if (menuItem.ItemType == MenuItemType.Ingredient)
             {
                 return menuItem.Ingredient?.Name ?? string.Empty;
+            }
+
+            if (menuItem.ItemType == MenuItemType.PreparedRecipeBatch)
+            {
+                return $"{menuItem.PreparedRecipeBatch?.Recipe?.Name} | cooked {menuItem.PreparedRecipeBatch?.CookedDate}";
             }
 
             return string.Empty;
