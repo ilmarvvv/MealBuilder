@@ -563,7 +563,7 @@ Goal: make menu planning easier and more understandable.
 - [ ] Improve prepared batch dropdown labels
 - [ ] Show recipe name, cooked date, and remaining servings in prepared batch dropdown
 - [ ] Show prepared batch details in Menu Details
-- [ ] Show weekly nutrition totals in Menu Calendar
+- [ ] Show daily average nutrition in Menu Calendar
 - [ ] Add Edit Menu page
 - [ ] Add Delete Menu page
 - [ ] Add Details Prepared Batch page

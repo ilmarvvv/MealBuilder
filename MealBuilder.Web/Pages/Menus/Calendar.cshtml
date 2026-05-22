@@ -16,6 +16,31 @@
     <a asp-page="./Calendar" asp-route-startDate="@Model.NextWeekStartRouteValue" class="btn btn-secondary">Next Week</a>
 </p>
 
+<h2>Daily Average</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Calories</th>
+            <th>Protein</th>
+            <th>Fiber</th>
+            <th>Sugar</th>
+            <th>Salt</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@Model.DailyAverageTotals.Calories.ToString("0.00")</td>
+            <td>@Model.DailyAverageTotals.Protein.ToString("0.00")</td>
+            <td>@Model.DailyAverageTotals.Fiber.ToString("0.00")</td>
+            <td>@Model.DailyAverageTotals.Sugar.ToString("0.00")</td>
+            <td>@Model.DailyAverageTotals.Salt.ToString("0.00")</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Days</h2>
+
 <table class="table">
     <thead>
         <tr>

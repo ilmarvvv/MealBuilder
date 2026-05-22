@@ -24,6 +24,8 @@ namespace MealBuilder.Web.Pages.Menus
 
         public DateOnly WeekStart { get; set; }
 
+        public RecipeNutritionTotals DailyAverageTotals { get; set; } = new();
+
         public DateOnly PreviousWeekStart => WeekStart.AddDays(-7);
 
         public DateOnly NextWeekStart => WeekStart.AddDays(7);
@@ -83,6 +85,15 @@ namespace MealBuilder.Web.Pages.Menus
                         : _menuCalculationService.Calculate(menu)
                 });
             }
+
+            DailyAverageTotals = new RecipeNutritionTotals
+            {
+                Calories = Days.Sum(day => day.Totals.Calories) / 7,
+                Protein = Days.Sum(day => day.Totals.Protein) / 7,
+                Fiber = Days.Sum(day => day.Totals.Fiber) / 7,
+                Sugar = Days.Sum(day => day.Totals.Sugar) / 7,
+                Salt = Days.Sum(day => day.Totals.Salt) / 7
+            };
         }
 
         private static DateOnly GetWeekStart(DateOnly date)
