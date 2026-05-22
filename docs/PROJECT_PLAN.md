@@ -570,9 +570,22 @@ Goal: make menu planning easier and more understandable.
 - [x] Add Delete Prepared Batch page
 - [x] Prevent deleting a prepared batch that is already used in menus
 
-### Milestone 12: Business Logic and Domain Review
+### Milestone 12: Core Domain Refinement
 
-Goal: review, rebuild, and improve the business logic and domain model before adding larger features.
+Goal: review and improve the core domain model, data structure, business rules, calculations, and user flows before moving to larger features.
+
+This milestone goes through the existing system from ingredients to menus and refines it closer to the real product vision. Detailed subtasks will be added to each area when that area is reviewed.
+
+- [ ] Ingredient data and nutrition fields
+- [ ] Recipe data and recipe structure
+- [ ] Recipe ingredients and quantity rules
+- [ ] Recipe components and reusable recipe logic
+- [ ] Prepared recipe batches and remaining servings logic
+- [ ] Menus and menu items
+- [ ] Nutrition calculations
+- [ ] Validation rules
+- [ ] User flows and page behavior
+- [ ] Documentation updates
 
 ### Milestone 13: Users and Authentication
 
