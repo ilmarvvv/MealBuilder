@@ -116,8 +116,8 @@ namespace MealBuilder.Web.Pages.Menus
                 .ThenByDescending(preparedRecipeBatch => preparedRecipeBatch.CookedDate)
                 .ToListAsync();
 
-            List<PreparedRecipeBatch> availablePreparedRecipeBatches = preparedRecipeBatches
-                .Where(preparedRecipeBatch =>
+            var availablePreparedRecipeBatches = preparedRecipeBatches
+                .Select(preparedRecipeBatch =>
                 {
                     decimal usedServings = preparedRecipeBatch.MenuItems
                         .Where(menuItem => menuItem.ServingsCount is not null)
@@ -125,14 +125,20 @@ namespace MealBuilder.Web.Pages.Menus
 
                     decimal remainingServings = preparedRecipeBatch.TotalServings - usedServings;
 
-                    return remainingServings > 0;
+                    return new
+                    {
+                        preparedRecipeBatch.Id,
+                        Label = $"{preparedRecipeBatch.Recipe?.Name} | cooked {preparedRecipeBatch.CookedDate} | remaining {remainingServings} servings",
+                        RemainingServings = remainingServings
+                    };
                 })
+                .Where(preparedRecipeBatch => preparedRecipeBatch.RemainingServings > 0)
                 .ToList();
 
             PreparedRecipeBatches = new SelectList(
                 availablePreparedRecipeBatches,
                 "Id",
-                "Recipe.Name");
+                "Label");
         }
     }
 }
