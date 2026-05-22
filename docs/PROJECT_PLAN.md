@@ -542,19 +542,19 @@ Goal: allow the user to view planned menus across multiple days.
 Goal: track cooked recipe batches and remaining servings over time.
 
 - [x] Refine `PreparedRecipeBatch` entity
-- [ ] Add `PreparedRecipeBatch` model
-- [ ] Add `PreparedRecipeBatch` relationship to `Recipe`
-- [ ] Add optional `PreparedRecipeBatch` relationship to `MenuItem`
-- [ ] Add migration for prepared recipe batches
-- [ ] Add Prepared Batches list page
-- [ ] Add Create Prepared Batch page
-- [ ] Allow selecting a recipe when creating a prepared batch
-- [ ] Store cooked date and total prepared servings
-- [ ] Show used and remaining servings for each prepared batch
-- [ ] Allow adding a prepared batch serving to a menu
-- [ ] Prevent using more servings than remain in the prepared batch
-- [ ] Do not show a prepared batch as available after its servings run out
-- [ ] Allow creating a new batch when the recipe is cooked again
+- [x] Add `PreparedRecipeBatch` model
+- [x] Add `PreparedRecipeBatch` relationship to `Recipe`
+- [x] Add optional `PreparedRecipeBatch` relationship to `MenuItem`
+- [x] Add migration for prepared recipe batches
+- [x] Add Prepared Batches list page
+- [x] Add Create Prepared Batch page
+- [x] Allow selecting a recipe when creating a prepared batch
+- [x] Store cooked date and total prepared servings
+- [x] Show used and remaining servings for each prepared batch
+- [x] Allow adding a prepared batch serving to a menu
+- [x] Prevent using more servings than remain in the prepared batch
+- [x] Do not show a prepared batch as available after its servings run out
+- [x] Allow creating a new batch when the recipe is cooked again
 
 ### Milestone 11: Menu Planning Improvements
 
