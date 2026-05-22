@@ -20,6 +20,7 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
         {
             List<PreparedRecipeBatch> preparedRecipeBatches = await _context.PreparedRecipeBatches
                 .Include(preparedRecipeBatch => preparedRecipeBatch.Recipe)
+                .Include(preparedRecipeBatch => preparedRecipeBatch.MenuItems)
                 .OrderByDescending(preparedRecipeBatch => preparedRecipeBatch.CookedDate)
                 .ToListAsync();
 
@@ -27,7 +28,9 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
                 .Select(preparedRecipeBatch => new PreparedRecipeBatchSummary
                 {
                     PreparedRecipeBatch = preparedRecipeBatch,
-                    UsedServings = 0
+                    UsedServings = preparedRecipeBatch.MenuItems
+                        .Where(menuItem => menuItem.ServingsCount is not null)
+                        .Sum(menuItem => menuItem.ServingsCount!.Value)
                 })
                 .ToList();
         }

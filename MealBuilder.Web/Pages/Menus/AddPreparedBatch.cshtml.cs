@@ -63,6 +63,31 @@ namespace MealBuilder.Web.Pages.Menus
                 ModelState.AddModelError("MenuItem.ServingsCount", "Servings count must be greater than 0.");
             }
 
+            if (MenuItem.PreparedRecipeBatchId is not null && MenuItem.ServingsCount is not null)
+            {
+                PreparedRecipeBatch? preparedRecipeBatch = await _context.PreparedRecipeBatches
+                    .Include(preparedRecipeBatch => preparedRecipeBatch.MenuItems)
+                    .FirstOrDefaultAsync(preparedRecipeBatch => preparedRecipeBatch.Id == MenuItem.PreparedRecipeBatchId);
+
+                if (preparedRecipeBatch is null)
+                {
+                    ModelState.AddModelError("MenuItem.PreparedRecipeBatchId", "Prepared batch was not found.");
+                }
+                else
+                {
+                    decimal usedServings = preparedRecipeBatch.MenuItems
+                        .Where(menuItem => menuItem.ServingsCount is not null)
+                        .Sum(menuItem => menuItem.ServingsCount!.Value);
+
+                    decimal remainingServings = preparedRecipeBatch.TotalServings - usedServings;
+
+                    if (MenuItem.ServingsCount > remainingServings)
+                    {
+                        ModelState.AddModelError("MenuItem.ServingsCount", $"Only {remainingServings} servings remain in this prepared batch.");
+                    }
+                }
+            }
+
             if (!ModelState.IsValid)
             {
                 Menu? menu = await _context.Menus.FindAsync(MenuItem.MenuId);
