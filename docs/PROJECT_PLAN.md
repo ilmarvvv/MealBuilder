@@ -574,18 +574,155 @@ Goal: make menu planning easier and more understandable.
 
 Goal: review and improve the core domain model, data structure, business rules, calculations, and user flows before moving to larger features.
 
-This milestone goes through the existing system from ingredients to menus and refines it closer to the real product vision. Detailed subtasks will be added to each area when that area is reviewed.
+This milestone goes through the existing system from ingredients to menus and refines it closer to the real product vision.
 
-- [ ] Ingredient data and nutrition fields
-- [ ] Recipe data and recipe structure
-- [ ] Recipe ingredients and quantity rules
-- [ ] Recipe components and reusable recipe logic
-- [ ] Prepared recipe batches and remaining servings logic
-- [ ] Menus and menu items
-- [ ] Nutrition calculations
-- [ ] Validation rules
-- [ ] User flows and page behavior
-- [ ] Documentation updates
+#### 12.1 Ingredient Refinement
+
+- [ ] Add optional grams-per-piece value
+  - Show on Create, Edit, and Details pages.
+  - Do not show on the Index page in the first version.
+  - If entered, value must be between 0.01 and 10000.
+- [ ] Add optional grams-per-milliliter value
+  - Show on Create, Edit, and Details pages.
+  - Do not show on the Index page in the first version.
+  - If entered, value must be between 0.01 and 10000.
+- [ ] Add optional notes field
+  - Show on Create, Edit, and Details pages.
+  - Do not show on the Index page in the first version.
+- [ ] Keep ingredient nutrition values per 100g
+- [ ] Keep all calculations gram-based
+- [ ] Treat ingredient name as the product and food state description
+- [ ] Do not require globally unique ingredient names in the first version
+- [ ] Keep raw/cooked state out of the Ingredient model for now
+- [ ] Review unknown nutrition values versus real zero values
+  - For now, unknown nutrition values are stored as 0.
+  - This is a simplification for the first version.
+- [ ] Review ingredient deletion rules when ingredient is already used in recipes or menus
+  - If an ingredient is used in recipes or menus, do not delete it.
+  - Archive or deactivate workflow can be added later.
+
+#### 12.2 Recipe Refinement
+
+- [ ] Decide whether recipes should use live ingredient values or ingredient snapshots
+  - For now, recipes use live ingredient values.
+  - Ingredient snapshots can be added later for published or shared recipes.
+- [ ] Keep recipe description as simple optional text in the first version
+- [ ] Move structured recipe instructions to Future Ideas
+- [ ] Move recipe images to Future Ideas
+- [ ] Move recipe storage and expiration information to Future Ideas
+- [ ] Do not require globally unique recipe names in the first version
+- [ ] Prevent deleting a recipe if it is used in recipe components, menus, or prepared batches
+- [ ] Keep recipe servings as default output servings
+- [ ] Move recipe days from Recipe to PreparedRecipeBatch
+- [ ] Use menu items and prepared batches for actual user-specific consumption
+- [ ] Add optional recipe final weight in grams
+  - If not set, estimate recipe weight from ingredients and components.
+  - Show warning or helper text that final weight is approximate.
+  - Use final weight for more accurate recipe component calculations.
+
+#### 12.3 Recipe Ingredient Units
+
+- [ ] Add ingredient amount unit enum
+- [ ] Store original quantity and unit for recipe ingredients
+- [ ] Keep calculated grams for recipe calculations
+- [ ] Convert quantity to grams when adding or editing recipe ingredients
+- [ ] Validate pieces only when ingredient has grams-per-piece
+- [ ] Validate milliliters only when ingredient has grams-per-milliliter
+- [ ] Show original quantity and calculated grams in recipe details
+
+#### 12.4 Recipe Components
+
+- [ ] Keep recipe components grams-only in the first version
+- [ ] Use recipe final weight for more accurate component calculations when available
+- [ ] Use estimated recipe weight when final weight is not set
+- [ ] Prevent deleting a recipe if it is used as a component in another recipe
+- [ ] Keep recipe components based on live recipe values in the first version
+- [ ] Move recipe component snapshots to Future Ideas
+
+#### 12.5 Prepared Batches
+
+- [ ] Treat PreparedRecipeBatch as cooked food inventory
+- [ ] Add start date to prepared batches
+- [ ] Add planned days to prepared batches
+- [ ] Calculate servings per day from prepared batch total servings / planned days
+- [ ] Consider automatically creating menu items across planned days when a batch is created
+- [ ] Add Create Batch action from Recipe Details
+- [ ] Preselect recipe when creating a prepared batch from Recipe Details
+- [ ] Store recipe name snapshot when a prepared batch is created
+- [ ] Store recipe nutrition totals snapshot when a prepared batch is created
+- [ ] Use prepared batch snapshot values for menu calculations
+- [ ] Allow different batches of the same recipe to have different nutrition values
+- [ ] Move full ingredient-level batch snapshots to Future Ideas
+- [ ] Move recipe versioning to Future Ideas
+
+#### 12.6 Daily Plans and Menu Items
+
+- [ ] Treat each Menu as one daily food plan
+- [ ] Keep one menu per date
+- [ ] Allow ingredients and prepared batch servings to be added to any day
+- [ ] Store original quantity and unit for ingredient menu items
+- [ ] Keep calculated grams for ingredient menu item calculations
+- [ ] Convert quantity to grams when adding or editing ingredient menu items
+- [ ] Validate pieces only when ingredient has grams-per-piece
+- [ ] Validate milliliters only when ingredient has grams-per-milliliter
+- [ ] Show original quantity and calculated grams in menu details
+
+#### 12.7 Calculations and Validation
+
+- [ ] Keep ingredient calculation formula: value per 100g * grams / 100
+- [ ] Use calculated grams for recipe ingredient calculations
+- [ ] Use calculated grams for ingredient menu item calculations
+- [ ] Use recipe final weight for recipe component calculations when available
+- [ ] Use estimated recipe weight when final weight is not available
+- [ ] Calculate prepared batch nutrition from stored batch snapshot values
+- [ ] Calculate prepared batch per-serving values from snapshot totals / total servings
+- [ ] Calculate daily menu totals as the sum of menu item values
+- [ ] Calculate calendar daily average from seven daily totals
+- [ ] Validate ingredient name is required
+- [ ] Validate ingredient nutrition value ranges
+- [ ] Validate ingredient grams-per-piece and grams-per-milliliter are positive when entered
+- [ ] Prevent deleting ingredients that are already used in recipes or menus
+- [ ] Validate recipe name is required
+- [ ] Validate recipe servings are greater than 0
+- [ ] Validate recipe final weight is greater than 0 when entered
+- [ ] Prevent deleting recipes that are used in components, menus, or prepared batches
+- [ ] Validate recipe ingredient quantity is greater than 0
+- [ ] Validate recipe ingredient unit is selected
+- [ ] Validate recipe ingredient grams after conversion are greater than 0
+- [ ] Validate pieces only when ingredient has grams-per-piece
+- [ ] Validate milliliters only when ingredient has grams-per-milliliter
+- [ ] Validate recipe component grams are greater than 0
+- [ ] Prevent recipe from directly containing itself as a component
+- [ ] Prevent duplicate recipe components
+- [ ] Review indirect recipe component cycle validation
+- [ ] Validate prepared batch recipe is required
+- [ ] Validate prepared batch total servings are greater than 0
+- [ ] Validate prepared batch planned days are greater than 0
+- [ ] Validate prepared batch start date and cooked date rules
+- [ ] Prevent using more prepared batch servings than remain
+- [ ] Keep one menu per date
+- [ ] Validate menu item quantity is greater than 0
+- [ ] Validate ingredient menu item unit conversion rules
+- [ ] Validate prepared batch menu item does not exceed remaining servings
+
+#### 12.8 User Flows and Documentation
+
+- [ ] Review Create/Edit/Details ingredient flow with conversion fields and notes
+- [ ] Review recipe creation as a draft-like workflow
+- [ ] Review adding ingredients to recipes with quantity, unit, and calculated grams
+- [ ] Review adding recipe components to recipes with grams
+- [ ] Review recipe totals, per-serving values, and final weight behavior
+- [ ] Review creating prepared batches from Recipe Details
+- [ ] Review prepared batch creation with preselected recipe, start date, planned days, and snapshot values
+- [ ] Review daily menu planning as one daily food plan per date
+- [ ] Review adding direct ingredients to daily plans with quantity, unit, and calculated grams
+- [ ] Review adding prepared batch servings to daily plans
+- [ ] Review calendar day creation and daily average behavior
+- [ ] Review safe delete behavior for used ingredients, recipes, and prepared batches
+- [ ] Update entity descriptions after domain changes
+- [ ] Update business rules after unit and snapshot changes
+- [ ] Update implementation plan after each completed domain area
+- [ ] Update README if project description becomes outdated
 
 ### Milestone 13: Users and Authentication
 
@@ -603,8 +740,28 @@ Goal: plan the transition from Razor Pages to an API-based application and choos
 
 This section contains ideas that may be useful for the project in the future, but are not part of the nearest implementation plan.
 
+### Ingredient Improvements
+
+- [ ] Add ingredient brand
+
+- [ ] Add ingredient category
+
 - [ ] Add image support for ingredients
   - Decide later how images should be stored.
+
+- [ ] Add ingredient data source
+  - Decide later how to store whether values came from manual input, package labels, AI, or external databases.
+
+- [ ] Add advanced ingredient state handling
+  - For example, raw, cooked, peeled, or trimmed product states.
+
+- [ ] Add package-label-based nutrition input
+  - Allow entering nutrition values for a custom reference amount and convert them to values per 100g.
+
+- [ ] Improve ingredient search and display
+
+- [ ] Add ingredient archive or deactivate workflow
+  - Used ingredients should probably be hidden instead of deleted.
 
 - [ ] Add AI-assisted ingredient nutrition autofill
   - AI can suggest initial nutrition values, but the user should review and correct them before saving.
@@ -612,17 +769,56 @@ This section contains ideas that may be useful for the project in the future, bu
 - [ ] Add AI-assisted nutrition label photo import
   - AI can analyze a photo of a nutrition label, extract available values, and suggest missing values when possible.
 
+### Nutrients and Health Data
+
 - [ ] Add vitamins and micronutrients
   - Decide later which vitamins and micronutrients should be tracked first.
 
-- [ ] Add search and filters
+- [ ] Add additional macronutrients
+  - For example, fat, carbohydrates, and saturated fat.
 
-- [ ] Support piece-based products
+- [ ] Add optional harmful substances or food safety notes
+  - For example, warnings or tracked substances for products like tuna.
 
-- [ ] Support milliliters or other units
+### Recipe and Calculation Improvements
+
+- [ ] Add recipe versioning
+  - Preserve recipe versions so prepared batches and published recipes can point to a stable recipe version.
+
+- [ ] Add optional recipe ingredients
+  - Allow a recipe to include ingredients that are not required.
+
+- [ ] Add recipe ingredient choice groups
+  - Allow choosing one ingredient from several alternatives.
+  - Example: raisins, cranberries, or dried apricots.
+
+- [ ] Add structured recipe instructions
+  - Support multiple instruction blocks or ordered steps.
+
+- [ ] Add recipe storage instructions
+  - For example, how to store the prepared food.
+
+- [ ] Add recipe expiration or best-before information
+  - For example, how many days the prepared dish can be safely stored.
+
+- [ ] Add recipe images
+
+- [ ] Add recipe draft or publish workflow
+
+- [ ] Add recipe type
+  - For example, meal, sauce, preparation, component, or snack.
+
+- [ ] Add recipe component snapshots
+  - Preserve component recipe values so later edits do not silently change recipes that already use the component.
+
+- [ ] Support serving-based recipe components
+  - Allow adding another recipe as a component by servings instead of grams.
 
 - [ ] Add recipe scaling
   - Allow scaling recipes up or down without changing the original recipe.
+  - Support multipliers such as 1.5x or 2x.
+  - Decide whether a recipe can be safely scaled.
+  - In the future, some ingredients may need custom scaling behavior instead of simple multiplication.
 
 - [ ] Add editable final recipe weight
   - By default, the system can estimate recipe weight from all ingredients and components.
@@ -634,11 +830,39 @@ This section contains ideas that may be useful for the project in the future, bu
   - Prevent the same ingredient from being added more than once inside the same recipe.
   - Prevent indirect recipe component cycles.
 
+### Menu Planning Improvements
+
+- [ ] Add full prepared batch ingredient snapshots
+  - Preserve the exact ingredients and components used when a batch was cooked.
+
+- [ ] Auto-fill menu days from prepared batch
+  - When a batch is created with a start date and planned days, automatically create menu items for those days.
+
+- [ ] Rename Menu to a more accurate domain name
+  - For example, DailyPlan or DailyFoodPlan.
+
+- [ ] Plan meals for families or multiple people
+  - Review how servings, prepared batches, and daily plans should work for several people.
+
 - [ ] Show when a prepared recipe batch will run out
 
 - [ ] Show missing daily nutrition when prepared food runs out
 
-- [ ] Add user accounts and authentication
+### Sharing and Users
+
+- [ ] Add private user-owned ingredients and recipes
+
+- [ ] Add public ingredient catalog
+
+- [ ] Allow users to request publishing private ingredients and recipes
+
+- [ ] Add admin approval workflow for shared ingredients and recipes
+
+- [ ] Preserve published recipe ingredients so later edits do not silently change published recipes
+
+### General Improvements
+
+- [ ] Add search and filters
 
 - [ ] Improve UI
 
