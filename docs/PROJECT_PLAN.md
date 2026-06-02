@@ -866,4 +866,9 @@ This section contains ideas that may be useful for the project in the future, bu
 
 - [ ] Improve UI
 
-- [ ] Add tests
+- [ ] Add automated tests for calculation logic
+  - Test `RecipeCalculationService`.
+  - Test `MenuCalculationService`.
+  - Test prepared batch nutrition calculations.
+  - Test daily menu totals.
+  - Test edge cases such as empty recipes, zero values, recipe components, and prepared batch servings.
