@@ -25,6 +25,15 @@ public class Ingredient
     [Range(0, 100)]
     public decimal SaltPer100g { get; set; }
 
+    [Range(0.01, 10000)]
+    public decimal? GramsPerPiece { get; set; }
+
+    [Range(0.01, 10000)]
+    public decimal? GramsPerMilliliter { get; set; }
+
+    [StringLength(1000)]
+    public string? Notes { get; set; }
+
     public List<RecipeIngredient> RecipeIngredients { get; set; } = [];
 
     public List<MenuItem> MenuItems { get; set; } = [];
