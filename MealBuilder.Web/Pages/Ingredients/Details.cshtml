@@ -25,6 +25,15 @@
 
     <dt class="col-sm-3">Salt per 100g</dt>
     <dd class="col-sm-9">@Model.Ingredient.SaltPer100g</dd>
+
+    <dt class="col-sm-3">Grams per piece</dt>
+    <dd class="col-sm-9">@Model.Ingredient.GramsPerPiece</dd>
+
+    <dt class="col-sm-3">Grams per milliliter</dt>
+    <dd class="col-sm-9">@Model.Ingredient.GramsPerMilliliter</dd>
+
+    <dt class="col-sm-3">Notes</dt>
+    <dd class="col-sm-9">@Model.Ingredient.Notes</dd>
 </dl>
 
 <a asp-page="./Edit" asp-route-id="@Model.Ingredient.Id" class="btn btn-primary">Edit</a>
