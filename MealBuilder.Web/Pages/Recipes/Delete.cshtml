@@ -7,7 +7,16 @@
 
 <h1>Delete Recipe</h1>
 
-<p>Are you sure you want to delete this recipe?</p>
+@if (Model.IsUsed)
+{
+    <p class="text-danger">
+        This recipe cannot be deleted because it is used in recipe components, menus, or prepared batches.
+    </p>
+}
+else
+{
+    <p class="text-danger">Are you sure you want to delete this recipe?</p>
+}
 
 <dl class="row">
     <dt class="col-sm-2">Name</dt>
@@ -21,6 +30,10 @@
 </dl>
 
 <form method="post">
-    <button type="submit" class="btn btn-danger">Delete</button>
+    @if (!Model.IsUsed)
+    {
+        <button type="submit" class="btn btn-danger">Delete</button>
+    }
+
     <a asp-page="./Index" class="btn btn-secondary">Cancel</a>
 </form>
