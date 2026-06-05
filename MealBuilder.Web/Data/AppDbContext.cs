@@ -26,6 +26,12 @@ namespace MealBuilder.Web.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<RecipeIngredient>()
+                .HasOne(recipeIngredient => recipeIngredient.Ingredient)
+                .WithMany(ingredient => ingredient.RecipeIngredients)
+                .HasForeignKey(recipeIngredient => recipeIngredient.IngredientId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<RecipeComponent>()
                 .HasOne(recipeComponent => recipeComponent.ParentRecipe)
                 .WithMany(recipe => recipe.Components)

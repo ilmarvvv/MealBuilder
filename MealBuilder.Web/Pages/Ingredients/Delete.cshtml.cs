@@ -2,6 +2,7 @@ using MealBuilder.Web.Data;
 using MealBuilder.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 
 namespace MealBuilder.Web.Pages.Ingredients
 {
@@ -16,6 +17,8 @@ namespace MealBuilder.Web.Pages.Ingredients
 
         public Ingredient Ingredient { get; set; } = new();
 
+        public bool IsUsed { get; set; }
+
         public async Task<IActionResult> OnGetAsync(int id)
         {
             var ingredient = await _context.Ingredients.FindAsync(id);
@@ -26,6 +29,7 @@ namespace MealBuilder.Web.Pages.Ingredients
             }
 
             Ingredient = ingredient;
+            IsUsed = await IsIngredientUsedAsync(id);
 
             return Page();
         }
@@ -39,10 +43,26 @@ namespace MealBuilder.Web.Pages.Ingredients
                 return NotFound();
             }
 
+            if (await IsIngredientUsedAsync(id))
+            {
+                Ingredient = ingredient;
+                IsUsed = true;
+
+                return Page();
+            }
+
             _context.Ingredients.Remove(ingredient);
             await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");
+        }
+
+        private async Task<bool> IsIngredientUsedAsync(int ingredientId)
+        {
+            return await _context.RecipeIngredients.AnyAsync(recipeIngredient =>
+                       recipeIngredient.IngredientId == ingredientId)
+                   || await _context.MenuItems.AnyAsync(menuItem =>
+                       menuItem.IngredientId == ingredientId);
         }
     }
 }
