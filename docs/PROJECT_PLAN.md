@@ -615,26 +615,17 @@ This milestone goes through the existing system from ingredients to menus and re
 - [ ] Keep recipe servings as default output servings
 - [ ] Move recipe days from Recipe to PreparedRecipeBatch
 - [ ] Use menu items and prepared batches for actual user-specific consumption
-- [ ] Add optional recipe final weight in grams
-  - If not set, estimate recipe weight from ingredients and components.
-  - Show warning or helper text that final weight is approximate.
-  - Use final weight for more accurate recipe component calculations.
+- [ ] Move recipe final weight to Future Ideas
 
 #### 12.3 Recipe Ingredient Units
 
-- [ ] Add ingredient amount unit enum
-- [ ] Store original quantity and unit for recipe ingredients
-- [ ] Keep calculated grams for recipe calculations
-- [ ] Convert quantity to grams when adding or editing recipe ingredients
-- [ ] Validate pieces only when ingredient has grams-per-piece
-- [ ] Validate milliliters only when ingredient has grams-per-milliliter
-- [ ] Show original quantity and calculated grams in recipe details
+- [ ] Keep recipe ingredient input grams-only in this milestone
+- [ ] Move piece and milliliter input support to Future Ideas
 
 #### 12.4 Recipe Components
 
 - [ ] Keep recipe components grams-only in the first version
-- [ ] Use recipe final weight for more accurate component calculations when available
-- [ ] Use estimated recipe weight when final weight is not set
+- [ ] Keep recipe component calculations approximate in this milestone
 - [ ] Prevent deleting a recipe if it is used as a component in another recipe
 - [ ] Keep recipe components based on live recipe values in the first version
 - [ ] Move recipe component snapshots to Future Ideas
@@ -660,20 +651,14 @@ This milestone goes through the existing system from ingredients to menus and re
 - [ ] Treat each Menu as one daily food plan
 - [ ] Keep one menu per date
 - [ ] Allow ingredients and prepared batch servings to be added to any day
-- [ ] Store original quantity and unit for ingredient menu items
-- [ ] Keep calculated grams for ingredient menu item calculations
-- [ ] Convert quantity to grams when adding or editing ingredient menu items
-- [ ] Validate pieces only when ingredient has grams-per-piece
-- [ ] Validate milliliters only when ingredient has grams-per-milliliter
-- [ ] Show original quantity and calculated grams in menu details
+- [ ] Keep direct ingredient menu items grams-only in this milestone
+- [ ] Move menu item piece and milliliter input support to Future Ideas
 
 #### 12.7 Calculations and Validation
 
 - [ ] Keep ingredient calculation formula: value per 100g * grams / 100
-- [ ] Use calculated grams for recipe ingredient calculations
-- [ ] Use calculated grams for ingredient menu item calculations
-- [ ] Use recipe final weight for recipe component calculations when available
-- [ ] Use estimated recipe weight when final weight is not available
+- [ ] Use grams for recipe ingredient calculations
+- [ ] Use grams for direct ingredient menu item calculations
 - [ ] Calculate prepared batch nutrition from stored batch snapshot values
 - [ ] Calculate prepared batch per-serving values from snapshot totals / total servings
 - [ ] Calculate daily menu totals as the sum of menu item values
@@ -684,17 +669,12 @@ This milestone goes through the existing system from ingredients to menus and re
 - [ ] Prevent deleting ingredients that are already used in recipes or menus
 - [ ] Validate recipe name is required
 - [ ] Validate recipe servings are greater than 0
-- [ ] Validate recipe final weight is greater than 0 when entered
 - [ ] Prevent deleting recipes that are used in components, menus, or prepared batches
 - [ ] Validate recipe ingredient quantity is greater than 0
-- [ ] Validate recipe ingredient unit is selected
-- [ ] Validate recipe ingredient grams after conversion are greater than 0
-- [ ] Validate pieces only when ingredient has grams-per-piece
-- [ ] Validate milliliters only when ingredient has grams-per-milliliter
 - [ ] Validate recipe component grams are greater than 0
 - [ ] Prevent recipe from directly containing itself as a component
 - [ ] Prevent duplicate recipe components
-- [ ] Review indirect recipe component cycle validation
+- [ ] Move indirect recipe component cycle validation to Future Ideas
 - [ ] Validate prepared batch recipe is required
 - [ ] Validate prepared batch total servings are greater than 0
 - [ ] Validate prepared batch planned days are greater than 0
@@ -702,25 +682,23 @@ This milestone goes through the existing system from ingredients to menus and re
 - [ ] Prevent using more prepared batch servings than remain
 - [ ] Keep one menu per date
 - [ ] Validate menu item quantity is greater than 0
-- [ ] Validate ingredient menu item unit conversion rules
 - [ ] Validate prepared batch menu item does not exceed remaining servings
 
 #### 12.8 User Flows and Documentation
 
 - [ ] Review Create/Edit/Details ingredient flow with conversion fields and notes
-- [ ] Review recipe creation as a draft-like workflow
-- [ ] Review adding ingredients to recipes with quantity, unit, and calculated grams
+- [ ] Review adding ingredients to recipes with grams
 - [ ] Review adding recipe components to recipes with grams
-- [ ] Review recipe totals, per-serving values, and final weight behavior
+- [ ] Review recipe totals and per-serving values
 - [ ] Review creating prepared batches from Recipe Details
 - [ ] Review prepared batch creation with preselected recipe, start date, planned days, and snapshot values
 - [ ] Review daily menu planning as one daily food plan per date
-- [ ] Review adding direct ingredients to daily plans with quantity, unit, and calculated grams
+- [ ] Review adding direct ingredients to daily plans with grams
 - [ ] Review adding prepared batch servings to daily plans
 - [ ] Review calendar day creation and daily average behavior
 - [ ] Review safe delete behavior for used ingredients, recipes, and prepared batches
 - [ ] Update entity descriptions after domain changes
-- [ ] Update business rules after unit and snapshot changes
+- [ ] Update business rules after domain changes
 - [ ] Update implementation plan after each completed domain area
 - [ ] Update README if project description becomes outdated
 
@@ -759,6 +737,12 @@ This section contains ideas that may be useful for the project in the future, bu
   - Allow entering nutrition values for a custom reference amount and convert them to values per 100g.
 
 - [ ] Improve ingredient search and display
+
+- [ ] Use ingredient conversion fields in recipe and menu input
+  - Allow users to enter ingredients by pieces when `GramsPerPiece` is available.
+  - Allow users to enter ingredients by milliliters when `GramsPerMilliliter` is available.
+  - Convert entered quantity to grams for all calculations.
+  - Store or display the original quantity and calculated grams when useful.
 
 - [ ] Add ingredient archive or deactivate workflow
   - Used ingredients should probably be hidden instead of deleted.
@@ -834,9 +818,6 @@ This section contains ideas that may be useful for the project in the future, bu
 
 - [ ] Add full prepared batch ingredient snapshots
   - Preserve the exact ingredients and components used when a batch was cooked.
-
-- [ ] Auto-fill menu days from prepared batch
-  - When a batch is created with a start date and planned days, automatically create menu items for those days.
 
 - [ ] Rename Menu to a more accurate domain name
   - For example, DailyPlan or DailyFoodPlan.
