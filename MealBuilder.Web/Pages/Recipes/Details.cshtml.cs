@@ -25,10 +25,6 @@ namespace MealBuilder.Web.Pages.Recipes
 
         public RecipeNutritionTotals PerServingTotals { get; set; } = new();
 
-        public RecipeNutritionTotals PerDayTotals { get; set; } = new();
-
-        public decimal ServingsPerDay { get; set; }
-
         public async Task<IActionResult> OnGetAsync(int id)
         {
             Recipe? recipe = await _context.Recipes
@@ -48,8 +44,6 @@ namespace MealBuilder.Web.Pages.Recipes
             Recipe = recipe;
             Totals = _recipeCalculationService.Calculate(recipe);
             PerServingTotals = _recipeCalculationService.Divide(Totals, recipe.Servings);
-            PerDayTotals = _recipeCalculationService.Divide(Totals, recipe.Days);
-            ServingsPerDay = (decimal)recipe.Servings / recipe.Days;
 
             return Page();
         }

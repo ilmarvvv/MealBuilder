@@ -18,6 +18,9 @@ namespace MealBuilder.Web.Models
         [Range(1, 1000)]
         public decimal TotalServings { get; set; }
 
+        [Range(1, 365)]
+        public int PlannedDays { get; set; } = 1;
+
         public List<MenuItem> MenuItems { get; set; } = [];
 
     }
