@@ -6,6 +6,8 @@
 
         public decimal UsedServings { get; set; }
 
+        public decimal ServingsPerDay => PreparedRecipeBatch.TotalServings / PreparedRecipeBatch.PlannedDays;
+
         public decimal RemainingServings => PreparedRecipeBatch.TotalServings - UsedServings;
     }
 }
