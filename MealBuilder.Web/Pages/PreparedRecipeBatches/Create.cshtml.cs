@@ -21,9 +21,14 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
 
         public SelectList RecipeSelectList { get; set; } = default!;
 
-        public async Task OnGetAsync()
+        public async Task OnGetAsync(int? recipeId)
         {
             PreparedRecipeBatch.CookedDate = DateOnly.FromDateTime(DateTime.Today);
+
+            if (recipeId is not null)
+            {
+                PreparedRecipeBatch.RecipeId = recipeId.Value;
+            }
 
             await LoadRecipeSelectListAsync();
         }
