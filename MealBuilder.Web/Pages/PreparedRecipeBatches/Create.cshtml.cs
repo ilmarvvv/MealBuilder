@@ -1,5 +1,6 @@
 using MealBuilder.Web.Data;
 using MealBuilder.Web.Models;
+using MealBuilder.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -11,9 +12,12 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
     {
         private readonly AppDbContext _context;
 
-        public CreateModel(AppDbContext context)
+        private readonly RecipeCalculationService _recipeCalculationService;
+
+        public CreateModel(AppDbContext context, RecipeCalculationService recipeCalculationService)
         {
             _context = context;
+            _recipeCalculationService = recipeCalculationService;
         }
 
         [BindProperty]
@@ -35,11 +39,44 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
 
         public async Task<IActionResult> OnPostAsync()
         {
+            ModelState.Remove("PreparedRecipeBatch.RecipeNameSnapshot");
+            ModelState.Remove("PreparedRecipeBatch.TotalCaloriesSnapshot");
+            ModelState.Remove("PreparedRecipeBatch.TotalProteinSnapshot");
+            ModelState.Remove("PreparedRecipeBatch.TotalFiberSnapshot");
+            ModelState.Remove("PreparedRecipeBatch.TotalSugarSnapshot");
+            ModelState.Remove("PreparedRecipeBatch.TotalSaltSnapshot");
+
             if (!ModelState.IsValid)
             {
                 await LoadRecipeSelectListAsync();
                 return Page();
             }
+
+            Recipe? recipe = await _context.Recipes
+                .Include(recipe => recipe.RecipeIngredients)
+                .ThenInclude(recipeIngredient => recipeIngredient.Ingredient)
+                .Include(recipe => recipe.Components)
+                .ThenInclude(recipeComponent => recipeComponent.ComponentRecipe)
+                .ThenInclude(componentRecipe => componentRecipe.RecipeIngredients)
+                .ThenInclude(recipeIngredient => recipeIngredient.Ingredient)
+                .FirstOrDefaultAsync(recipe => recipe.Id == PreparedRecipeBatch.RecipeId);
+
+            if (recipe is null)
+            {
+                ModelState.AddModelError("PreparedRecipeBatch.RecipeId", "Recipe was not found.");
+                await LoadRecipeSelectListAsync();
+
+                return Page();
+            }
+
+            RecipeNutritionTotals totals = _recipeCalculationService.Calculate(recipe);
+
+            PreparedRecipeBatch.RecipeNameSnapshot = recipe.Name;
+            PreparedRecipeBatch.TotalCaloriesSnapshot = totals.Calories;
+            PreparedRecipeBatch.TotalProteinSnapshot = totals.Protein;
+            PreparedRecipeBatch.TotalFiberSnapshot = totals.Fiber;
+            PreparedRecipeBatch.TotalSugarSnapshot = totals.Sugar;
+            PreparedRecipeBatch.TotalSaltSnapshot = totals.Salt;
 
             _context.PreparedRecipeBatches.Add(PreparedRecipeBatch);
             await _context.SaveChangesAsync();

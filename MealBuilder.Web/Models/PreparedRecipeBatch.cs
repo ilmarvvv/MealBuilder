@@ -21,6 +21,25 @@ namespace MealBuilder.Web.Models
         [Range(1, 365)]
         public int PlannedDays { get; set; } = 1;
 
+        [Required]
+        [StringLength(100)]
+        public string RecipeNameSnapshot { get; set; } = string.Empty;
+
+        [Range(0, 1000000)]
+        public decimal TotalCaloriesSnapshot { get; set; }
+
+        [Range(0, 1000000)]
+        public decimal TotalProteinSnapshot { get; set; }
+
+        [Range(0, 1000000)]
+        public decimal TotalFiberSnapshot { get; set; }
+
+        [Range(0, 1000000)]
+        public decimal TotalSugarSnapshot { get; set; }
+
+        [Range(0, 1000000)]
+        public decimal TotalSaltSnapshot { get; set; }
+
         public List<MenuItem> MenuItems { get; set; } = [];
 
     }
