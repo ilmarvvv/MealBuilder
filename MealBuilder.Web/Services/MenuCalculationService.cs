@@ -21,18 +21,9 @@ namespace MealBuilder.Web.Services
                 {
                     AddRecipeItemTotals(totals, menuItem);
                 }
-                else if (menuItem.ItemType == MenuItemType.PreparedRecipeBatch &&
-                     menuItem.PreparedRecipeBatch?.Recipe is not null &&
-                     menuItem.ServingsCount is not null)
+                else if (menuItem.ItemType == MenuItemType.PreparedRecipeBatch)
                 {
-                    RecipeNutritionTotals recipeTotals = _recipeCalculationService.Calculate(menuItem.PreparedRecipeBatch.Recipe);
-                    RecipeNutritionTotals perServingTotals = _recipeCalculationService.Divide(recipeTotals, menuItem.PreparedRecipeBatch.Recipe.Servings);
-
-                    totals.Calories += perServingTotals.Calories * menuItem.ServingsCount.Value;
-                    totals.Protein += perServingTotals.Protein * menuItem.ServingsCount.Value;
-                    totals.Fiber += perServingTotals.Fiber * menuItem.ServingsCount.Value;
-                    totals.Sugar += perServingTotals.Sugar * menuItem.ServingsCount.Value;
-                    totals.Salt += perServingTotals.Salt * menuItem.ServingsCount.Value;
+                    AddPreparedRecipeBatchItemTotals(totals, menuItem);
                 }
                 else if (menuItem.ItemType == MenuItemType.Ingredient && menuItem.Ingredient is not null)
                 {
@@ -62,6 +53,29 @@ namespace MealBuilder.Web.Services
             totals.Fiber += perServingTotals.Fiber * menuItem.ServingsCount.Value;
             totals.Sugar += perServingTotals.Sugar * menuItem.ServingsCount.Value;
             totals.Salt += perServingTotals.Salt * menuItem.ServingsCount.Value;
+        }
+
+        private static void AddPreparedRecipeBatchItemTotals(
+            RecipeNutritionTotals totals,
+            MenuItem menuItem)
+        {
+            if (menuItem.PreparedRecipeBatch is null || menuItem.ServingsCount is null)
+            {
+                return;
+            }
+
+            if (menuItem.PreparedRecipeBatch.TotalServings <= 0)
+            {
+                return;
+            }
+
+            decimal servingRatio = menuItem.ServingsCount.Value / menuItem.PreparedRecipeBatch.TotalServings;
+
+            totals.Calories += menuItem.PreparedRecipeBatch.TotalCaloriesSnapshot * servingRatio;
+            totals.Protein += menuItem.PreparedRecipeBatch.TotalProteinSnapshot * servingRatio;
+            totals.Fiber += menuItem.PreparedRecipeBatch.TotalFiberSnapshot * servingRatio;
+            totals.Sugar += menuItem.PreparedRecipeBatch.TotalSugarSnapshot * servingRatio;
+            totals.Salt += menuItem.PreparedRecipeBatch.TotalSaltSnapshot * servingRatio;
         }
 
         private static void AddIngredientItemTotals(
