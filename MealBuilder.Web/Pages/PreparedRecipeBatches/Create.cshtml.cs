@@ -79,6 +79,35 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
             PreparedRecipeBatch.TotalSaltSnapshot = totals.Salt;
 
             _context.PreparedRecipeBatches.Add(PreparedRecipeBatch);
+
+            decimal servingsPerDay = PreparedRecipeBatch.TotalServings / PreparedRecipeBatch.PlannedDays;
+
+            for (int dayOffset = 0; dayOffset < PreparedRecipeBatch.PlannedDays; dayOffset++)
+            {
+                DateOnly menuDate = PreparedRecipeBatch.CookedDate.AddDays(dayOffset);
+
+                Menu? menu = await _context.Menus
+                    .FirstOrDefaultAsync(menu => menu.Date == menuDate);
+
+                if (menu is null)
+                {
+                    menu = new Menu
+                    {
+                        Name = $"Menu {menuDate}",
+                        Date = menuDate
+                    };
+
+                    _context.Menus.Add(menu);
+                }
+
+                menu.MenuItems.Add(new MenuItem
+                {
+                    ItemType = MenuItemType.PreparedRecipeBatch,
+                    PreparedRecipeBatch = PreparedRecipeBatch,
+                    ServingsCount = servingsPerDay
+                });
+            }
+
             await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");
