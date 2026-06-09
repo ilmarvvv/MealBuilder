@@ -28,7 +28,7 @@
         @foreach (var summary in Model.PreparedRecipeBatchSummaries)
         {
             <tr>
-                <td>@summary.PreparedRecipeBatch.Recipe?.Name</td>
+                <td>@summary.PreparedRecipeBatch.RecipeNameSnapshot</td>
                 <td>@summary.PreparedRecipeBatch.CookedDate</td>
                 <td>@summary.PreparedRecipeBatch.TotalServings</td>
                 <td>@summary.PreparedRecipeBatch.PlannedDays</td>
