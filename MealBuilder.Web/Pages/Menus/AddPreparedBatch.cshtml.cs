@@ -110,9 +110,8 @@ namespace MealBuilder.Web.Pages.Menus
         private async Task LoadPreparedRecipeBatchesAsync()
         {
             List<PreparedRecipeBatch> preparedRecipeBatches = await _context.PreparedRecipeBatches
-                .Include(preparedRecipeBatch => preparedRecipeBatch.Recipe)
                 .Include(preparedRecipeBatch => preparedRecipeBatch.MenuItems)
-                .OrderBy(preparedRecipeBatch => preparedRecipeBatch.Recipe!.Name)
+                .OrderBy(preparedRecipeBatch => preparedRecipeBatch.RecipeNameSnapshot)
                 .ThenByDescending(preparedRecipeBatch => preparedRecipeBatch.CookedDate)
                 .ToListAsync();
 
@@ -128,7 +127,7 @@ namespace MealBuilder.Web.Pages.Menus
                     return new
                     {
                         preparedRecipeBatch.Id,
-                        Label = $"{preparedRecipeBatch.Recipe?.Name} | cooked {preparedRecipeBatch.CookedDate} | remaining {remainingServings} servings",
+                        Label = $"{preparedRecipeBatch.RecipeNameSnapshot} | cooked {preparedRecipeBatch.CookedDate} | remaining {remainingServings} servings",
                         RemainingServings = remainingServings
                     };
                 })

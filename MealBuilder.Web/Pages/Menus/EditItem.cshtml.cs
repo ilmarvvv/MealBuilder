@@ -116,7 +116,7 @@ namespace MealBuilder.Web.Pages.Menus
 
             if (menuItem.ItemType == MenuItemType.PreparedRecipeBatch)
             {
-                return $"{menuItem.PreparedRecipeBatch?.Recipe?.Name} | cooked {menuItem.PreparedRecipeBatch?.CookedDate}";
+                return $"{menuItem.PreparedRecipeBatch?.RecipeNameSnapshot} | cooked {menuItem.PreparedRecipeBatch?.CookedDate}";
             }
 
             return string.Empty;

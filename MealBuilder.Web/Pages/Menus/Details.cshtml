@@ -79,7 +79,7 @@ else
                         }
                         else if (menuItem.ItemType == MealBuilder.Web.Models.MenuItemType.PreparedRecipeBatch)
                         {
-                            @($"{menuItem.PreparedRecipeBatch?.Recipe?.Name} | cooked {menuItem.PreparedRecipeBatch?.CookedDate}")
+                            @($"{menuItem.PreparedRecipeBatch?.RecipeNameSnapshot} | cooked {menuItem.PreparedRecipeBatch?.CookedDate}")
                         }
                     </td>
                     <td>
