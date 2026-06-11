@@ -67,6 +67,8 @@ namespace MealBuilder.Web.Pages.Menus
                 {
                     ModelState.AddModelError("MenuItem.ServingsCount", "Servings count must be greater than 0.");
                 }
+
+                await ValidatePreparedBatchServingsAsync();
             }
             else if (MenuItem.ItemType == MenuItemType.Ingredient)
             {
@@ -100,6 +102,35 @@ namespace MealBuilder.Web.Pages.Menus
             await _context.SaveChangesAsync();
 
             return RedirectToPage("./Details", new { id = MenuItem.MenuId });
+        }
+
+        private async Task ValidatePreparedBatchServingsAsync()
+        {
+            if (MenuItem.PreparedRecipeBatchId is null || MenuItem.ServingsCount is null)
+            {
+                return;
+            }
+
+            PreparedRecipeBatch? preparedRecipeBatch = await _context.PreparedRecipeBatches
+                .Include(preparedRecipeBatch => preparedRecipeBatch.MenuItems)
+                .FirstOrDefaultAsync(preparedRecipeBatch => preparedRecipeBatch.Id == MenuItem.PreparedRecipeBatchId);
+
+            if (preparedRecipeBatch is null)
+            {
+                ModelState.AddModelError("MenuItem.PreparedRecipeBatchId", "Prepared batch was not found.");
+                return;
+            }
+
+            decimal usedByOtherMenuItems = preparedRecipeBatch.MenuItems
+                .Where(menuItem => menuItem.Id != MenuItem.Id && menuItem.ServingsCount is not null)
+                .Sum(menuItem => menuItem.ServingsCount!.Value);
+
+            decimal availableServings = preparedRecipeBatch.TotalServings - usedByOtherMenuItems;
+
+            if (MenuItem.ServingsCount > availableServings)
+            {
+                ModelState.AddModelError("MenuItem.ServingsCount", $"Only {availableServings} servings are available for this prepared batch.");
+            }
         }
 
         private static string GetItemName(MenuItem menuItem)
