@@ -13,6 +13,21 @@ namespace MealBuilder.Web.Models
         [StringLength(1000)]
         public string? Description { get; set; }
 
+        [Range(1, 365)]
+        public int DefaultPlannedDays { get; set; } = 1;
+
+        [Range(1, 100)]
+        public int DefaultServingsPerDay { get; set; } = 1;
+
+        [Range(0, 10000)]
+        public int PrepTimeMinutes { get; set; }
+
+        [Range(0, 10000)]
+        public int CookTimeMinutes { get; set; }
+
+        [StringLength(2000)]
+        public string? PreparationNotes { get; set; }
+
         [Range(1, 100)]
         public int Servings { get; set; } = 1;
 
