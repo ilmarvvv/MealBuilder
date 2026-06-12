@@ -728,6 +728,10 @@ This milestone goes through the existing system from ingredients to menus and re
   - Treat Details as a read-only recipe review page.
   - Show recipe totals, per-day values, and per-serving values clearly.
   - Show ingredients and recipe components as recipe contents.
+- [ ] Add recipe contents ordering
+  - Add position numbers for ingredients and recipe components inside a recipe.
+  - Show recipe contents in position order.
+  - Keep positions continuous without duplicates or gaps.
 
 #### 12.10 Editable Prepared Batch Snapshot
 
@@ -820,6 +824,14 @@ This section contains ideas that may be useful for the project in the future, bu
 - [ ] Add recipe ingredient choice groups
   - Allow choosing one ingredient from several alternatives.
   - Example: raisins, cranberries, or dried apricots.
+
+- [ ] Improve recipe contents ordering UI
+  - Allow moving recipe contents up and down with a better interface.
+  - Consider drag-and-drop reordering.
+
+- [ ] Replace recipe content type strings with safer values
+  - Avoid comparing string values such as `Ingredient` and `Recipe` directly in Razor Pages.
+  - Use an enum or shared constants when the flow becomes more complex.
 
 - [ ] Add structured recipe instructions
   - Support multiple instruction blocks or ordered steps.
