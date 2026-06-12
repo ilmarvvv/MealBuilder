@@ -14,15 +14,31 @@
     <dt class="col-sm-2">Description</dt>
     <dd class="col-sm-10">@Model.Recipe.Description</dd>
 
-    <dt class="col-sm-2">Servings</dt>
+    <dt class="col-sm-2">Category</dt>
+    <dd class="col-sm-10">Future idea</dd>
+
+    <dt class="col-sm-2">Planned days</dt>
+    <dd class="col-sm-10">@Model.Recipe.DefaultPlannedDays</dd>
+
+    <dt class="col-sm-2">Servings per day</dt>
+    <dd class="col-sm-10">@Model.Recipe.DefaultServingsPerDay</dd>
+
+    <dt class="col-sm-2">Total servings</dt>
     <dd class="col-sm-10">@Model.Recipe.Servings</dd>
+
+    <dt class="col-sm-2">Prep time minutes</dt>
+    <dd class="col-sm-10">@Model.Recipe.PrepTimeMinutes</dd>
+
+    <dt class="col-sm-2">Cook time minutes</dt>
+    <dd class="col-sm-10">@Model.Recipe.CookTimeMinutes</dd>
 </dl>
 
-<h2>Totals</h2>
+<h2>Nutrition Summary</h2>
 
 <table class="table">
     <thead>
         <tr>
+            <th>Type</th>
             <th>Calories</th>
             <th>Protein</th>
             <th>Fiber</th>
@@ -32,29 +48,23 @@
     </thead>
     <tbody>
         <tr>
+            <td>Total recipe</td>
             <td>@Model.Totals.Calories.ToString("0.00")</td>
             <td>@Model.Totals.Protein.ToString("0.00")</td>
             <td>@Model.Totals.Fiber.ToString("0.00")</td>
             <td>@Model.Totals.Sugar.ToString("0.00")</td>
             <td>@Model.Totals.Salt.ToString("0.00")</td>
         </tr>
-    </tbody>
-</table>
-
-<h2>Per Serving</h2>
-
-<table class="table">
-    <thead>
         <tr>
-            <th>Calories</th>
-            <th>Protein</th>
-            <th>Fiber</th>
-            <th>Sugar</th>
-            <th>Salt</th>
+            <td>Per day</td>
+            <td>@Model.PerDayTotals.Calories.ToString("0.00")</td>
+            <td>@Model.PerDayTotals.Protein.ToString("0.00")</td>
+            <td>@Model.PerDayTotals.Fiber.ToString("0.00")</td>
+            <td>@Model.PerDayTotals.Sugar.ToString("0.00")</td>
+            <td>@Model.PerDayTotals.Salt.ToString("0.00")</td>
         </tr>
-    </thead>
-    <tbody>
         <tr>
+            <td>Per serving</td>
             <td>@Model.PerServingTotals.Calories.ToString("0.00")</td>
             <td>@Model.PerServingTotals.Protein.ToString("0.00")</td>
             <td>@Model.PerServingTotals.Fiber.ToString("0.00")</td>
