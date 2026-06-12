@@ -807,6 +807,10 @@ This section contains ideas that may be useful for the project in the future, bu
   - Categories are not needed in the current milestone.
   - For now, recipe pages may show a placeholder such as `Category: Future idea`.
 
+- [ ] Rename recipe `Servings` to `TotalServings`
+  - `Servings` currently means the total number of servings in a recipe.
+  - A clearer name can be introduced later when the recipe core model is cleaned up further.
+
 - [ ] Add recipe versioning
   - Preserve recipe versions so prepared batches and published recipes can point to a stable recipe version.
 
