@@ -710,9 +710,24 @@ This milestone goes through the existing system from ingredients to menus and re
 #### 12.9 Recipe Flow Refinement
 
 - [ ] Refine recipe core
+  - Add default planned days.
+  - Add default servings per day.
+  - Keep total servings calculated from default planned days * default servings per day.
+  - Add prep time.
+  - Add cook time.
+  - Add optional preparation notes.
+  - Keep recipe categories out of the core model for now.
 - [ ] Refine Recipe Create page
+  - Structure the page as a reusable recipe form.
+  - Add a Basic Information section.
+  - Show category as a placeholder only.
 - [ ] Refine Recipe Edit page
+  - Reuse the same form structure as Recipe Create.
+  - Keep editable recipe core fields in one clear place.
 - [ ] Refine Recipe Details page
+  - Treat Details as a read-only recipe review page.
+  - Show recipe totals, per-day values, and per-serving values clearly.
+  - Show ingredients and recipe components as recipe contents.
 
 #### 12.10 Editable Prepared Batch Snapshot
 
@@ -787,6 +802,10 @@ This section contains ideas that may be useful for the project in the future, bu
   - For example, warnings or tracked substances for products like tuna.
 
 ### Recipe and Calculation Improvements
+
+- [ ] Add recipe categories
+  - Categories are not needed in the current milestone.
+  - For now, recipe pages may show a placeholder such as `Category: Future idea`.
 
 - [ ] Add recipe versioning
   - Preserve recipe versions so prepared batches and published recipes can point to a stable recipe version.
