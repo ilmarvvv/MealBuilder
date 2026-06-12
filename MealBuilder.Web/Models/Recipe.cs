@@ -25,9 +25,6 @@ namespace MealBuilder.Web.Models
         [Range(0, 10000)]
         public int CookTimeMinutes { get; set; }
 
-        [StringLength(2000)]
-        public string? PreparationNotes { get; set; }
-
         [Range(1, 100)]
         public int Servings { get; set; } = 1;
 

@@ -8,6 +8,8 @@
 <h1>Create Recipe</h1>
 
 <form method="post">
+    <h2>Basic Information</h2>
+
     <div class="mb-3">
         <label asp-for="Recipe.Name" class="form-label"></label>
         <input asp-for="Recipe.Name" class="form-control" />
@@ -21,12 +23,43 @@
     </div>
 
     <div class="mb-3">
-        <label asp-for="Recipe.Servings" class="form-label"></label>
-        <input asp-for="Recipe.Servings" class="form-control" />
+        <label class="form-label">Category</label>
+        <input class="form-control" value="Future idea" disabled />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Recipe.DefaultPlannedDays" class="form-label">Planned days</label>
+        <input asp-for="Recipe.DefaultPlannedDays" class="form-control" />
+        <span asp-validation-for="Recipe.DefaultPlannedDays" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Recipe.DefaultServingsPerDay" class="form-label">Servings per day</label>
+        <input asp-for="Recipe.DefaultServingsPerDay" class="form-control" />
+        <span asp-validation-for="Recipe.DefaultServingsPerDay" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Recipe.Servings" class="form-label">Total servings</label>
+        <input asp-for="Recipe.Servings" class="form-control" readonly />
         <span asp-validation-for="Recipe.Servings" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary">Save</button>
+    <div class="mb-3">
+        <label asp-for="Recipe.PrepTimeMinutes" class="form-label">Prep time minutes</label>
+        <input asp-for="Recipe.PrepTimeMinutes" class="form-control" />
+        <span asp-validation-for="Recipe.PrepTimeMinutes" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Recipe.CookTimeMinutes" class="form-label">Cook time minutes</label>
+        <input asp-for="Recipe.CookTimeMinutes" class="form-control" />
+        <span asp-validation-for="Recipe.CookTimeMinutes" class="text-danger"></span>
+    </div>
+
+    <h2>Actions</h2>
+
+    <button type="submit" class="btn btn-primary">Create Recipe</button>
     <a asp-page="./Index" class="btn btn-secondary">Cancel</a>
 </form>
 

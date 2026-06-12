@@ -38,6 +38,8 @@ namespace MealBuilder.Web.Pages.Recipes
                 return Page();
             }
 
+            Recipe.Servings = Recipe.DefaultPlannedDays * Recipe.DefaultServingsPerDay;
+
             _context.Recipes.Update(Recipe);
             await _context.SaveChangesAsync();
 
