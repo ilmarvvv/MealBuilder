@@ -27,6 +27,10 @@ namespace MealBuilder.Web.Pages.Recipes
 
         public RecipeNutritionTotals PerServingTotals { get; set; } = new();
 
+        public decimal EstimatedWeightGrams { get; set; }
+
+        public decimal EffectiveWeightGrams { get; set; }
+
         public async Task<IActionResult> OnGetAsync(int id)
         {
             Recipe? recipe = await _context.Recipes
@@ -47,6 +51,8 @@ namespace MealBuilder.Web.Pages.Recipes
             Totals = _recipeCalculationService.Calculate(recipe);
             PerDayTotals = _recipeCalculationService.Divide(Totals, recipe.DefaultPlannedDays);
             PerServingTotals = _recipeCalculationService.Divide(Totals, recipe.Servings);
+            EstimatedWeightGrams = _recipeCalculationService.CalculateEstimatedWeight(recipe);
+            EffectiveWeightGrams = _recipeCalculationService.CalculateEffectiveWeight(recipe);
             return Page();
         }
 

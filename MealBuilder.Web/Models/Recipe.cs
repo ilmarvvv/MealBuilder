@@ -28,6 +28,9 @@ namespace MealBuilder.Web.Models
         [Range(1, 100)]
         public int Servings { get; set; } = 1;
 
+        [Range(0.01, 100000)]
+        public decimal? FinalWeightGrams { get; set; }
+
         public List<RecipeIngredient> RecipeIngredients { get; set; } = [];
 
         public List<RecipeComponent> Components { get; set; } = [];

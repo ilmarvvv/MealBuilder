@@ -57,6 +57,12 @@
         <span asp-validation-for="Recipe.CookTimeMinutes" class="text-danger"></span>
     </div>
 
+    <div class="mb-3">
+        <label asp-for="Recipe.FinalWeightGrams" class="form-label">Final weight grams</label>
+        <input asp-for="Recipe.FinalWeightGrams" class="form-control" />
+        <span asp-validation-for="Recipe.FinalWeightGrams" class="text-danger"></span>
+    </div>
+
     <h2>Actions</h2>
 
     <button type="submit" class="btn btn-primary">Create Recipe</button>

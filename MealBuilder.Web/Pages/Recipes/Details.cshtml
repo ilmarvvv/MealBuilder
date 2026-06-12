@@ -8,29 +8,42 @@
 <h1>Recipe Details</h1>
 
 <dl class="row">
-    <dt class="col-sm-2">Name</dt>
-    <dd class="col-sm-10">@Model.Recipe.Name</dd>
+    <dt class="col-sm-4 col-md-3">Name</dt>
+    <dd class="col-sm-8 col-md-9">@Model.Recipe.Name</dd>
 
-    <dt class="col-sm-2">Description</dt>
-    <dd class="col-sm-10">@Model.Recipe.Description</dd>
+    <dt class="col-sm-4 col-md-3">Description</dt>
+    <dd class="col-sm-8 col-md-9">@Model.Recipe.Description</dd>
 
-    <dt class="col-sm-2">Category</dt>
-    <dd class="col-sm-10">Future idea</dd>
+    <dt class="col-sm-4 col-md-3">Category</dt>
+    <dd class="col-sm-8 col-md-9">Future idea</dd>
 
-    <dt class="col-sm-2">Planned days</dt>
-    <dd class="col-sm-10">@Model.Recipe.DefaultPlannedDays</dd>
+    <dt class="col-sm-4 col-md-3">Planned days</dt>
+    <dd class="col-sm-8 col-md-9">@Model.Recipe.DefaultPlannedDays</dd>
 
-    <dt class="col-sm-2">Servings per day</dt>
-    <dd class="col-sm-10">@Model.Recipe.DefaultServingsPerDay</dd>
+    <dt class="col-sm-4 col-md-3">Servings per day</dt>
+    <dd class="col-sm-8 col-md-9">@Model.Recipe.DefaultServingsPerDay</dd>
 
-    <dt class="col-sm-2">Total servings</dt>
-    <dd class="col-sm-10">@Model.Recipe.Servings</dd>
+    <dt class="col-sm-4 col-md-3">Total servings</dt>
+    <dd class="col-sm-8 col-md-9">@Model.Recipe.Servings</dd>
 
-    <dt class="col-sm-2">Prep time minutes</dt>
-    <dd class="col-sm-10">@Model.Recipe.PrepTimeMinutes</dd>
+    <dt class="col-sm-4 col-md-3">Prep time minutes</dt>
+    <dd class="col-sm-8 col-md-9">@Model.Recipe.PrepTimeMinutes</dd>
 
-    <dt class="col-sm-2">Cook time minutes</dt>
-    <dd class="col-sm-10">@Model.Recipe.CookTimeMinutes</dd>
+    <dt class="col-sm-4 col-md-3">Cook time minutes</dt>
+    <dd class="col-sm-8 col-md-9">@Model.Recipe.CookTimeMinutes</dd>
+
+    <dt class="col-sm-4 col-md-3">Recipe weight</dt>
+    <dd class="col-sm-8 col-md-9">
+        @Model.EffectiveWeightGrams.ToString("0.##") g
+        @if (Model.Recipe.FinalWeightGrams is null)
+        {
+            <span class="text-muted">(estimated)</span>
+        }
+        else
+        {
+            <span class="text-muted">(manual)</span>
+        }
+    </dd>
 </dl>
 
 <h2>Nutrition Summary</h2>
