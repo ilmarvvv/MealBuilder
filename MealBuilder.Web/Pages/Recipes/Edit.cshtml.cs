@@ -25,6 +25,12 @@ namespace MealBuilder.Web.Pages.Recipes
 
         public List<RecipeContentSummary> RecipeContentSummaries { get; set; } = [];
 
+        public RecipeNutritionTotals Totals { get; set; } = new();
+
+        public RecipeNutritionTotals PerDayTotals { get; set; } = new();
+
+        public RecipeNutritionTotals PerServingTotals { get; set; } = new();
+
         public async Task<IActionResult> OnGetAsync(int id)
         {
             Recipe? recipe = await LoadRecipeAsync(id);
@@ -35,7 +41,7 @@ namespace MealBuilder.Web.Pages.Recipes
             }
 
             Recipe = recipe;
-            RecipeContentSummaries = BuildRecipeContentSummaries(recipe);
+            LoadRecipeViewData(recipe);
 
             return Page();
         }
@@ -48,7 +54,7 @@ namespace MealBuilder.Web.Pages.Recipes
 
                 if (recipe is not null)
                 {
-                    RecipeContentSummaries = BuildRecipeContentSummaries(recipe);
+                    LoadRecipeViewData(recipe);
                 }
 
                 return Page();
@@ -265,6 +271,14 @@ namespace MealBuilder.Web.Pages.Recipes
                 .ThenInclude(componentRecipe => componentRecipe.RecipeIngredients)
                 .ThenInclude(recipeIngredient => recipeIngredient.Ingredient)
                 .FirstOrDefaultAsync(recipe => recipe.Id == id);
+        }
+
+        private void LoadRecipeViewData(Recipe recipe)
+        {
+            RecipeContentSummaries = BuildRecipeContentSummaries(recipe);
+            Totals = _recipeCalculationService.Calculate(recipe);
+            PerDayTotals = _recipeCalculationService.Divide(Totals, recipe.DefaultPlannedDays);
+            PerServingTotals = _recipeCalculationService.Divide(Totals, recipe.Servings);
         }
 
         private List<RecipeContentSummary> BuildRecipeContentSummaries(Recipe recipe)
