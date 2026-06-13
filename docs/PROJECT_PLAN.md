@@ -743,15 +743,18 @@ This milestone goes through the existing system from ingredients to menus and re
 
 ##### 12.9.2 Recipe Edit Flow Refinement
 
-- [ ] Make Recipe Details read-only
+- [x] Make Recipe Details read-only
   - Remove add, edit, remove, and position editing controls from Recipe Details.
   - Keep Recipe Details focused on review, nutrition summary, recipe contents, and prepared batch creation.
-- [ ] Use Recipe Edit as the main place for editing recipe contents
+- [x] Use Recipe Edit as the main place for editing recipe contents
   - Move add ingredient and add recipe component actions to Recipe Edit.
   - Move edit, remove, and position controls to Recipe Edit.
-- [ ] Redirect Recipe Create to Recipe Edit after saving
+- [x] Redirect Recipe Create to Recipe Edit after saving
   - Allow the user to create basic recipe information first.
   - Continue filling recipe contents in Recipe Edit.
+- [x] Show nutrition summary on Recipe Edit
+  - Show total recipe, per-day, and per-serving values.
+  - Update values after recipe contents are changed and the page reloads.
 
 #### 12.10 Editable Prepared Batch Snapshot
 
