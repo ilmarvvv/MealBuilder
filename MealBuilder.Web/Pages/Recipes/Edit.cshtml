@@ -68,11 +68,6 @@
 
     <h2>Ingredients & Nutrition</h2>
 
-    <div class="mb-3">
-        <a asp-page="./AddIngredient" asp-route-id="@Model.Recipe.Id" class="btn btn-primary">Add Ingredient</a>
-        <a asp-page="./AddComponent" asp-route-id="@Model.Recipe.Id" class="btn btn-primary">Add Recipe</a>
-    </div>
-
     @if (Model.RecipeContentSummaries.Count == 0)
     {
         <p>No recipe contents have been added yet.</p>
@@ -98,7 +93,14 @@
                 @foreach (var item in Model.RecipeContentSummaries)
                 {
                     <tr>
-                        <td>@item.Position</td>
+                        <td>
+                            <form method="post" asp-page-handler="ChangeContentPosition" class="d-flex gap-2">
+                                <input type="hidden" name="contentType" value="@item.Type" />
+                                <input type="hidden" name="contentId" value="@item.Id" />
+                                <input type="number" name="newPosition" value="@item.Position" min="1" class="form-control form-control-sm" style="width: 80px;" />
+                                <button type="submit" class="btn btn-link p-0">Set</button>
+                            </form>
+                        </td>
                         <td>@item.Type</td>
                         <td>@item.Name</td>
                         <td>@item.Grams.ToString("0.##")</td>
@@ -130,6 +132,11 @@
             </tbody>
         </table>
     }
+
+<div class="mb-3">
+    <a asp-page="./AddIngredient" asp-route-id="@Model.Recipe.Id" class="btn btn-primary">Add Ingredient</a>
+    <a asp-page="./AddComponent" asp-route-id="@Model.Recipe.Id" class="btn btn-primary">Add Recipe</a>
+</div>
 
     <h2>Actions</h2>
 
