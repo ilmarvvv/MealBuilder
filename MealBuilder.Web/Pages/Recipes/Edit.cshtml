@@ -7,7 +7,7 @@
 
 <h1>Edit Recipe</h1>
 
-<form method="post">
+<form id="recipe-edit-form" method="post">
     <input type="hidden" asp-for="Recipe.Id" />
 
     <h2>Basic Information</h2>
@@ -64,12 +64,77 @@
         <input asp-for="Recipe.FinalWeightGrams" class="form-control" />
         <span asp-validation-for="Recipe.FinalWeightGrams" class="text-danger"></span>
     </div>
+</form>
+
+    <h2>Ingredients & Nutrition</h2>
+
+    <div class="mb-3">
+        <a asp-page="./AddIngredient" asp-route-id="@Model.Recipe.Id" class="btn btn-primary">Add Ingredient</a>
+        <a asp-page="./AddComponent" asp-route-id="@Model.Recipe.Id" class="btn btn-primary">Add Recipe</a>
+    </div>
+
+    @if (Model.RecipeContentSummaries.Count == 0)
+    {
+        <p>No recipe contents have been added yet.</p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Position</th>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Grams</th>
+                    <th>Calories</th>
+                    <th>Protein</th>
+                    <th>Fiber</th>
+                    <th>Sugar</th>
+                    <th>Salt</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.RecipeContentSummaries)
+                {
+                    <tr>
+                        <td>@item.Position</td>
+                        <td>@item.Type</td>
+                        <td>@item.Name</td>
+                        <td>@item.Grams.ToString("0.##")</td>
+                        <td>@item.Calories.ToString("0.00")</td>
+                        <td>@item.Protein.ToString("0.00")</td>
+                        <td>@item.Fiber.ToString("0.00")</td>
+                        <td>@item.Sugar.ToString("0.00")</td>
+                        <td>@item.Salt.ToString("0.00")</td>
+                        <td>
+                            @if (item.Type == "Ingredient")
+                            {
+                                <a asp-page="./EditIngredient" asp-route-id="@item.Id">Edit</a>
+                                <form method="post" asp-page-handler="RemoveIngredient" class="d-inline">
+                                    <input type="hidden" name="recipeIngredientId" value="@item.Id" />
+                                    <button type="submit" class="btn btn-link p-0">Remove</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <a asp-page="./EditComponent" asp-route-id="@item.Id">Edit</a>
+                                <form method="post" asp-page-handler="RemoveComponent" class="d-inline">
+                                    <input type="hidden" name="recipeComponentId" value="@item.Id" />
+                                    <button type="submit" class="btn btn-link p-0">Remove</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
 
     <h2>Actions</h2>
 
-    <button type="submit" class="btn btn-primary">Save Changes</button>
-    <a asp-page="./Index" class="btn btn-secondary">Cancel</a>
-</form>
+    <button type="submit" form="recipe-edit-form" class="btn btn-primary">Save Changes</button>
+    <a asp-page="./Details" asp-route-id="@Model.Recipe.Id" class="btn btn-secondary">Cancel</a>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
