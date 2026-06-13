@@ -709,29 +709,49 @@ This milestone goes through the existing system from ingredients to menus and re
 
 #### 12.9 Recipe Flow Refinement
 
-- [ ] Refine recipe core
+##### 12.9.1 Recipe Core and Summary Refinement
+
+- [x] Refine recipe core
   - Add default planned days.
   - Add default servings per day.
   - Keep total servings calculated from default planned days * default servings per day.
   - Add prep time.
   - Add cook time.
-  - Add optional preparation notes.
+  - Add optional final weight.
   - Keep recipe categories out of the core model for now.
-- [ ] Refine Recipe Create page
+- [x] Refine Recipe Create page
   - Structure the page as a reusable recipe form.
   - Add a Basic Information section.
   - Show category as a placeholder only.
-- [ ] Refine Recipe Edit page
+- [x] Refine Recipe Edit page
   - Reuse the same form structure as Recipe Create.
   - Keep editable recipe core fields in one clear place.
-- [ ] Refine Recipe Details page
-  - Treat Details as a read-only recipe review page.
+- [x] Refine Recipe Details summary
   - Show recipe totals, per-day values, and per-serving values clearly.
-  - Show ingredients and recipe components as recipe contents.
-- [ ] Add recipe contents ordering
+  - Show recipe weight using manual final weight when available, otherwise estimated weight.
+  - Show ingredients and recipe components as one recipe contents summary.
+- [x] Add mixed recipe weight handling
+  - Use manual final weight when set.
+  - Otherwise use estimated weight from recipe contents.
+- [x] Combine ingredient and recipe component display
+  - Use one recipe contents summary for Ingredients and Recipes.
+- [x] Add recipe contents ordering
   - Add position numbers for ingredients and recipe components inside a recipe.
   - Show recipe contents in position order.
   - Keep positions continuous without duplicates or gaps.
+  - Allow changing recipe content position by entering a position number.
+
+##### 12.9.2 Recipe Edit Flow Refinement
+
+- [ ] Make Recipe Details read-only
+  - Remove add, edit, remove, and position editing controls from Recipe Details.
+  - Keep Recipe Details focused on review, nutrition summary, recipe contents, and prepared batch creation.
+- [ ] Use Recipe Edit as the main place for editing recipe contents
+  - Move add ingredient and add recipe component actions to Recipe Edit.
+  - Move edit, remove, and position controls to Recipe Edit.
+- [ ] Redirect Recipe Create to Recipe Edit after saving
+  - Allow the user to create basic recipe information first.
+  - Continue filling recipe contents in Recipe Edit.
 
 #### 12.10 Editable Prepared Batch Snapshot
 
