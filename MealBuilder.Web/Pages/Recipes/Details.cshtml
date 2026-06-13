@@ -114,7 +114,14 @@ else
             @foreach (var item in Model.RecipeContentSummaries)
         {
             <tr>
-                <td>@item.Position</td>
+                <td>
+                    <form method="post" asp-page-handler="ChangeContentPosition" class="d-flex gap-1">
+                        <input type="hidden" name="contentType" value="@item.Type" />
+                        <input type="hidden" name="contentId" value="@item.Id" />
+                        <input type="number" name="newPosition" value="@item.Position" min="1" class="form-control form-control-sm" style="width: 80px;" />
+                        <button type="submit" class="btn btn-sm btn-outline-secondary">Set</button>
+                    </form>
+                </td>
                 <td>@item.Type</td>
                 <td>@item.Name</td>
                 <td>@item.Grams.ToString("0.##")</td>

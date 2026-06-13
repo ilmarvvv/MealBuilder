@@ -5,6 +5,7 @@ using MealBuilder.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using System.Xml.Linq;
 
 namespace MealBuilder.Web.Pages.Recipes
 {
@@ -135,6 +136,131 @@ namespace MealBuilder.Web.Pages.Recipes
             await _context.SaveChangesAsync();
 
             return RedirectToPage("./Details", new { id = recipeId });
+        }
+
+        public async Task<IActionResult> OnPostChangeContentPositionAsync(
+            string contentType,
+            int contentId,
+            int newPosition)
+        {
+            RecipeIngredient? recipeIngredient = null;
+            RecipeComponent? recipeComponent = null;
+            int recipeId;
+
+            if (contentType == "Ingredient")
+            {
+                recipeIngredient = await _context.RecipeIngredients.FindAsync(contentId);
+
+                if (recipeIngredient is null)
+                {
+                    return NotFound();
+                }
+
+                recipeId = recipeIngredient.RecipeId;
+            }
+            else
+            {
+                recipeComponent = await _context.RecipeComponents.FindAsync(contentId);
+
+                if (recipeComponent is null)
+                {
+                    return NotFound();
+                }
+
+                recipeId = recipeComponent.ParentRecipeId;
+            }
+
+            List<RecipeContentPositionItem> contentItems = await LoadRecipeContentPositionItemsAsync(recipeId);
+
+            RecipeContentPositionItem? movedItem = contentItems
+                .FirstOrDefault(contentItem =>
+                    contentItem.ContentType == contentType &&
+                    contentItem.Id == contentId);
+
+            if (movedItem is null)
+            {
+                return NotFound();
+            }
+
+            contentItems.Remove(movedItem);
+
+            int insertIndex = Math.Clamp(newPosition - 1, 0, contentItems.Count);
+            contentItems.Insert(insertIndex, movedItem);
+
+            await ApplyRecipeContentPositionsAsync(contentItems);
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToPage("./Details", new { id = recipeId });
+        }
+
+        private async Task<List<RecipeContentPositionItem>> LoadRecipeContentPositionItemsAsync(int recipeId)
+        {
+            List<RecipeContentPositionItem> ingredientItems = await _context.RecipeIngredients
+                .Where(recipeIngredient => recipeIngredient.RecipeId == recipeId)
+                .Select(recipeIngredient => new RecipeContentPositionItem
+                {
+                    Id = recipeIngredient.Id,
+                    ContentType = "Ingredient",
+                    Position = recipeIngredient.Position
+                })
+                .ToListAsync();
+
+            List<RecipeContentPositionItem> componentItems = await _context.RecipeComponents
+                .Where(recipeComponent => recipeComponent.ParentRecipeId == recipeId)
+                .Select(recipeComponent => new RecipeContentPositionItem
+                {
+                    Id = recipeComponent.Id,
+                    ContentType = "Recipe",
+                    Position = recipeComponent.Position
+                })
+                .ToListAsync();
+
+            return ingredientItems
+                .Concat(componentItems)
+                .OrderBy(contentItem => contentItem.Position)
+                .ThenBy(contentItem => contentItem.ContentType)
+                .ThenBy(contentItem => contentItem.Id)
+                .ToList();
+        }
+
+        private async Task ApplyRecipeContentPositionsAsync(List<RecipeContentPositionItem> contentItems)
+        {
+            for (int index = 0; index < contentItems.Count; index++)
+            {
+                RecipeContentPositionItem contentItem = contentItems[index];
+                int position = index + 1;
+
+                if (contentItem.ContentType == "Ingredient")
+                {
+                    RecipeIngredient? recipeIngredient = await _context.RecipeIngredients
+                        .FindAsync(contentItem.Id);
+
+                    if (recipeIngredient is not null)
+                    {
+                        recipeIngredient.Position = position;
+                    }
+                }
+                else
+                {
+                    RecipeComponent? recipeComponent = await _context.RecipeComponents
+                        .FindAsync(contentItem.Id);
+
+                    if (recipeComponent is not null)
+                    {
+                        recipeComponent.Position = position;
+                    }
+                }
+            }
+        }
+
+        private class RecipeContentPositionItem
+        {
+            public int Id { get; set; }
+
+            public string ContentType { get; set; } = string.Empty;
+
+            public int Position { get; set; }
         }
 
         private async Task ReorderRecipeContentsAsync(int recipeId)
