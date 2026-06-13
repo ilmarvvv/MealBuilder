@@ -107,59 +107,26 @@ else
                 <th>Fiber</th>
                 <th>Sugar</th>
                 <th>Salt</th>
-                <th></th>
             </tr>
         </thead>
         <tbody>
             @foreach (var item in Model.RecipeContentSummaries)
-        {
-            <tr>
-                <td>
-                    <form method="post" asp-page-handler="ChangeContentPosition" class="d-flex gap-1">
-                        <input type="hidden" name="contentType" value="@item.Type" />
-                        <input type="hidden" name="contentId" value="@item.Id" />
-                        <input type="number" name="newPosition" value="@item.Position" min="1" class="form-control form-control-sm" style="width: 80px;" />
-                        <button type="submit" class="btn btn-sm btn-outline-secondary">Set</button>
-                    </form>
-                </td>
-                <td>@item.Type</td>
-                <td>@item.Name</td>
-                <td>@item.Grams.ToString("0.##")</td>
-                <td>@item.Calories.ToString("0.00")</td>
-                <td>@item.Protein.ToString("0.00")</td>
-                <td>@item.Fiber.ToString("0.00")</td>
-                <td>@item.Sugar.ToString("0.00")</td>
-                <td>@item.Salt.ToString("0.00")</td>
-                <td>
-                    @if (item.Type == "Ingredient")
-                    {
-                        <a asp-page="./EditIngredient" asp-route-id="@item.Id">Edit</a>
-
-                        <form method="post" asp-page-handler="RemoveIngredient" class="d-inline">
-                            <input type="hidden" name="recipeIngredientId" value="@item.Id" />
-                            <button type="submit" class="btn btn-link p-0">Remove</button>
-                        </form>
-                    }
-                    else
-                    {
-                        <a asp-page="./EditComponent" asp-route-id="@item.Id">Edit</a>
-
-                        <form method="post" asp-page-handler="RemoveComponent" class="d-inline">
-                            <input type="hidden" name="recipeComponentId" value="@item.Id" />
-                            <button type="submit" class="btn btn-link p-0">Remove</button>
-                        </form>
-                    }
-                </td>
-            </tr>
-        }
+            {
+                <tr>
+                    <td>@item.Position</td>
+                    <td>@item.Type</td>
+                    <td>@item.Name</td>
+                    <td>@item.Grams.ToString("0.##")</td>
+                    <td>@item.Calories.ToString("0.00")</td>
+                    <td>@item.Protein.ToString("0.00")</td>
+                    <td>@item.Fiber.ToString("0.00")</td>
+                    <td>@item.Sugar.ToString("0.00")</td>
+                    <td>@item.Salt.ToString("0.00")</td>
+                </tr>
+            }
         </tbody>
     </table>
 }
-
-<p>
-    <a asp-page="./AddIngredient" asp-route-id="@Model.Recipe.Id" class="btn btn-primary">Add Ingredient</a>
-    <a asp-page="./AddComponent" asp-route-id="@Model.Recipe.Id" class="btn btn-primary">Add Recipe</a>
-</p>
 
 <a asp-page="/PreparedRecipeBatches/Create" asp-route-recipeId="@Model.Recipe.Id" class="btn btn-primary">Create Prepared Batch</a>
 <a asp-page="./Edit" asp-route-id="@Model.Recipe.Id" class="btn btn-primary">Edit</a>
