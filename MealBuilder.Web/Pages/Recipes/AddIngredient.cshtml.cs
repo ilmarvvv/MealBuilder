@@ -58,6 +58,14 @@ namespace MealBuilder.Web.Pages.Recipes
                 return Page();
             }
 
+            int ingredientCount = await _context.RecipeIngredients
+                .CountAsync(recipeIngredient => recipeIngredient.RecipeId == RecipeIngredient.RecipeId);
+
+            int componentCount = await _context.RecipeComponents
+                .CountAsync(recipeComponent => recipeComponent.ParentRecipeId == RecipeIngredient.RecipeId);
+
+            RecipeIngredient.Position = ingredientCount + componentCount + 1;
+
             _context.RecipeIngredients.Add(RecipeIngredient);
             await _context.SaveChangesAsync();
 

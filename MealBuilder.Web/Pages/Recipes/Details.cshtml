@@ -98,6 +98,7 @@ else
     <table class="table">
         <thead>
             <tr>
+                <th>Position</th>
                 <th>Type</th>
                 <th>Name</th>
                 <th>Grams</th>
@@ -113,6 +114,7 @@ else
             @foreach (var item in Model.RecipeContentSummaries)
         {
             <tr>
+                <td>@item.Position</td>
                 <td>@item.Type</td>
                 <td>@item.Name</td>
                 <td>@item.Grams.ToString("0.##")</td>
