@@ -775,6 +775,11 @@ Goal: improve the features that already exist.
 
 Goal: plan the transition from Razor Pages to an API-based application and choose the future frontend technology.
 
+- [ ] Design full recipe creation flow for the API/frontend version
+  - Allow creating a recipe with ingredients and recipe components in one flow.
+  - Avoid the temporary Razor Pages two-step flow where the basic recipe is created first and contents are added later.
+  - Decide how the frontend should manage unsaved recipe contents before the recipe is saved.
+
 ## 7. Future Ideas
 
 This section contains ideas that may be useful for the project in the future, but are not part of the nearest implementation plan.
