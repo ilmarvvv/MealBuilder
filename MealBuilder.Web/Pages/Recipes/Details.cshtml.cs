@@ -110,6 +110,9 @@ namespace MealBuilder.Web.Pages.Recipes
             _context.RecipeIngredients.Remove(recipeIngredient);
             await _context.SaveChangesAsync();
 
+            await ReorderRecipeContentsAsync(recipeId);
+            await _context.SaveChangesAsync();
+
             return RedirectToPage("./Details", new { id = recipeId });
         }
 
@@ -128,7 +131,39 @@ namespace MealBuilder.Web.Pages.Recipes
             _context.RecipeComponents.Remove(recipeComponent);
             await _context.SaveChangesAsync();
 
+            await ReorderRecipeContentsAsync(recipeId);
+            await _context.SaveChangesAsync();
+
             return RedirectToPage("./Details", new { id = recipeId });
+        }
+
+        private async Task ReorderRecipeContentsAsync(int recipeId)
+        {
+            List<RecipeIngredient> recipeIngredients = await _context.RecipeIngredients
+                .Where(recipeIngredient => recipeIngredient.RecipeId == recipeId)
+                .OrderBy(recipeIngredient => recipeIngredient.Position)
+                .ThenBy(recipeIngredient => recipeIngredient.Id)
+                .ToListAsync();
+
+            List<RecipeComponent> recipeComponents = await _context.RecipeComponents
+                .Where(recipeComponent => recipeComponent.ParentRecipeId == recipeId)
+                .OrderBy(recipeComponent => recipeComponent.Position)
+                .ThenBy(recipeComponent => recipeComponent.Id)
+                .ToListAsync();
+
+            int position = 1;
+
+            foreach (RecipeIngredient recipeIngredient in recipeIngredients)
+            {
+                recipeIngredient.Position = position;
+                position++;
+            }
+
+            foreach (RecipeComponent recipeComponent in recipeComponents)
+            {
+                recipeComponent.Position = position;
+                position++;
+            }
         }
     }
 }
