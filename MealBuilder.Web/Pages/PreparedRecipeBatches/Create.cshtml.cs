@@ -78,6 +78,43 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
             PreparedRecipeBatch.TotalSugarSnapshot = totals.Sugar;
             PreparedRecipeBatch.TotalSaltSnapshot = totals.Salt;
 
+            PreparedRecipeBatch.Items = recipe.RecipeIngredients
+                .Select(recipeIngredient => new PreparedRecipeBatchItem
+                {
+                    ItemType = PreparedRecipeBatchItemType.Ingredient,
+                    SourceIngredientId = recipeIngredient.IngredientId,
+                    NameSnapshot = recipeIngredient.Ingredient.Name,
+                    Grams = recipeIngredient.Grams,
+                    CaloriesSnapshot = recipeIngredient.Ingredient.CaloriesPer100g * recipeIngredient.Grams / 100,
+                    ProteinSnapshot = recipeIngredient.Ingredient.ProteinPer100g * recipeIngredient.Grams / 100,
+                    FiberSnapshot = recipeIngredient.Ingredient.FiberPer100g * recipeIngredient.Grams / 100,
+                    SugarSnapshot = recipeIngredient.Ingredient.SugarPer100g * recipeIngredient.Grams / 100,
+                    SaltSnapshot = recipeIngredient.Ingredient.SaltPer100g * recipeIngredient.Grams / 100,
+                    Position = recipeIngredient.Position
+                })
+                .Concat(recipe.Components.Select(recipeComponent =>
+                {
+                    decimal componentTotalWeight = _recipeCalculationService.CalculateEffectiveWeight(recipeComponent.ComponentRecipe);
+                    RecipeNutritionTotals componentTotals = _recipeCalculationService.Calculate(recipeComponent.ComponentRecipe);
+                    decimal ratio = componentTotalWeight > 0 ? recipeComponent.Grams / componentTotalWeight : 0;
+
+                    return new PreparedRecipeBatchItem
+                    {
+                        ItemType = PreparedRecipeBatchItemType.Recipe,
+                        SourceRecipeId = recipeComponent.ComponentRecipeId,
+                        NameSnapshot = recipeComponent.ComponentRecipe.Name,
+                        Grams = recipeComponent.Grams,
+                        CaloriesSnapshot = componentTotals.Calories * ratio,
+                        ProteinSnapshot = componentTotals.Protein * ratio,
+                        FiberSnapshot = componentTotals.Fiber * ratio,
+                        SugarSnapshot = componentTotals.Sugar * ratio,
+                        SaltSnapshot = componentTotals.Salt * ratio,
+                        Position = recipeComponent.Position
+                    };
+                }))
+                .OrderBy(item => item.Position)
+                .ToList();
+
             _context.PreparedRecipeBatches.Add(PreparedRecipeBatch);
 
             decimal servingsPerDay = PreparedRecipeBatch.TotalServings / PreparedRecipeBatch.PlannedDays;
