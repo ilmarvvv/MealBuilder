@@ -45,5 +45,46 @@
     <dd class="col-sm-9">@Model.PreparedRecipeBatchSummary.RemainingServings</dd>
 </dl>
 
+<h2>Batch Items</h2>
+
+@if (Model.PreparedRecipeBatchSummary.PreparedRecipeBatch.Items.Count == 0)
+{
+    <p>No batch items have been saved for this prepared batch.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Position</th>
+                <th>Type</th>
+                <th>Name</th>
+                <th>Grams</th>
+                <th>Calories</th>
+                <th>Protein</th>
+                <th>Fiber</th>
+                <th>Sugar</th>
+                <th>Salt</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.PreparedRecipeBatchSummary.PreparedRecipeBatch.Items.OrderBy(item => item.Position))
+            {
+                <tr>
+                    <td>@item.Position</td>
+                    <td>@item.ItemType</td>
+                    <td>@item.NameSnapshot</td>
+                    <td>@item.Grams.ToString("0.##")</td>
+                    <td>@item.CaloriesSnapshot.ToString("0.00")</td>
+                    <td>@item.ProteinSnapshot.ToString("0.00")</td>
+                    <td>@item.FiberSnapshot.ToString("0.00")</td>
+                    <td>@item.SugarSnapshot.ToString("0.00")</td>
+                    <td>@item.SaltSnapshot.ToString("0.00")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
 <a asp-page="./Delete" asp-route-id="@Model.PreparedRecipeBatchSummary.PreparedRecipeBatch.Id" class="btn btn-danger">Delete</a>
 <a asp-page="./Index" class="btn btn-secondary">Back</a>

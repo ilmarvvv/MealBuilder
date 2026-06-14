@@ -22,6 +22,7 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
             PreparedRecipeBatch? preparedRecipeBatch = await _context.PreparedRecipeBatches
                 .Include(preparedRecipeBatch => preparedRecipeBatch.Recipe)
                 .Include(preparedRecipeBatch => preparedRecipeBatch.MenuItems)
+                .Include(preparedRecipeBatch => preparedRecipeBatch.Items)
                 .FirstOrDefaultAsync(preparedRecipeBatch => preparedRecipeBatch.Id == id);
 
             if (preparedRecipeBatch is null)
