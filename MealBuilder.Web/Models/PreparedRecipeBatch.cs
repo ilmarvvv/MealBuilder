@@ -40,6 +40,8 @@ namespace MealBuilder.Web.Models
         [Range(0, 1000000)]
         public decimal TotalSaltSnapshot { get; set; }
 
+        public List<PreparedRecipeBatchItem> Items { get; set; } = [];
+
         public List<MenuItem> MenuItems { get; set; } = [];
 
     }

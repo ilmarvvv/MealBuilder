@@ -24,6 +24,8 @@ namespace MealBuilder.Web.Data
 
         public DbSet<PreparedRecipeBatch> PreparedRecipeBatches { get; set; }
 
+        public DbSet<PreparedRecipeBatchItem> PreparedRecipeBatchItems { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<RecipeIngredient>()
@@ -83,6 +85,23 @@ namespace MealBuilder.Web.Data
                 .HasOne(preparedRecipeBatch => preparedRecipeBatch.Recipe)
                 .WithMany(recipe => recipe.PreparedRecipeBatches)
                 .HasForeignKey(preparedRecipeBatch => preparedRecipeBatch.RecipeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PreparedRecipeBatchItem>()
+                .HasOne(preparedRecipeBatchItem => preparedRecipeBatchItem.PreparedRecipeBatch)
+                .WithMany(preparedRecipeBatch => preparedRecipeBatch.Items)
+                .HasForeignKey(preparedRecipeBatchItem => preparedRecipeBatchItem.PreparedRecipeBatchId);
+
+            modelBuilder.Entity<PreparedRecipeBatchItem>()
+                .HasOne(preparedRecipeBatchItem => preparedRecipeBatchItem.SourceIngredient)
+                .WithMany()
+                .HasForeignKey(preparedRecipeBatchItem => preparedRecipeBatchItem.SourceIngredientId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PreparedRecipeBatchItem>()
+                .HasOne(preparedRecipeBatchItem => preparedRecipeBatchItem.SourceRecipe)
+                .WithMany()
+                .HasForeignKey(preparedRecipeBatchItem => preparedRecipeBatchItem.SourceRecipeId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
