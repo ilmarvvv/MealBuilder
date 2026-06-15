@@ -98,6 +98,7 @@ else
                 <th>Fiber</th>
                 <th>Sugar</th>
                 <th>Salt</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -113,6 +114,9 @@ else
                     <td>@item.FiberSnapshot.ToString("0.00")</td>
                     <td>@item.SugarSnapshot.ToString("0.00")</td>
                     <td>@item.SaltSnapshot.ToString("0.00")</td>
+                    <td>
+                        <a asp-page="./EditItem" asp-route-id="@item.Id">Edit</a>
+                    </td>
                 </tr>
             }
         </tbody>
