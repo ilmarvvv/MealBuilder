@@ -67,5 +67,39 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
 
             return Page();
         }
+
+        public async Task<IActionResult> OnPostRemoveItemAsync(int preparedRecipeBatchItemId)
+        {
+            PreparedRecipeBatchItem? item = await _context.PreparedRecipeBatchItems
+                .FirstOrDefaultAsync(item => item.Id == preparedRecipeBatchItemId);
+
+            if (item is null)
+            {
+                return NotFound();
+            }
+
+            int preparedRecipeBatchId = item.PreparedRecipeBatchId;
+
+            _context.PreparedRecipeBatchItems.Remove(item);
+            await _context.SaveChangesAsync();
+
+            await ReorderBatchItemsAsync(preparedRecipeBatchId);
+            await _context.SaveChangesAsync();
+
+            return RedirectToPage("./Details", new { id = preparedRecipeBatchId });
+        }
+        private async Task ReorderBatchItemsAsync(int preparedRecipeBatchId)
+        {
+            List<PreparedRecipeBatchItem> items = await _context.PreparedRecipeBatchItems
+                .Where(item => item.PreparedRecipeBatchId == preparedRecipeBatchId)
+                .OrderBy(item => item.Position)
+                .ThenBy(item => item.Id)
+                .ToListAsync();
+
+            for (int index = 0; index < items.Count; index++)
+            {
+                items[index].Position = index + 1;
+            }
+        }
     }
 }

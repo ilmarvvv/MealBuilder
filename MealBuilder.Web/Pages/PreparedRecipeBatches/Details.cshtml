@@ -116,6 +116,10 @@ else
                     <td>@item.SaltSnapshot.ToString("0.00")</td>
                     <td>
                         <a asp-page="./EditItem" asp-route-id="@item.Id">Edit</a>
+                        <form method="post" asp-page-handler="RemoveItem" class="d-inline">
+                            <input type="hidden" name="preparedRecipeBatchItemId" value="@item.Id" />
+                            <button type="submit" class="btn btn-link p-0">Remove</button>
+                        </form>
                     </td>
                 </tr>
             }
