@@ -17,6 +17,10 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
 
         public PreparedRecipeBatchSummary PreparedRecipeBatchSummary { get; set; } = new();
 
+        public RecipeNutritionTotals ItemTotals { get; set; } = new();
+
+        public RecipeNutritionTotals ItemPerServingTotals { get; set; } = new();
+
         public async Task<IActionResult> OnGetAsync(int id)
         {
             PreparedRecipeBatch? preparedRecipeBatch = await _context.PreparedRecipeBatches
@@ -39,6 +43,27 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
                 PreparedRecipeBatch = preparedRecipeBatch,
                 UsedServings = usedServings
             };
+
+            ItemTotals = new RecipeNutritionTotals
+            {
+                Calories = preparedRecipeBatch.Items.Sum(item => item.CaloriesSnapshot),
+                Protein = preparedRecipeBatch.Items.Sum(item => item.ProteinSnapshot),
+                Fiber = preparedRecipeBatch.Items.Sum(item => item.FiberSnapshot),
+                Sugar = preparedRecipeBatch.Items.Sum(item => item.SugarSnapshot),
+                Salt = preparedRecipeBatch.Items.Sum(item => item.SaltSnapshot)
+            };
+
+            if (preparedRecipeBatch.TotalServings > 0)
+            {
+                ItemPerServingTotals = new RecipeNutritionTotals
+                {
+                    Calories = ItemTotals.Calories / preparedRecipeBatch.TotalServings,
+                    Protein = ItemTotals.Protein / preparedRecipeBatch.TotalServings,
+                    Fiber = ItemTotals.Fiber / preparedRecipeBatch.TotalServings,
+                    Sugar = ItemTotals.Sugar / preparedRecipeBatch.TotalServings,
+                    Salt = ItemTotals.Salt / preparedRecipeBatch.TotalServings
+                };
+            }
 
             return Page();
         }

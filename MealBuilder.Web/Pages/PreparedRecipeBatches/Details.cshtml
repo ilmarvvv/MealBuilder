@@ -45,6 +45,39 @@
     <dd class="col-sm-9">@Model.PreparedRecipeBatchSummary.RemainingServings</dd>
 </dl>
 
+<h2>Nutrition Summary</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Calories</th>
+            <th>Protein</th>
+            <th>Fiber</th>
+            <th>Sugar</th>
+            <th>Salt</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Total batch</td>
+            <td>@Model.ItemTotals.Calories.ToString("0.00")</td>
+            <td>@Model.ItemTotals.Protein.ToString("0.00")</td>
+            <td>@Model.ItemTotals.Fiber.ToString("0.00")</td>
+            <td>@Model.ItemTotals.Sugar.ToString("0.00")</td>
+            <td>@Model.ItemTotals.Salt.ToString("0.00")</td>
+        </tr>
+        <tr>
+            <td>Per serving</td>
+            <td>@Model.ItemPerServingTotals.Calories.ToString("0.00")</td>
+            <td>@Model.ItemPerServingTotals.Protein.ToString("0.00")</td>
+            <td>@Model.ItemPerServingTotals.Fiber.ToString("0.00")</td>
+            <td>@Model.ItemPerServingTotals.Sugar.ToString("0.00")</td>
+            <td>@Model.ItemPerServingTotals.Salt.ToString("0.00")</td>
+        </tr>
+    </tbody>
+</table>
+
 <h2>Batch Items</h2>
 
 @if (Model.PreparedRecipeBatchSummary.PreparedRecipeBatch.Items.Count == 0)
