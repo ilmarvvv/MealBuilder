@@ -71,11 +71,17 @@ namespace MealBuilder.Web.Services
 
             decimal servingRatio = menuItem.ServingsCount.Value / menuItem.PreparedRecipeBatch.TotalServings;
 
-            totals.Calories += menuItem.PreparedRecipeBatch.TotalCaloriesSnapshot * servingRatio;
-            totals.Protein += menuItem.PreparedRecipeBatch.TotalProteinSnapshot * servingRatio;
-            totals.Fiber += menuItem.PreparedRecipeBatch.TotalFiberSnapshot * servingRatio;
-            totals.Sugar += menuItem.PreparedRecipeBatch.TotalSugarSnapshot * servingRatio;
-            totals.Salt += menuItem.PreparedRecipeBatch.TotalSaltSnapshot * servingRatio;
+            decimal totalCalories = menuItem.PreparedRecipeBatch.Items.Sum(item => item.CaloriesSnapshot);
+            decimal totalProtein = menuItem.PreparedRecipeBatch.Items.Sum(item => item.ProteinSnapshot);
+            decimal totalFiber = menuItem.PreparedRecipeBatch.Items.Sum(item => item.FiberSnapshot);
+            decimal totalSugar = menuItem.PreparedRecipeBatch.Items.Sum(item => item.SugarSnapshot);
+            decimal totalSalt = menuItem.PreparedRecipeBatch.Items.Sum(item => item.SaltSnapshot);
+
+            totals.Calories += totalCalories * servingRatio;
+            totals.Protein += totalProtein * servingRatio;
+            totals.Fiber += totalFiber * servingRatio;
+            totals.Sugar += totalSugar * servingRatio;
+            totals.Salt += totalSalt * servingRatio;
         }
 
         private static void AddIngredientItemTotals(
