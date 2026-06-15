@@ -88,6 +88,42 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
 
             return RedirectToPage("./Details", new { id = preparedRecipeBatchId });
         }
+
+        public async Task<IActionResult> OnPostChangeItemPositionAsync(
+    int preparedRecipeBatchItemId,
+    int newPosition)
+        {
+            PreparedRecipeBatchItem? item = await _context.PreparedRecipeBatchItems
+                .FirstOrDefaultAsync(item => item.Id == preparedRecipeBatchItemId);
+
+            if (item is null)
+            {
+                return NotFound();
+            }
+
+            int preparedRecipeBatchId = item.PreparedRecipeBatchId;
+
+            List<PreparedRecipeBatchItem> items = await _context.PreparedRecipeBatchItems
+                .Where(batchItem => batchItem.PreparedRecipeBatchId == preparedRecipeBatchId)
+                .OrderBy(batchItem => batchItem.Position)
+                .ThenBy(batchItem => batchItem.Id)
+                .ToListAsync();
+
+            items.Remove(item);
+
+            int insertIndex = Math.Clamp(newPosition - 1, 0, items.Count);
+            items.Insert(insertIndex, item);
+
+            for (int index = 0; index < items.Count; index++)
+            {
+                items[index].Position = index + 1;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToPage("./Details", new { id = preparedRecipeBatchId });
+        }
+
         private async Task ReorderBatchItemsAsync(int preparedRecipeBatchId)
         {
             List<PreparedRecipeBatchItem> items = await _context.PreparedRecipeBatchItems

@@ -105,7 +105,13 @@ else
             @foreach (var item in Model.PreparedRecipeBatchSummary.PreparedRecipeBatch.Items.OrderBy(item => item.Position))
             {
                 <tr>
-                    <td>@item.Position</td>
+                    <td>
+                        <form method="post" asp-page-handler="ChangeItemPosition" class="d-flex gap-2">
+                            <input type="hidden" name="preparedRecipeBatchItemId" value="@item.Id" />
+                            <input type="number" name="newPosition" value="@item.Position" min="1" class="form-control form-control-sm" style="width: 80px;" />
+                            <button type="submit" class="btn btn-link p-0">Set</button>
+                        </form>
+                    </td>
                     <td>@item.ItemType</td>
                     <td>@item.NameSnapshot</td>
                     <td>@item.Grams.ToString("0.##")</td>
