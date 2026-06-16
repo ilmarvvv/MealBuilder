@@ -133,5 +133,9 @@ else
     </table>
 }
 
+<div class="mb-3">
+    <a asp-page="./AddIngredient" asp-route-id="@Model.PreparedRecipeBatchSummary.PreparedRecipeBatch.Id" class="btn btn-primary">Add Ingredient</a>
+</div>
+
 <a asp-page="./Delete" asp-route-id="@Model.PreparedRecipeBatchSummary.PreparedRecipeBatch.Id" class="btn btn-danger">Delete</a>
 <a asp-page="./Index" class="btn btn-secondary">Back</a>
