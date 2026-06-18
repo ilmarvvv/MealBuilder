@@ -1,11 +1,11 @@
 ﻿@page "{id:int}"
-@model MealBuilder.Web.Pages.PreparedRecipeBatches.DetailsModel
+@model MealBuilder.Web.Pages.PreparedRecipeBatches.EditModel
 
 @{
-    ViewData["Title"] = "Prepared Batch Details";
+    ViewData["Title"] = "Edit Prepared Batch";
 }
 
-<h1>Prepared Batch Details</h1>
+<h1>Edit Prepared Batch</h1>
 
 <dl class="row">
     <dt class="col-sm-3">Recipe</dt>
@@ -83,13 +83,20 @@ else
                 <th>Fiber</th>
                 <th>Sugar</th>
                 <th>Salt</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
             @foreach (var item in Model.PreparedRecipeBatchSummary.PreparedRecipeBatch.Items.OrderBy(item => item.Position))
             {
                 <tr>
-                    <td>@item.Position</td>
+                    <td>
+                        <form method="post" asp-page-handler="ChangeItemPosition" class="d-flex gap-2">
+                            <input type="hidden" name="preparedRecipeBatchItemId" value="@item.Id" />
+                            <input type="number" name="newPosition" value="@item.Position" min="1" class="form-control form-control-sm" style="width: 80px;" />
+                            <button type="submit" class="btn btn-link p-0">Set</button>
+                        </form>
+                    </td>
                     <td>@item.ItemType</td>
                     <td>@item.NameSnapshot</td>
                     <td>@item.Grams.ToString("0.##")</td>
@@ -98,12 +105,23 @@ else
                     <td>@item.FiberSnapshot.ToString("0.00")</td>
                     <td>@item.SugarSnapshot.ToString("0.00")</td>
                     <td>@item.SaltSnapshot.ToString("0.00")</td>
+                    <td>
+                        <a asp-page="./EditItem" asp-route-id="@item.Id">Edit</a>
+                        <form method="post" asp-page-handler="RemoveItem" class="d-inline">
+                            <input type="hidden" name="preparedRecipeBatchItemId" value="@item.Id" />
+                            <button type="submit" class="btn btn-link p-0">Remove</button>
+                        </form>
+                    </td>
                 </tr>
             }
         </tbody>
     </table>
 }
 
-<a asp-page="./Edit" asp-route-id="@Model.PreparedRecipeBatchSummary.PreparedRecipeBatch.Id" class="btn btn-primary">Edit</a>
-<a asp-page="./Delete" asp-route-id="@Model.PreparedRecipeBatchSummary.PreparedRecipeBatch.Id" class="btn btn-danger">Delete</a>
+<div class="mb-3">
+    <a asp-page="./AddIngredient" asp-route-id="@Model.PreparedRecipeBatchSummary.PreparedRecipeBatch.Id" class="btn btn-primary">Add Ingredient</a>
+    <a asp-page="./AddRecipe" asp-route-id="@Model.PreparedRecipeBatchSummary.PreparedRecipeBatch.Id" class="btn btn-primary">Add Recipe</a>
+</div>
+
+<a asp-page="./Details" asp-route-id="@Model.PreparedRecipeBatchSummary.PreparedRecipeBatch.Id" class="btn btn-secondary">Details</a>
 <a asp-page="./Index" class="btn btn-secondary">Back</a>

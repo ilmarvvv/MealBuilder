@@ -100,7 +100,7 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
             _context.PreparedRecipeBatchItems.Add(item);
             await _context.SaveChangesAsync();
 
-            return RedirectToPage("./Details", new { id = preparedRecipeBatch.Id });
+            return RedirectToPage("./Edit", new { id = preparedRecipeBatch.Id });
         }
 
         private async Task LoadIngredientsAsync()
