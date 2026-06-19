@@ -760,38 +760,45 @@ This milestone goes through the existing system from ingredients to menus and re
 
 Goal: treat a prepared batch as an editable cooked copy of a recipe that can be planned across specific days.
 
-- [ ] Refine prepared batch snapshot concept
+- [x] Refine prepared batch snapshot concept
   - `Recipe` is the reusable template.
   - `PreparedRecipeBatch` is the cooked/planned copy created from a recipe.
   - Editing a prepared batch must not change the original recipe.
   - Later changes to the original recipe must not silently change already created prepared batches.
-- [ ] Add prepared batch item snapshot model
+- [x] Add prepared batch item snapshot model
   - Add one snapshot item model for both copied ingredients and copied recipe components.
   - Store item type, source ingredient or source recipe reference, name snapshot, grams, nutrition snapshot values, and position.
   - Use copied snapshot values for batch calculations instead of live recipe values.
-- [ ] Copy recipe contents into prepared batch items when a batch is created
+- [x] Copy recipe contents into prepared batch items when a batch is created
   - Copy recipe ingredients.
   - Copy recipe components as recipe-type snapshot items.
   - Keep item positions in the same order as the source recipe.
-- [ ] Show prepared batch items on Prepared Batch Details
+- [x] Show prepared batch items on Prepared Batch Details
   - Show item type, name, grams, calories, protein, fiber, sugar, and salt.
   - Show batch nutrition summary from prepared batch items.
-- [ ] Allow editing prepared batch items before final planning
+- [x] Separate Prepared Batch Details and Edit pages
+  - Keep Details as a read-only page.
+  - Move add, edit, remove, and reorder actions to Edit.
+- [x] Allow editing prepared batch items before final planning
   - Allow adding an ingredient snapshot item.
   - Allow adding a recipe snapshot item.
   - Allow changing grams.
   - Allow removing items.
   - Allow changing item position.
-- [ ] Allow changing batch total servings and planned days before saving the plan
+- [x] Allow changing batch total servings and planned days before saving the plan
   - Use recipe defaults as starting values.
   - Allow user to override total servings and planned days for the cooked batch.
-- [ ] Save the prepared batch into daily menus after confirming the plan
+- [x] Save the prepared batch into daily menus after confirming the plan
   - Split servings across planned days.
   - Create or reuse one menu per date.
   - Add prepared batch menu items for each planned day.
-- [ ] Allow editing daily servings after the batch is planned
+- [x] Allow editing daily servings after the batch is planned
   - Allow changing how much of the prepared batch is eaten on a specific day.
   - Recalculate remaining future servings when daily servings change.
+
+#### 12.11 Core Workflow Validation and Stabilization
+
+Goal: review and stabilize the current single-user core functionality before planning Milestone 13.
 
 ### Milestone 13: Users and Authentication
 
