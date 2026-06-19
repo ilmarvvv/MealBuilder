@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MealBuilder.Web.Models
 {
@@ -19,14 +20,14 @@ namespace MealBuilder.Web.Models
         [Range(1, 100)]
         public int DefaultServingsPerDay { get; set; } = 1;
 
+        [NotMapped]
+        public int TotalServings => DefaultPlannedDays * DefaultServingsPerDay;
+
         [Range(0, 10000)]
         public int PrepTimeMinutes { get; set; }
 
         [Range(0, 10000)]
         public int CookTimeMinutes { get; set; }
-
-        [Range(1, 100)]
-        public int Servings { get; set; } = 1;
 
         [Range(0.01, 100000)]
         public decimal? FinalWeightGrams { get; set; }

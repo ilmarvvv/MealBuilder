@@ -46,7 +46,7 @@ namespace MealBuilder.Web.Services
             RecipeNutritionTotals recipeTotals = _recipeCalculationService.Calculate(menuItem.Recipe);
             RecipeNutritionTotals perServingTotals = _recipeCalculationService.Divide(
                 recipeTotals,
-                menuItem.Recipe.Servings);
+                menuItem.Recipe.TotalServings);
 
             totals.Calories += perServingTotals.Calories * menuItem.ServingsCount.Value;
             totals.Protein += perServingTotals.Protein * menuItem.ServingsCount.Value;

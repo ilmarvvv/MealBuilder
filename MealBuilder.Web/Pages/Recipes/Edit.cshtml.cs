@@ -60,8 +60,6 @@ namespace MealBuilder.Web.Pages.Recipes
                 return Page();
             }
 
-            Recipe.Servings = Recipe.DefaultPlannedDays * Recipe.DefaultServingsPerDay;
-
             _context.Recipes.Update(Recipe);
             await _context.SaveChangesAsync();
 
@@ -278,7 +276,7 @@ namespace MealBuilder.Web.Pages.Recipes
             RecipeContentSummaries = BuildRecipeContentSummaries(recipe);
             Totals = _recipeCalculationService.Calculate(recipe);
             PerDayTotals = _recipeCalculationService.Divide(Totals, recipe.DefaultPlannedDays);
-            PerServingTotals = _recipeCalculationService.Divide(Totals, recipe.Servings);
+            PerServingTotals = _recipeCalculationService.Divide(Totals, recipe.TotalServings);
         }
 
         private List<RecipeContentSummary> BuildRecipeContentSummaries(Recipe recipe)

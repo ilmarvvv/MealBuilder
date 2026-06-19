@@ -40,9 +40,10 @@
     </div>
 
     <div class="mb-3">
-        <label asp-for="Recipe.Servings" class="form-label">Total servings</label>
-        <input asp-for="Recipe.Servings" class="form-control" readonly />
-        <span asp-validation-for="Recipe.Servings" class="text-danger"></span>
+        <label class="form-label">Total servings</label>
+        <div id="total-servings" class="form-control-plaintext">
+            @Model.Recipe.TotalServings
+        </div>
     </div>
 
     <div class="mb-3">
@@ -71,4 +72,22 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const plannedDaysInput = document.getElementById("Recipe_DefaultPlannedDays");
+        const servingsPerDayInput = document.getElementById("Recipe_DefaultServingsPerDay");
+        const totalServingsDisplay = document.getElementById("total-servings");
+
+        function updateTotalServings() {
+            const plannedDays = Number(plannedDaysInput.value) || 0;
+            const servingsPerDay = Number(servingsPerDayInput.value) || 0;
+
+            totalServingsDisplay.textContent = plannedDays * servingsPerDay;
+        }
+
+        plannedDaysInput.addEventListener("input", updateTotalServings);
+        servingsPerDayInput.addEventListener("input", updateTotalServings);
+
+        updateTotalServings();
+    </script>
 }

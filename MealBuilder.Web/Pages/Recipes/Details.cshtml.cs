@@ -52,7 +52,7 @@ namespace MealBuilder.Web.Pages.Recipes
             Recipe = recipe;
             Totals = _recipeCalculationService.Calculate(recipe);
             PerDayTotals = _recipeCalculationService.Divide(Totals, recipe.DefaultPlannedDays);
-            PerServingTotals = _recipeCalculationService.Divide(Totals, recipe.Servings);
+            PerServingTotals = _recipeCalculationService.Divide(Totals, recipe.TotalServings);
             EstimatedWeightGrams = _recipeCalculationService.CalculateEstimatedWeight(recipe);
             EffectiveWeightGrams = _recipeCalculationService.CalculateEffectiveWeight(recipe);
             RecipeContentSummaries = recipe.RecipeIngredients
