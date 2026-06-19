@@ -15,7 +15,7 @@ namespace MealBuilder.Web.Models
         [DataType(DataType.Date)]
         public DateOnly CookedDate { get; set; } = DateOnly.FromDateTime(DateTime.Today);
 
-        [Range(1, 1000)]
+        [Range(1, 36500)]
         public decimal TotalServings { get; set; }
 
         [Range(1, 365)]

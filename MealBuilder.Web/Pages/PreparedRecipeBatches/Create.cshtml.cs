@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace MealBuilder.Web.Pages.PreparedRecipeBatches
 {
@@ -23,15 +24,34 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
         [BindProperty]
         public PreparedRecipeBatch PreparedRecipeBatch { get; set; } = new();
 
+        [BindProperty]
+        [Range(1, 100)]
+        public int ServingsPerDay { get; set; } = 1;
+
         public SelectList RecipeSelectList { get; set; } = default!;
 
         public async Task OnGetAsync(int? recipeId)
         {
-            PreparedRecipeBatch.CookedDate = DateOnly.FromDateTime(DateTime.Today);
+            PreparedRecipeBatch.CookedDate =
+                DateOnly.FromDateTime(DateTime.Today);
 
             if (recipeId is not null)
             {
-                PreparedRecipeBatch.RecipeId = recipeId.Value;
+                Recipe? recipe = await _context.Recipes
+                    .FirstOrDefaultAsync(recipe => recipe.Id == recipeId.Value);
+
+                if (recipe is not null)
+                {
+                    PreparedRecipeBatch.RecipeId = recipe.Id;
+                    PreparedRecipeBatch.PlannedDays =
+                        recipe.DefaultPlannedDays;
+
+                    ServingsPerDay =
+                        recipe.DefaultServingsPerDay;
+
+                    PreparedRecipeBatch.TotalServings =
+                        recipe.TotalServings;
+                }
             }
 
             await LoadRecipeSelectListAsync();
@@ -39,6 +59,11 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
 
         public async Task<IActionResult> OnPostAsync()
         {
+            ModelState.Remove("PreparedRecipeBatch.TotalServings");
+
+            PreparedRecipeBatch.TotalServings =
+                PreparedRecipeBatch.PlannedDays * ServingsPerDay;
+
             ModelState.Remove("PreparedRecipeBatch.RecipeNameSnapshot");
             ModelState.Remove("PreparedRecipeBatch.TotalCaloriesSnapshot");
             ModelState.Remove("PreparedRecipeBatch.TotalProteinSnapshot");
@@ -117,8 +142,6 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
 
             _context.PreparedRecipeBatches.Add(PreparedRecipeBatch);
 
-            decimal servingsPerDay = PreparedRecipeBatch.TotalServings / PreparedRecipeBatch.PlannedDays;
-
             for (int dayOffset = 0; dayOffset < PreparedRecipeBatch.PlannedDays; dayOffset++)
             {
                 DateOnly menuDate = PreparedRecipeBatch.CookedDate.AddDays(dayOffset);
@@ -141,7 +164,7 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
                 {
                     ItemType = MenuItemType.PreparedRecipeBatch,
                     PreparedRecipeBatch = PreparedRecipeBatch,
-                    ServingsCount = servingsPerDay
+                    ServingsCount = ServingsPerDay
                 });
             }
 
