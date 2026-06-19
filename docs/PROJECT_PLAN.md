@@ -938,6 +938,14 @@ This section contains ideas that may be useful for the project in the future, bu
 - [ ] Add advanced prepared batch snapshot history
   - Preserve deeper source details, edit history, and recipe version references if the basic prepared batch snapshot model is not enough.
 
+- [ ] Allow selecting specific meal dates for prepared batches
+  - Open a calendar when creating a prepared batch.
+  - Preselect meal dates from the recipe planning defaults.
+  - Allow users to add or remove individual eating days.
+  - Set planned days from the number of selected dates.
+  - Calculate total servings from selected dates and servings per day.
+  - Create or reuse daily menus only for the selected dates.
+
 - [ ] Rename Menu to a more accurate domain name
   - For example, DailyPlan or DailyFoodPlan.
 
