@@ -97,14 +97,14 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
 
         private void LoadPreparedRecipeBatchSummary(PreparedRecipeBatch preparedRecipeBatch)
         {
-            decimal usedServings = preparedRecipeBatch.MenuItems
+            decimal allocatedServings = preparedRecipeBatch.MenuItems
                 .Where(menuItem => menuItem.ServingsCount is not null)
                 .Sum(menuItem => menuItem.ServingsCount!.Value);
 
             PreparedRecipeBatchSummary = new PreparedRecipeBatchSummary
             {
                 PreparedRecipeBatch = preparedRecipeBatch,
-                UsedServings = usedServings
+                AllocatedServings = allocatedServings
             };
 
             ItemTotals = new RecipeNutritionTotals

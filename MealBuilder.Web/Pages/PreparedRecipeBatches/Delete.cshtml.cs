@@ -17,7 +17,7 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
 
         public PreparedRecipeBatchSummary PreparedRecipeBatchSummary { get; set; } = new();
 
-        public bool CanDelete => PreparedRecipeBatchSummary.UsedServings == 0;
+        public bool CanDelete => PreparedRecipeBatchSummary.AllocatedServings == 0;
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
@@ -47,9 +47,9 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
                 return NotFound();
             }
 
-            decimal usedServings = CalculateUsedServings(preparedRecipeBatch);
+            decimal allocatedServings = CalculateAllocatedServings(preparedRecipeBatch);
 
-            if (usedServings > 0)
+            if (allocatedServings > 0)
             {
                 return RedirectToPage("./Details", new { id });
             }
@@ -65,11 +65,12 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
             PreparedRecipeBatchSummary = new PreparedRecipeBatchSummary
             {
                 PreparedRecipeBatch = preparedRecipeBatch,
-                UsedServings = CalculateUsedServings(preparedRecipeBatch)
+                AllocatedServings = CalculateAllocatedServings(preparedRecipeBatch)
             };
         }
 
-        private static decimal CalculateUsedServings(PreparedRecipeBatch preparedRecipeBatch)
+        private static decimal CalculateAllocatedServings(
+            PreparedRecipeBatch preparedRecipeBatch)
         {
             return preparedRecipeBatch.MenuItems
                 .Where(menuItem => menuItem.ServingsCount is not null)

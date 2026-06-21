@@ -28,7 +28,7 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
                 .Select(preparedRecipeBatch => new PreparedRecipeBatchSummary
                 {
                     PreparedRecipeBatch = preparedRecipeBatch,
-                    UsedServings = preparedRecipeBatch.MenuItems
+                    AllocatedServings = preparedRecipeBatch.MenuItems
                         .Where(menuItem => menuItem.ServingsCount is not null)
                         .Sum(menuItem => menuItem.ServingsCount!.Value)
                 })

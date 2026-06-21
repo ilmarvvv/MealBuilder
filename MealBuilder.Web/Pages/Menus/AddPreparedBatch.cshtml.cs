@@ -75,15 +75,18 @@ namespace MealBuilder.Web.Pages.Menus
                 }
                 else
                 {
-                    decimal usedServings = preparedRecipeBatch.MenuItems
+                    decimal allocatedServings = preparedRecipeBatch.MenuItems
                         .Where(menuItem => menuItem.ServingsCount is not null)
                         .Sum(menuItem => menuItem.ServingsCount!.Value);
 
-                    decimal remainingServings = preparedRecipeBatch.TotalServings - usedServings;
+                    decimal unallocatedServings =
+                        preparedRecipeBatch.TotalServings - allocatedServings;
 
-                    if (MenuItem.ServingsCount > remainingServings)
+                    if (MenuItem.ServingsCount > unallocatedServings)
                     {
-                        ModelState.AddModelError("MenuItem.ServingsCount", $"Only {remainingServings} servings remain in this prepared batch.");
+                        ModelState.AddModelError(
+                            "MenuItem.ServingsCount",
+                            $"Only {unallocatedServings} unallocated servings are available for this prepared batch.");
                     }
                 }
             }
@@ -118,21 +121,28 @@ namespace MealBuilder.Web.Pages.Menus
             var availablePreparedRecipeBatches = preparedRecipeBatches
                 .Select(preparedRecipeBatch =>
                 {
-                    decimal usedServings = preparedRecipeBatch.MenuItems
+                    decimal allocatedServings = preparedRecipeBatch.MenuItems
                         .Where(menuItem => menuItem.ServingsCount is not null)
                         .Sum(menuItem => menuItem.ServingsCount!.Value);
 
-                    decimal remainingServings = preparedRecipeBatch.TotalServings - usedServings;
+                    decimal unallocatedServings =
+                        preparedRecipeBatch.TotalServings - allocatedServings;
 
                     return new
                     {
                         preparedRecipeBatch.Id,
-                        Label = $"{preparedRecipeBatch.RecipeNameSnapshot} | cooked {preparedRecipeBatch.CookedDate} | remaining {remainingServings} servings",
-                        RemainingServings = remainingServings
+
+                        Label =
+                            $"{preparedRecipeBatch.RecipeNameSnapshot} | " +
+                            $"cooked {preparedRecipeBatch.CookedDate} | " +
+                            $"unallocated {unallocatedServings} servings",
+
+                        UnallocatedServings = unallocatedServings
                     };
                 })
-                .Where(preparedRecipeBatch => preparedRecipeBatch.RemainingServings > 0)
-                .ToList();
+    .Where(preparedRecipeBatch =>
+        preparedRecipeBatch.UnallocatedServings > 0)
+    .ToList();
 
             PreparedRecipeBatches = new SelectList(
                 availablePreparedRecipeBatches,

@@ -121,11 +121,14 @@ namespace MealBuilder.Web.Pages.Menus
                 return;
             }
 
-            decimal usedByOtherMenuItems = preparedRecipeBatch.MenuItems
-                .Where(menuItem => menuItem.Id != MenuItem.Id && menuItem.ServingsCount is not null)
+            decimal allocatedByOtherMenuItems = preparedRecipeBatch.MenuItems
+                .Where(menuItem => menuItem.Id != MenuItem.Id &&
+                       menuItem.ServingsCount is not null)
                 .Sum(menuItem => menuItem.ServingsCount!.Value);
 
-            decimal availableServings = preparedRecipeBatch.TotalServings - usedByOtherMenuItems;
+            decimal availableServings =
+                preparedRecipeBatch.TotalServings -
+                allocatedByOtherMenuItems;
 
             if (MenuItem.ServingsCount > availableServings)
             {
