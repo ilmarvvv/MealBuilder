@@ -12,7 +12,6 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
     public class CreateModel : PageModel
     {
         private readonly AppDbContext _context;
-
         private readonly RecipeCalculationService _recipeCalculationService;
 
         public CreateModel(AppDbContext context, RecipeCalculationService recipeCalculationService)
@@ -32,8 +31,7 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
 
         public async Task OnGetAsync(int? recipeId)
         {
-            PreparedRecipeBatch.CookedDate =
-                DateOnly.FromDateTime(DateTime.Today);
+            PreparedRecipeBatch.CookedDate = DateOnly.FromDateTime(DateTime.Today);
 
             if (recipeId is not null)
             {
@@ -43,14 +41,9 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
                 if (recipe is not null)
                 {
                     PreparedRecipeBatch.RecipeId = recipe.Id;
-                    PreparedRecipeBatch.PlannedDays =
-                        recipe.DefaultPlannedDays;
-
-                    ServingsPerDay =
-                        recipe.DefaultServingsPerDay;
-
-                    PreparedRecipeBatch.TotalServings =
-                        recipe.TotalServings;
+                    PreparedRecipeBatch.PlannedDays = recipe.DefaultPlannedDays;
+                    ServingsPerDay = recipe.DefaultServingsPerDay;
+                    PreparedRecipeBatch.TotalServings = recipe.TotalServings;
                 }
             }
 
@@ -60,16 +53,10 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
         public async Task<IActionResult> OnPostAsync()
         {
             ModelState.Remove("PreparedRecipeBatch.TotalServings");
+            ModelState.Remove("PreparedRecipeBatch.RecipeNameSnapshot");
 
             PreparedRecipeBatch.TotalServings =
                 PreparedRecipeBatch.PlannedDays * ServingsPerDay;
-
-            ModelState.Remove("PreparedRecipeBatch.RecipeNameSnapshot");
-            ModelState.Remove("PreparedRecipeBatch.TotalCaloriesSnapshot");
-            ModelState.Remove("PreparedRecipeBatch.TotalProteinSnapshot");
-            ModelState.Remove("PreparedRecipeBatch.TotalFiberSnapshot");
-            ModelState.Remove("PreparedRecipeBatch.TotalSugarSnapshot");
-            ModelState.Remove("PreparedRecipeBatch.TotalSaltSnapshot");
 
             if (!ModelState.IsValid)
             {
@@ -88,20 +75,15 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
 
             if (recipe is null)
             {
-                ModelState.AddModelError("PreparedRecipeBatch.RecipeId", "Recipe was not found.");
-                await LoadRecipeSelectListAsync();
+                ModelState.AddModelError(
+                    "PreparedRecipeBatch.RecipeId",
+                    "Recipe was not found.");
 
+                await LoadRecipeSelectListAsync();
                 return Page();
             }
 
-            RecipeNutritionTotals totals = _recipeCalculationService.Calculate(recipe);
-
             PreparedRecipeBatch.RecipeNameSnapshot = recipe.Name;
-            PreparedRecipeBatch.TotalCaloriesSnapshot = totals.Calories;
-            PreparedRecipeBatch.TotalProteinSnapshot = totals.Protein;
-            PreparedRecipeBatch.TotalFiberSnapshot = totals.Fiber;
-            PreparedRecipeBatch.TotalSugarSnapshot = totals.Sugar;
-            PreparedRecipeBatch.TotalSaltSnapshot = totals.Salt;
 
             PreparedRecipeBatch.Items = recipe.RecipeIngredients
                 .Select(recipeIngredient => new PreparedRecipeBatchItem
@@ -120,8 +102,12 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
                 .Concat(recipe.Components.Select(recipeComponent =>
                 {
                     decimal componentTotalWeight = _recipeCalculationService.CalculateEffectiveWeight(recipeComponent.ComponentRecipe);
+
                     RecipeNutritionTotals componentTotals = _recipeCalculationService.Calculate(recipeComponent.ComponentRecipe);
-                    decimal ratio = componentTotalWeight > 0 ? recipeComponent.Grams / componentTotalWeight : 0;
+
+                    decimal ratio = componentTotalWeight > 0
+                        ? recipeComponent.Grams / componentTotalWeight
+                        : 0;
 
                     return new PreparedRecipeBatchItem
                     {
