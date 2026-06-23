@@ -808,6 +808,16 @@ Goal: make the app ready for multiple users.
 
 Goal: improve the features that already exist.
 
+- [ ] Add ingredient descriptions
+  - Store a longer user-facing description for ingredients.
+  - Keep technical or personal notes separate from the public description.
+
+- [ ] Add ingredient image support
+  - Allow up to 3 images per ingredient.
+  - Private draft ingredients may have 0-3 images.
+  - Published or shared ingredients should have 1-3 images.
+  - The first image should be treated as the main image.
+
 ### Milestone 15: API and Frontend Planning
 
 Goal: plan the transition from Razor Pages to an API-based application and choose the future frontend technology.
@@ -828,6 +838,11 @@ This section contains ideas that may be useful for the project in the future, bu
 - [ ] Add ingredient category
 
 - [ ] Add image support for ingredients
+  - Planned for Milestone 14.
+  - Allow up to 3 images per ingredient.
+  - Private draft ingredients may have 0-3 images.
+  - Published or shared ingredients should have 1-3 images.
+  - The first image should be treated as the main image.
   - Decide later how images should be stored.
 
 - [ ] Add ingredient data source
