@@ -800,6 +800,22 @@ Goal: treat a prepared batch as an editable cooked copy of a recipe that can be 
 
 Goal: review and stabilize the current single-user core functionality before planning Milestone 13.
 
+#### 12.11.1 Ingredients and Daily Planning Review
+
+Goal: review the current ingredient and daily planning workflows before continuing stabilization.
+
+- [x] Review the Ingredients workflow
+  - Ingredient CRUD works well enough for the current version.
+
+- [x] Review the Menu and Calendar concept
+  - `Menu` currently represents one daily food plan.
+  - `Calendar` displays multiple daily food plans across dates.
+  - The current model works, but the name `Menu` may be confusing later.
+
+#### 12.11.2 Days and Calendar Review
+
+Goal: review and adjust days, calendar behavior, and related workflow issues found during testing.
+
 ### Milestone 13: Users and Authentication
 
 Goal: make the app ready for multiple users.
