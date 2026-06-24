@@ -856,6 +856,10 @@ This section contains ideas that may be useful for the project in the future, bu
 
 - [ ] Improve ingredient search and display
 
+- [ ] Allow creating a new ingredient from recipe ingredient selection
+  - When adding an ingredient to a recipe and the needed ingredient does not exist, allow creating it without leaving the recipe flow.
+  - After the ingredient is created, return to the recipe ingredient add flow with the new ingredient available for selection.
+
 - [ ] Use ingredient conversion fields in recipe and menu input
   - Allow users to enter ingredients by pieces when `GramsPerPiece` is available.
   - Allow users to enter ingredients by milliliters when `GramsPerMilliliter` is available.
