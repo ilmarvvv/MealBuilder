@@ -893,6 +893,10 @@ This section contains ideas that may be useful for the project in the future, bu
 
 ### Nutrients and Health Data
 
+- [ ] Add a BMI calculator
+  - Step 1: create a standalone tool that calculates BMI from height and weight.
+  - Step 2: integrate BMI tracking with the menu calendar.
+
 - [ ] Add vitamins and micronutrients
   - Decide later which vitamins and micronutrients should be tracked first.
 
