@@ -816,6 +816,10 @@ Goal: review the current ingredient and daily planning workflows before continui
 
 Goal: review and adjust days, calendar behavior, and related workflow issues found during testing.
 
+- [x] Rename `Menu` to `DailyPlan`
+  - Rename related models, pages, service, routes, and database tables.
+  - Preserve existing data through a rename-only migration.
+
 ### Milestone 13: Users and Authentication
 
 Goal: make the app ready for multiple users.
@@ -984,9 +988,6 @@ This section contains ideas that may be useful for the project in the future, bu
   - Set planned days from the number of selected dates.
   - Calculate total servings from selected dates and servings per day.
   - Create or reuse daily menus only for the selected dates.
-
-- [ ] Rename Menu to a more accurate domain name
-  - For example, DailyPlan or DailyFoodPlan.
 
 - [ ] Plan meals for families or multiple people
   - Review how servings, prepared batches, and daily plans should work for several people.
