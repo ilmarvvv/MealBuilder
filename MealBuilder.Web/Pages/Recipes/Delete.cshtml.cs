@@ -62,8 +62,8 @@ namespace MealBuilder.Web.Pages.Recipes
             return await _context.RecipeComponents.AnyAsync(recipeComponent =>
                        recipeComponent.ParentRecipeId == recipeId
                        || recipeComponent.ComponentRecipeId == recipeId)
-                   || await _context.MenuItems.AnyAsync(menuItem =>
-                       menuItem.RecipeId == recipeId)
+                   || await _context.DailyPlanItems.AnyAsync(dailyPlanItem =>
+                       dailyPlanItem.RecipeId == recipeId)
                    || await _context.PreparedRecipeBatches.AnyAsync(preparedRecipeBatch =>
                        preparedRecipeBatch.RecipeId == recipeId);
         }

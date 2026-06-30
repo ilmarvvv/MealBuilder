@@ -23,7 +23,7 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
         {
             PreparedRecipeBatch? preparedRecipeBatch = await _context.PreparedRecipeBatches
                 .Include(preparedRecipeBatch => preparedRecipeBatch.Recipe)
-                .Include(preparedRecipeBatch => preparedRecipeBatch.MenuItems)
+                .Include(preparedRecipeBatch => preparedRecipeBatch.DailyPlanItems)
                 .FirstOrDefaultAsync(preparedRecipeBatch => preparedRecipeBatch.Id == id);
 
             if (preparedRecipeBatch is null)
@@ -39,7 +39,7 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
         public async Task<IActionResult> OnPostAsync(int id)
         {
             PreparedRecipeBatch? preparedRecipeBatch = await _context.PreparedRecipeBatches
-                .Include(preparedRecipeBatch => preparedRecipeBatch.MenuItems)
+                .Include(preparedRecipeBatch => preparedRecipeBatch.DailyPlanItems)
                 .FirstOrDefaultAsync(preparedRecipeBatch => preparedRecipeBatch.Id == id);
 
             if (preparedRecipeBatch is null)
@@ -72,9 +72,9 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
         private static decimal CalculateAllocatedServings(
             PreparedRecipeBatch preparedRecipeBatch)
         {
-            return preparedRecipeBatch.MenuItems
-                .Where(menuItem => menuItem.ServingsCount is not null)
-                .Sum(menuItem => menuItem.ServingsCount!.Value);
+            return preparedRecipeBatch.DailyPlanItems
+                .Where(dailyPlanItem => dailyPlanItem.ServingsCount is not null)
+                .Sum(dailyPlanItem => dailyPlanItem.ServingsCount!.Value);
         }
     }
 }

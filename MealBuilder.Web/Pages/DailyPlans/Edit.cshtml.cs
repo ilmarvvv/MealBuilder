@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
-namespace MealBuilder.Web.Pages.Menus
+namespace MealBuilder.Web.Pages.DailyPlans
 {
     public class EditModel : PageModel
     {
@@ -16,30 +16,30 @@ namespace MealBuilder.Web.Pages.Menus
         }
 
         [BindProperty]
-        public Menu Menu { get; set; } = new();
+        public DailyPlan DailyPlan { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
-            Menu? menu = await _context.Menus.FindAsync(id);
+            DailyPlan? dailyPlan = await _context.DailyPlans.FindAsync(id);
 
-            if (menu is null)
+            if (dailyPlan is null)
             {
                 return NotFound();
             }
 
-            Menu = menu;
+            DailyPlan = dailyPlan;
 
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
-            bool menuDateAlreadyExists = await _context.Menus
-                .AnyAsync(menu => menu.Date == Menu.Date && menu.Id != Menu.Id);
+            bool dailyPlanDateAlreadyExists = await _context.DailyPlans
+                .AnyAsync(dailyPlan => dailyPlan.Date == DailyPlan.Date && dailyPlan.Id != DailyPlan.Id);
 
-            if (menuDateAlreadyExists)
+            if (dailyPlanDateAlreadyExists)
             {
-                ModelState.AddModelError("Menu.Date", "A menu already exists for this date.");
+                ModelState.AddModelError("DailyPlan.Date", "A daily plan already exists for this date.");
             }
 
             if (!ModelState.IsValid)
@@ -47,10 +47,10 @@ namespace MealBuilder.Web.Pages.Menus
                 return Page();
             }
 
-            _context.Attach(Menu).State = EntityState.Modified;
+            _context.Attach(DailyPlan).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
-            return RedirectToPage("./Details", new { id = Menu.Id });
+            return RedirectToPage("./Details", new { id = DailyPlan.Id });
         }
     }
 }

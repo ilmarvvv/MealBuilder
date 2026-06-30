@@ -2,15 +2,15 @@
 
 namespace MealBuilder.Web.Models
 {
-    public class MenuItem
+    public class DailyPlanItem
     {
         public int Id { get; set; }
 
-        public int MenuId { get; set; }
+        public int DailyPlanId { get; set; }
 
-        public Menu Menu { get; set; } = null!;
+        public DailyPlan DailyPlan { get; set; } = null!;
 
-        public MenuItemType ItemType { get; set; }
+        public DailyPlanItemType ItemType { get; set; }
 
         public int? RecipeId { get; set; }
 

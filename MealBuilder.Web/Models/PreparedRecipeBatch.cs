@@ -27,7 +27,7 @@ namespace MealBuilder.Web.Models
 
         public List<PreparedRecipeBatchItem> Items { get; set; } = [];
 
-        public List<MenuItem> MenuItems { get; set; } = [];
+        public List<DailyPlanItem> DailyPlanItems { get; set; } = [];
 
     }
 }

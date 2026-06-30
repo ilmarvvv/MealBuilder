@@ -2,7 +2,7 @@
 
 namespace MealBuilder.Web.Models
 {
-    public class Menu
+    public class DailyPlan
     {
         public int Id { get; set; }
 
@@ -15,6 +15,6 @@ namespace MealBuilder.Web.Models
         [StringLength(1000)]
         public string? Description { get; set; }
 
-        public List<MenuItem> MenuItems { get; set; } = [];
+        public List<DailyPlanItem> DailyPlanItems { get; set; } = [];
     }
 }

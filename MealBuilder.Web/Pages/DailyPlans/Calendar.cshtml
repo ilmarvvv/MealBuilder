@@ -1,11 +1,11 @@
 ﻿@page
-@model MealBuilder.Web.Pages.Menus.CalendarModel
+@model MealBuilder.Web.Pages.DailyPlans.CalendarModel
 
 @{
-    ViewData["Title"] = "Menu Calendar";
+    ViewData["Title"] = "Daily Plan Calendar";
 }
 
-<h1>Menu Calendar</h1>
+<h1>Daily Plan Calendar</h1>
 
 <p>
     Week: @Model.WeekStart - @Model.WeekStart.AddDays(6)
@@ -45,7 +45,7 @@
     <thead>
         <tr>
             <th>Date</th>
-            <th>Menu</th>
+            <th>Daily Plan</th>
             <th>Calories</th>
             <th>Protein</th>
             <th>Fiber</th>
@@ -59,13 +59,13 @@
             <tr>
                 <td>@day.Date</td>
                 <td>
-                    @if (day.Menu is null)
+                    @if (day.DailyPlan is null)
                     {
-                        <a asp-page="./Create" asp-route-date="@day.Date.ToString("yyyy-MM-dd")">Create menu</a>
+                        <a asp-page="./Create" asp-route-date="@day.Date.ToString("yyyy-MM-dd")">Create daily plan</a>
                     }
                     else
                     {
-                        <a asp-page="./Details" asp-route-id="@day.Menu.Id">@day.Menu.Name</a>
+                        <a asp-page="./Details" asp-route-id="@day.DailyPlan.Id">@day.DailyPlan.Name</a>
                     }
                 </td>
                 <td>@day.Totals.Calories.ToString("0.00")</td>

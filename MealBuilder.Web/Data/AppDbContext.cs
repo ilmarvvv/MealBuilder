@@ -18,9 +18,9 @@ namespace MealBuilder.Web.Data
 
         public DbSet<RecipeComponent> RecipeComponents { get; set; }
 
-        public DbSet<Menu> Menus { get; set; }
+        public DbSet<DailyPlan> DailyPlans { get; set; }
 
-        public DbSet<MenuItem> MenuItems { get; set; }
+        public DbSet<DailyPlanItem> DailyPlanItems { get; set; }
 
         public DbSet<PreparedRecipeBatch> PreparedRecipeBatches { get; set; }
 
@@ -54,31 +54,31 @@ namespace MealBuilder.Web.Data
                 })
                 .IsUnique();
 
-            modelBuilder.Entity<Menu>()
-                .HasIndex(menu => menu.Date)
+            modelBuilder.Entity<DailyPlan>()
+                .HasIndex(dailyPlan => dailyPlan.Date)
                 .IsUnique();
 
-            modelBuilder.Entity<MenuItem>()
-                .HasOne(menuItem => menuItem.Menu)
-                .WithMany(menu => menu.MenuItems)
-                .HasForeignKey(menuItem => menuItem.MenuId);
+            modelBuilder.Entity<DailyPlanItem>()
+                .HasOne(dailyPlanItem => dailyPlanItem.DailyPlan)
+                .WithMany(dailyPlan => dailyPlan.DailyPlanItems)
+                .HasForeignKey(dailyPlanItem => dailyPlanItem.DailyPlanId);
 
-            modelBuilder.Entity<MenuItem>()
-                .HasOne(menuItem => menuItem.Recipe)
-                .WithMany(recipe => recipe.MenuItems)
-                .HasForeignKey(menuItem => menuItem.RecipeId)
+            modelBuilder.Entity<DailyPlanItem>()
+                .HasOne(dailyPlanItem => dailyPlanItem.Recipe)
+                .WithMany(recipe => recipe.DailyPlanItems)
+                .HasForeignKey(dailyPlanItem => dailyPlanItem.RecipeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<MenuItem>()
-                .HasOne(menuItem => menuItem.Ingredient)
-                .WithMany(ingredient => ingredient.MenuItems)
-                .HasForeignKey(menuItem => menuItem.IngredientId)
+            modelBuilder.Entity<DailyPlanItem>()
+                .HasOne(dailyPlanItem => dailyPlanItem.Ingredient)
+                .WithMany(ingredient => ingredient.DailyPlanItems)
+                .HasForeignKey(dailyPlanItem => dailyPlanItem.IngredientId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<MenuItem>()
-                .HasOne(menuItem => menuItem.PreparedRecipeBatch)
-                .WithMany(preparedRecipeBatch => preparedRecipeBatch.MenuItems)
-                .HasForeignKey(menuItem => menuItem.PreparedRecipeBatchId)
+            modelBuilder.Entity<DailyPlanItem>()
+                .HasOne(dailyPlanItem => dailyPlanItem.PreparedRecipeBatch)
+                .WithMany(preparedRecipeBatch => preparedRecipeBatch.DailyPlanItems)
+                .HasForeignKey(dailyPlanItem => dailyPlanItem.PreparedRecipeBatchId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<PreparedRecipeBatch>()

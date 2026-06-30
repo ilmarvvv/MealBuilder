@@ -1,0 +1,115 @@
+﻿@page "{id:int}"
+@model MealBuilder.Web.Pages.DailyPlans.DetailsModel
+
+@{
+    ViewData["Title"] = "Daily Plan Details";
+}
+
+<h1>Daily Plan Details</h1>
+
+<dl class="row">
+    <dt class="col-sm-2">Date</dt>
+    <dd class="col-sm-10">@Model.DailyPlan.Date</dd>
+
+    <dt class="col-sm-2">Name</dt>
+    <dd class="col-sm-10">@Model.DailyPlan.Name</dd>
+
+    <dt class="col-sm-2">Description</dt>
+    <dd class="col-sm-10">@Model.DailyPlan.Description</dd>
+</dl>
+
+<h2>Totals</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Calories</th>
+            <th>Protein</th>
+            <th>Fiber</th>
+            <th>Sugar</th>
+            <th>Salt</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@Model.Totals.Calories.ToString("0.00")</td>
+            <td>@Model.Totals.Protein.ToString("0.00")</td>
+            <td>@Model.Totals.Fiber.ToString("0.00")</td>
+            <td>@Model.Totals.Sugar.ToString("0.00")</td>
+            <td>@Model.Totals.Salt.ToString("0.00")</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Items</h2>
+
+<p>
+    <a asp-page="./AddIngredient" asp-route-id="@Model.DailyPlan.Id" class="btn btn-primary">Add Ingredient</a>
+    <a asp-page="./AddPreparedBatch" asp-route-id="@Model.DailyPlan.Id" class="btn btn-primary">Add Prepared Batch</a>
+</p>
+
+@if (Model.DailyPlan.DailyPlanItems.Count == 0)
+{
+    <p>No items have been added to this daily Plan yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Name</th>
+                <th>Amount</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var dailyPlanItem in Model.DailyPlan.DailyPlanItems)
+            {
+                <tr>
+                    <td>@dailyPlanItem.ItemType</td>
+                    <td>
+                        @if (dailyPlanItem.ItemType == MealBuilder.Web.Models.DailyPlanItemType.Recipe)
+                        {
+                            @dailyPlanItem.Recipe?.Name
+                        }
+                        else if (dailyPlanItem.ItemType == MealBuilder.Web.Models.DailyPlanItemType.Ingredient)
+                        {
+                            @dailyPlanItem.Ingredient?.Name
+                        }
+                        else if (dailyPlanItem.ItemType == MealBuilder.Web.Models.DailyPlanItemType.PreparedRecipeBatch)
+                        {
+                            @($"{dailyPlanItem.PreparedRecipeBatch?.RecipeNameSnapshot} | cooked {dailyPlanItem.PreparedRecipeBatch?.CookedDate}")
+                        }
+                    </td>
+                    <td>
+                        @if (dailyPlanItem.ItemType == MealBuilder.Web.Models.DailyPlanItemType.Recipe)
+                        {
+                            @($"{dailyPlanItem.ServingsCount} servings")
+                        }
+                        else if (dailyPlanItem.ItemType == MealBuilder.Web.Models.DailyPlanItemType.Ingredient)
+                        {
+                            @($"{dailyPlanItem.Grams} g")
+                        }
+                        else if (dailyPlanItem.ItemType == MealBuilder.Web.Models.DailyPlanItemType.PreparedRecipeBatch)
+                        {
+                            @($"{dailyPlanItem.ServingsCount} servings")
+                        }
+                    </td>
+                    <td>
+                        <a asp-page="./EditItem" asp-route-id="@dailyPlanItem.Id">Edit</a>
+
+                        <form method="post" asp-page-handler="RemoveItem" class="d-inline">
+                            <input type="hidden" name="dailyPlanItemId" value="@dailyPlanItem.Id" />
+                            <button type="submit" class="btn btn-link p-0">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<a asp-page="./Edit" asp-route-id="@Model.DailyPlan.Id" class="btn btn-primary">Edit</a>
+<a asp-page="./Delete" asp-route-id="@Model.DailyPlan.Id" class="btn btn-danger">Delete</a>
+<a asp-page="./Index" class="btn btn-secondary">Back</a>

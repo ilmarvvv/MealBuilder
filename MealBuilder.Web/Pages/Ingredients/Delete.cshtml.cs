@@ -61,8 +61,8 @@ namespace MealBuilder.Web.Pages.Ingredients
         {
             return await _context.RecipeIngredients.AnyAsync(recipeIngredient =>
                        recipeIngredient.IngredientId == ingredientId)
-                   || await _context.MenuItems.AnyAsync(menuItem =>
-                       menuItem.IngredientId == ingredientId);
+                   || await _context.DailyPlanItems.AnyAsync(dailyPlanItem =>
+                       dailyPlanItem.IngredientId == ingredientId);
         }
     }
 }

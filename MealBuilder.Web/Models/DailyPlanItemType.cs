@@ -1,6 +1,6 @@
 ﻿namespace MealBuilder.Web.Models
 {
-    public enum MenuItemType
+    public enum DailyPlanItemType
     {
         Recipe = 1,
         Ingredient = 2,

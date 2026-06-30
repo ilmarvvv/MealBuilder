@@ -25,7 +25,7 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
         {
             PreparedRecipeBatch? preparedRecipeBatch = await _context.PreparedRecipeBatches
                 .Include(preparedRecipeBatch => preparedRecipeBatch.Recipe)
-                .Include(preparedRecipeBatch => preparedRecipeBatch.MenuItems)
+                .Include(preparedRecipeBatch => preparedRecipeBatch.DailyPlanItems)
                 .Include(preparedRecipeBatch => preparedRecipeBatch.Items)
                 .FirstOrDefaultAsync(preparedRecipeBatch => preparedRecipeBatch.Id == id);
 
@@ -97,9 +97,9 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
 
         private void LoadPreparedRecipeBatchSummary(PreparedRecipeBatch preparedRecipeBatch)
         {
-            decimal allocatedServings = preparedRecipeBatch.MenuItems
-                .Where(menuItem => menuItem.ServingsCount is not null)
-                .Sum(menuItem => menuItem.ServingsCount!.Value);
+            decimal allocatedServings = preparedRecipeBatch.DailyPlanItems
+                .Where(dailyPlanItem => dailyPlanItem.ServingsCount is not null)
+                .Sum(dailyPlanItem => dailyPlanItem.ServingsCount!.Value);
 
             PreparedRecipeBatchSummary = new PreparedRecipeBatchSummary
             {

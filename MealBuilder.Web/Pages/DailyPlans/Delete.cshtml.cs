@@ -3,7 +3,7 @@ using MealBuilder.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace MealBuilder.Web.Pages.Menus
+namespace MealBuilder.Web.Pages.DailyPlans
 {
     public class DeleteModel : PageModel
     {
@@ -14,32 +14,32 @@ namespace MealBuilder.Web.Pages.Menus
             _context = context;
         }
 
-        public Menu Menu { get; set; } = new();
+        public DailyPlan DailyPlan { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
-            Menu? menu = await _context.Menus.FindAsync(id);
+            DailyPlan? dailyPlan = await _context.DailyPlans.FindAsync(id);
 
-            if (menu is null)
+            if (dailyPlan is null)
             {
                 return NotFound();
             }
 
-            Menu = menu;
+            DailyPlan = dailyPlan;
 
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync(int id)
         {
-            Menu? menu = await _context.Menus.FindAsync(id);
+            DailyPlan? dailyPlan = await _context.DailyPlans.FindAsync(id);
 
-            if (menu is null)
+            if (dailyPlan is null)
             {
                 return NotFound();
             }
 
-            _context.Menus.Remove(menu);
+            _context.DailyPlans.Remove(dailyPlan);
             await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");

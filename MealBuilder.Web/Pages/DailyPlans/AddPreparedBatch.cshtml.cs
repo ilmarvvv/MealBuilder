@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
-namespace MealBuilder.Web.Pages.Menus
+namespace MealBuilder.Web.Pages.DailyPlans
 {
     public class AddPreparedBatchModel : PageModel
     {
@@ -16,25 +16,25 @@ namespace MealBuilder.Web.Pages.Menus
             _context = context;
         }
 
-        public Menu Menu { get; set; } = new();
+        public DailyPlan DailyPlan { get; set; } = new();
 
         public SelectList PreparedRecipeBatches { get; set; } = null!;
 
         [BindProperty]
-        public MenuItem MenuItem { get; set; } = new();
+        public DailyPlanItem DailyPlanItem { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
-            Menu? menu = await _context.Menus.FindAsync(id);
+            DailyPlan? dailyPlan = await _context.DailyPlans.FindAsync(id);
 
-            if (menu is null)
+            if (dailyPlan is null)
             {
                 return NotFound();
             }
 
-            Menu = menu;
-            MenuItem.MenuId = menu.Id;
-            MenuItem.ItemType = MenuItemType.PreparedRecipeBatch;
+            DailyPlan = dailyPlan;
+            DailyPlanItem.DailyPlanId = dailyPlan.Id;
+            DailyPlanItem.ItemType = DailyPlanItemType.PreparedRecipeBatch;
 
             await LoadPreparedRecipeBatchesAsync();
 
@@ -43,49 +43,49 @@ namespace MealBuilder.Web.Pages.Menus
 
         public async Task<IActionResult> OnPostAsync()
         {
-            ModelState.Remove("MenuItem.Menu");
-            ModelState.Remove("MenuItem.Recipe");
-            ModelState.Remove("MenuItem.Ingredient");
-            ModelState.Remove("MenuItem.PreparedRecipeBatch");
+            ModelState.Remove("DailyPlanItem.DailyPlan");
+            ModelState.Remove("DailyPlanItem.Recipe");
+            ModelState.Remove("DailyPlanItem.Ingredient");
+            ModelState.Remove("DailyPlanItem.PreparedRecipeBatch");
 
-            MenuItem.ItemType = MenuItemType.PreparedRecipeBatch;
-            MenuItem.RecipeId = null;
-            MenuItem.IngredientId = null;
-            MenuItem.Grams = null;
+            DailyPlanItem.ItemType = DailyPlanItemType.PreparedRecipeBatch;
+            DailyPlanItem.RecipeId = null;
+            DailyPlanItem.IngredientId = null;
+            DailyPlanItem.Grams = null;
 
-            if (MenuItem.PreparedRecipeBatchId is null)
+            if (DailyPlanItem.PreparedRecipeBatchId is null)
             {
-                ModelState.AddModelError("MenuItem.PreparedRecipeBatchId", "Prepared batch is required.");
+                ModelState.AddModelError("DailyPlanItem.PreparedRecipeBatchId", "Prepared batch is required.");
             }
 
-            if (MenuItem.ServingsCount is null || MenuItem.ServingsCount <= 0)
+            if (DailyPlanItem.ServingsCount is null || DailyPlanItem.ServingsCount <= 0)
             {
-                ModelState.AddModelError("MenuItem.ServingsCount", "Servings count must be greater than 0.");
+                ModelState.AddModelError("DailyPlanItem.ServingsCount", "Servings count must be greater than 0.");
             }
 
-            if (MenuItem.PreparedRecipeBatchId is not null && MenuItem.ServingsCount is not null)
+            if (DailyPlanItem.PreparedRecipeBatchId is not null && DailyPlanItem.ServingsCount is not null)
             {
                 PreparedRecipeBatch? preparedRecipeBatch = await _context.PreparedRecipeBatches
-                    .Include(preparedRecipeBatch => preparedRecipeBatch.MenuItems)
-                    .FirstOrDefaultAsync(preparedRecipeBatch => preparedRecipeBatch.Id == MenuItem.PreparedRecipeBatchId);
+                    .Include(preparedRecipeBatch => preparedRecipeBatch.DailyPlanItems)
+                    .FirstOrDefaultAsync(preparedRecipeBatch => preparedRecipeBatch.Id == DailyPlanItem.PreparedRecipeBatchId);
 
                 if (preparedRecipeBatch is null)
                 {
-                    ModelState.AddModelError("MenuItem.PreparedRecipeBatchId", "Prepared batch was not found.");
+                    ModelState.AddModelError("DailyPlanItem.PreparedRecipeBatchId", "Prepared batch was not found.");
                 }
                 else
                 {
-                    decimal allocatedServings = preparedRecipeBatch.MenuItems
-                        .Where(menuItem => menuItem.ServingsCount is not null)
-                        .Sum(menuItem => menuItem.ServingsCount!.Value);
+                    decimal allocatedServings = preparedRecipeBatch.DailyPlanItems
+                        .Where(dailyPlanItem => dailyPlanItem.ServingsCount is not null)
+                        .Sum(dailyPlanItem => dailyPlanItem.ServingsCount!.Value);
 
                     decimal unallocatedServings =
                         preparedRecipeBatch.TotalServings - allocatedServings;
 
-                    if (MenuItem.ServingsCount > unallocatedServings)
+                    if (DailyPlanItem.ServingsCount > unallocatedServings)
                     {
                         ModelState.AddModelError(
-                            "MenuItem.ServingsCount",
+                            "DailyPlanItem.ServingsCount",
                             $"Only {unallocatedServings} unallocated servings are available for this prepared batch.");
                     }
                 }
@@ -93,27 +93,27 @@ namespace MealBuilder.Web.Pages.Menus
 
             if (!ModelState.IsValid)
             {
-                Menu? menu = await _context.Menus.FindAsync(MenuItem.MenuId);
+                DailyPlan? dailyPlan = await _context.DailyPlans.FindAsync(DailyPlanItem.DailyPlanId);
 
-                if (menu is not null)
+                if (dailyPlan is not null)
                 {
-                    Menu = menu;
+                    DailyPlan = dailyPlan;
                 }
 
                 await LoadPreparedRecipeBatchesAsync();
                 return Page();
             }
 
-            _context.MenuItems.Add(MenuItem);
+            _context.DailyPlanItems.Add(DailyPlanItem);
             await _context.SaveChangesAsync();
 
-            return RedirectToPage("./Details", new { id = MenuItem.MenuId });
+            return RedirectToPage("./Details", new { id = DailyPlanItem.DailyPlanId });
         }
 
         private async Task LoadPreparedRecipeBatchesAsync()
         {
             List<PreparedRecipeBatch> preparedRecipeBatches = await _context.PreparedRecipeBatches
-                .Include(preparedRecipeBatch => preparedRecipeBatch.MenuItems)
+                .Include(preparedRecipeBatch => preparedRecipeBatch.DailyPlanItems)
                 .OrderBy(preparedRecipeBatch => preparedRecipeBatch.RecipeNameSnapshot)
                 .ThenByDescending(preparedRecipeBatch => preparedRecipeBatch.CookedDate)
                 .ToListAsync();
@@ -121,9 +121,9 @@ namespace MealBuilder.Web.Pages.Menus
             var availablePreparedRecipeBatches = preparedRecipeBatches
                 .Select(preparedRecipeBatch =>
                 {
-                    decimal allocatedServings = preparedRecipeBatch.MenuItems
-                        .Where(menuItem => menuItem.ServingsCount is not null)
-                        .Sum(menuItem => menuItem.ServingsCount!.Value);
+                    decimal allocatedServings = preparedRecipeBatch.DailyPlanItems
+                        .Where(dailyPlanItem => dailyPlanItem.ServingsCount is not null)
+                        .Sum(dailyPlanItem => dailyPlanItem.ServingsCount!.Value);
 
                     decimal unallocatedServings =
                         preparedRecipeBatch.TotalServings - allocatedServings;
@@ -140,9 +140,9 @@ namespace MealBuilder.Web.Pages.Menus
                         UnallocatedServings = unallocatedServings
                     };
                 })
-    .Where(preparedRecipeBatch =>
-        preparedRecipeBatch.UnallocatedServings > 0)
-    .ToList();
+                .Where(preparedRecipeBatch =>
+                    preparedRecipeBatch.UnallocatedServings > 0)
+                .ToList();
 
             PreparedRecipeBatches = new SelectList(
                 availablePreparedRecipeBatches,

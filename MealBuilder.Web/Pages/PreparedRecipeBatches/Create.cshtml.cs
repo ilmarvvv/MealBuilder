@@ -130,25 +130,25 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
 
             for (int dayOffset = 0; dayOffset < PreparedRecipeBatch.PlannedDays; dayOffset++)
             {
-                DateOnly menuDate = PreparedRecipeBatch.CookedDate.AddDays(dayOffset);
+                DateOnly dailyPlanDate = PreparedRecipeBatch.CookedDate.AddDays(dayOffset);
 
-                Menu? menu = await _context.Menus
-                    .FirstOrDefaultAsync(menu => menu.Date == menuDate);
+                DailyPlan? dailyPlan = await _context.DailyPlans
+                    .FirstOrDefaultAsync(dailyPlan => dailyPlan.Date == dailyPlanDate);
 
-                if (menu is null)
+                if (dailyPlan is null)
                 {
-                    menu = new Menu
+                    dailyPlan = new DailyPlan
                     {
-                        Name = $"Menu {menuDate}",
-                        Date = menuDate
+                        Name = $"Daily Plan {dailyPlanDate}",
+                        Date = dailyPlanDate
                     };
 
-                    _context.Menus.Add(menu);
+                    _context.DailyPlans.Add(dailyPlan);
                 }
 
-                menu.MenuItems.Add(new MenuItem
+                dailyPlan.DailyPlanItems.Add(new DailyPlanItem
                 {
-                    ItemType = MenuItemType.PreparedRecipeBatch,
+                    ItemType = DailyPlanItemType.PreparedRecipeBatch,
                     PreparedRecipeBatch = PreparedRecipeBatch,
                     ServingsCount = ServingsPerDay
                 });

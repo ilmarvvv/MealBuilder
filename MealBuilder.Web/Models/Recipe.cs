@@ -38,7 +38,7 @@ namespace MealBuilder.Web.Models
 
         public List<RecipeComponent> UsedAsComponentInRecipes { get; set; } = [];
 
-        public List<MenuItem> MenuItems { get; set; } = [];
+        public List<DailyPlanItem> DailyPlanItems { get; set; } = [];
 
         public List<PreparedRecipeBatch> PreparedRecipeBatches { get; set; } = [];
 

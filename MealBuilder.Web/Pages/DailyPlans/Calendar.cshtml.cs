@@ -5,22 +5,22 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 
-namespace MealBuilder.Web.Pages.Menus
+namespace MealBuilder.Web.Pages.DailyPlans
 {
     public class CalendarModel : PageModel
     {
         private readonly AppDbContext _context;
-        private readonly MenuCalculationService _menuCalculationService;
+        private readonly DailyPlanCalculationService _dailyPlanCalculationService;
 
         public CalendarModel(
             AppDbContext context,
-            MenuCalculationService menuCalculationService)
+            DailyPlanCalculationService dailyPlanCalculationService)
         {
             _context = context;
-            _menuCalculationService = menuCalculationService;
+            _dailyPlanCalculationService = dailyPlanCalculationService;
         }
 
-        public List<MenuCalendarDay> Days { get; set; } = [];
+        public List<DailyPlanCalendarDay> Days { get; set; } = [];
 
         public DateOnly WeekStart { get; set; }
 
@@ -42,50 +42,50 @@ namespace MealBuilder.Web.Pages.Menus
 
             WeekStart = weekStart;
 
-            List<Menu> menus = await _context.Menus
-                .Include(menu => menu.MenuItems)
-                .ThenInclude(menuItem => menuItem.Ingredient)
-                .Include(menu => menu.MenuItems)
-                .ThenInclude(menuItem => menuItem.PreparedRecipeBatch)
+            List<DailyPlan> dailyPlans = await _context.DailyPlans
+                .Include(dailyPlan => dailyPlan.DailyPlanItems)
+                .ThenInclude(dailyPlanItem => dailyPlanItem.Ingredient)
+                .Include(dailyPlan => dailyPlan.DailyPlanItems)
+                .ThenInclude(dailyPlanItem => dailyPlanItem.PreparedRecipeBatch)
                 .ThenInclude(preparedRecipeBatch => preparedRecipeBatch!.Recipe)
                 .ThenInclude(recipe => recipe!.RecipeIngredients)
                 .ThenInclude(recipeIngredient => recipeIngredient.Ingredient)
-                .Include(menu => menu.MenuItems)
-                .ThenInclude(menuItem => menuItem.PreparedRecipeBatch)
+                .Include(dailyPlan => dailyPlan.DailyPlanItems)
+                .ThenInclude(dailyPlanItem => dailyPlanItem.PreparedRecipeBatch)
                 .ThenInclude(preparedRecipeBatch => preparedRecipeBatch!.Items)
-                .Include(menu => menu.MenuItems)
-                .ThenInclude(menuItem => menuItem.PreparedRecipeBatch)
+                .Include(dailyPlan => dailyPlan.DailyPlanItems)
+                .ThenInclude(dailyPlanItem => dailyPlanItem.PreparedRecipeBatch)
                 .ThenInclude(preparedRecipeBatch => preparedRecipeBatch!.Recipe)
                 .ThenInclude(recipe => recipe!.Components)
                 .ThenInclude(recipeComponent => recipeComponent.ComponentRecipe)
                 .ThenInclude(componentRecipe => componentRecipe.RecipeIngredients)
                 .ThenInclude(recipeIngredient => recipeIngredient.Ingredient)
-                .Include(menu => menu.MenuItems)
-                .ThenInclude(menuItem => menuItem.Recipe)
+                .Include(dailyPlan => dailyPlan.DailyPlanItems)
+                .ThenInclude(dailyPlanItem => dailyPlanItem.Recipe)
                 .ThenInclude(recipe => recipe!.RecipeIngredients)
                 .ThenInclude(recipeIngredient => recipeIngredient.Ingredient)
-                .Include(menu => menu.MenuItems)
-                .ThenInclude(menuItem => menuItem.Recipe)
+                .Include(dailyPlan => dailyPlan.DailyPlanItems)
+                .ThenInclude(dailyPlanItem => dailyPlanItem.Recipe)
                 .ThenInclude(recipe => recipe!.Components)
                 .ThenInclude(recipeComponent => recipeComponent.ComponentRecipe)
                 .ThenInclude(componentRecipe => componentRecipe.RecipeIngredients)
                 .ThenInclude(recipeIngredient => recipeIngredient.Ingredient)
-                .Where(menu => menu.Date >= weekStart && menu.Date <= weekEnd)
-                .OrderBy(menu => menu.Date)
+                .Where(dailyPlan => dailyPlan.Date >= weekStart && dailyPlan.Date <= weekEnd)
+                .OrderBy(dailyPlan => dailyPlan.Date)
                 .ToListAsync();
 
             for (int dayOffset = 0; dayOffset < 7; dayOffset++)
             {
                 DateOnly date = weekStart.AddDays(dayOffset);
-                Menu? menu = menus.FirstOrDefault(menu => menu.Date == date);
+                DailyPlan? dailyPlan = dailyPlans.FirstOrDefault(dailyPlan => dailyPlan.Date == date);
 
-                Days.Add(new MenuCalendarDay
+                Days.Add(new DailyPlanCalendarDay
                 {
                     Date = date,
-                    Menu = menu,
-                    Totals = menu is null
+                    DailyPlan = dailyPlan,
+                    Totals = dailyPlan is null
                         ? new RecipeNutritionTotals()
-                        : _menuCalculationService.Calculate(menu)
+                        : _dailyPlanCalculationService.Calculate(dailyPlan)
                 });
             }
 
@@ -107,11 +107,11 @@ namespace MealBuilder.Web.Pages.Menus
         }
     }
 
-    public class MenuCalendarDay
+    public class DailyPlanCalendarDay
     {
         public DateOnly Date { get; set; }
 
-        public Menu? Menu { get; set; }
+        public DailyPlan? DailyPlan { get; set; }
 
         public RecipeNutritionTotals Totals { get; set; } = new();
     }

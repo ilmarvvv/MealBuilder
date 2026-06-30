@@ -3,7 +3,7 @@ using MealBuilder.Web.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
-namespace MealBuilder.Web.Pages.Menus
+namespace MealBuilder.Web.Pages.DailyPlans
 {
     public class IndexModel : PageModel
     {
@@ -14,12 +14,12 @@ namespace MealBuilder.Web.Pages.Menus
             _context = context;
         }
 
-        public List<Menu> Menus { get; set; } = [];
+        public List<DailyPlan> DailyPlans { get; set; } = [];
 
         public async Task OnGetAsync()
         {
-            Menus = await _context.Menus
-                .OrderBy(menu => menu.Date)
+            DailyPlans = await _context.DailyPlans
+                .OrderBy(dailyPlan => dailyPlan.Date)
                 .ToListAsync();
         }
     }
