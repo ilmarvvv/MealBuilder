@@ -820,6 +820,11 @@ Goal: review and adjust days, calendar behavior, and related workflow issues fou
   - Rename related models, pages, service, routes, and database tables.
   - Preserve existing data through a rename-only migration.
 
+- [ ] Remove direct `Recipe` support from `DailyPlanItem`
+  - A daily plan should contain only prepared recipe batches and individual ingredients.
+  - A recipe must be converted into a prepared batch before it can be allocated to daily plans.
+  - Check existing data before removing the recipe relationship and enum value.
+
 ### Milestone 13: Users and Authentication
 
 Goal: make the app ready for multiple users.
