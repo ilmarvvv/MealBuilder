@@ -69,17 +69,29 @@ else
                 <tr>
                     <td>@dailyPlanItem.ItemType</td>
                     <td>
-                        @if (dailyPlanItem.ItemType == MealBuilder.Web.Models.DailyPlanItemType.Recipe)
+                        @if (dailyPlanItem.ItemType == MealBuilder.Web.Models.DailyPlanItemType.Recipe
+                            && dailyPlanItem.Recipe is not null)
                         {
-                            @dailyPlanItem.Recipe?.Name
+                            <a asp-page="/Recipes/Details"
+                               asp-route-id="@dailyPlanItem.Recipe.Id">
+                                @dailyPlanItem.Recipe.Name
+                            </a>
                         }
-                        else if (dailyPlanItem.ItemType == MealBuilder.Web.Models.DailyPlanItemType.Ingredient)
+                        else if (dailyPlanItem.ItemType == MealBuilder.Web.Models.DailyPlanItemType.Ingredient
+                            && dailyPlanItem.Ingredient is not null)
                         {
-                            @dailyPlanItem.Ingredient?.Name
+                            <a asp-page="/Ingredients/Details"
+                               asp-route-id="@dailyPlanItem.Ingredient.Id">
+                                @dailyPlanItem.Ingredient.Name
+                            </a>
                         }
-                        else if (dailyPlanItem.ItemType == MealBuilder.Web.Models.DailyPlanItemType.PreparedRecipeBatch)
+                        else if (dailyPlanItem.ItemType == MealBuilder.Web.Models.DailyPlanItemType.PreparedRecipeBatch
+                            && dailyPlanItem.PreparedRecipeBatch is not null)
                         {
-                            @($"{dailyPlanItem.PreparedRecipeBatch?.RecipeNameSnapshot} | cooked {dailyPlanItem.PreparedRecipeBatch?.CookedDate}")
+                            <a asp-page="/PreparedRecipeBatches/Details"
+                               asp-route-id="@dailyPlanItem.PreparedRecipeBatch.Id">
+                                @dailyPlanItem.PreparedRecipeBatch.RecipeNameSnapshot
+                            </a>
                         }
                     </td>
                     <td>
