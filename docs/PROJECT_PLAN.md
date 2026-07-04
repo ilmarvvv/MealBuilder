@@ -820,10 +820,17 @@ Goal: review and adjust days, calendar behavior, and related workflow issues fou
   - Rename related models, pages, service, routes, and database tables.
   - Preserve existing data through a rename-only migration.
 
-- [ ] Remove direct `Recipe` support from `DailyPlanItem`
-  - A daily plan should contain only prepared recipe batches and individual ingredients.
-  - A recipe must be converted into a prepared batch before it can be allocated to daily plans.
-  - Check existing data before removing the recipe relationship and enum value.
+- [x] Keep consecutive-day batch allocation for the current version
+  - Use `CookedDate` as the allocation start date.
+  - Distribute servings across consecutive days using `PlannedDays` and servings per day.
+  - Keep selecting individual meal dates as a future improvement.
+
+- [ ] Add lazy daily plan workflow from Calendar
+  - Remove the separate Daily Plan column and use the date as the navigation link.
+  - Open an existing daily plan by ID or show a virtual empty daily plan by date.
+  - Do not save an empty daily plan when the user only views it.
+  - Create the daily plan after the user successfully adds an ingredient or prepared batch, or saves other changes.
+  - Adjust Edit and Delete actions for virtual daily plans that have not been saved yet.
 
 ### Milestone 13: Users and Authentication
 
@@ -986,13 +993,18 @@ This section contains ideas that may be useful for the project in the future, bu
 - [ ] Add advanced prepared batch snapshot history
   - Preserve deeper source details, edit history, and recipe version references if the basic prepared batch snapshot model is not enough.
 
+- [ ] Remove direct `Recipe` support from `DailyPlanItem`
+  - A daily plan should contain only prepared recipe batches and individual ingredients.
+  - A recipe must be converted into a prepared batch before it can be allocated to daily plans.
+  - Check existing data before removing the recipe relationship and enum value.
+
 - [ ] Allow selecting specific meal dates for prepared batches
   - Open a calendar when creating a prepared batch.
   - Preselect meal dates from the recipe planning defaults.
   - Allow users to add or remove individual eating days.
   - Set planned days from the number of selected dates.
   - Calculate total servings from selected dates and servings per day.
-  - Create or reuse daily menus only for the selected dates.
+  - Create or reuse daily plans only for the selected dates.
 
 - [ ] Plan meals for families or multiple people
   - Review how servings, prepared batches, and daily plans should work for several people.
