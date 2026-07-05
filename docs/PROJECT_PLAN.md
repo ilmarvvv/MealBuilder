@@ -825,7 +825,7 @@ Goal: review and adjust days, calendar behavior, and related workflow issues fou
   - Distribute servings across consecutive days using `PlannedDays` and servings per day.
   - Keep selecting individual meal dates as a future improvement.
 
-- [ ] Add lazy daily plan workflow from Calendar
+- [ ] Add on-demand daily plan workflow from Calendar
   - Remove the separate Daily Plan column and use the date as the navigation link.
   - Open an existing daily plan by ID or show a virtual empty daily plan by date.
   - Do not save an empty daily plan when the user only views it.
