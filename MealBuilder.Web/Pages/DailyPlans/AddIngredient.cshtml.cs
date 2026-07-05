@@ -18,21 +18,49 @@ namespace MealBuilder.Web.Pages.DailyPlans
 
         public DailyPlan DailyPlan { get; set; } = new();
 
+        [BindProperty]
+        public DateOnly? DailyPlanDate { get; set; }
+
         public SelectList Ingredients { get; set; } = null!;
 
         [BindProperty]
         public DailyPlanItem DailyPlanItem { get; set; } = new();
 
-        public async Task<IActionResult> OnGetAsync(int id)
+        public async Task<IActionResult> OnGetAsync(int? id, DateOnly? date)
         {
-            DailyPlan? dailyPlan = await _context.DailyPlans.FindAsync(id);
+            DailyPlan? dailyPlan;
 
-            if (dailyPlan is null)
+            if (id.HasValue)
             {
-                return NotFound();
+                dailyPlan = await _context.DailyPlans.FindAsync(id.Value);
+
+                if (dailyPlan is null)
+                {
+                    return NotFound();
+                }
+            }
+            else
+            {
+                if (!date.HasValue)
+                {
+                    return BadRequest();
+                }
+
+                dailyPlan = await _context.DailyPlans
+                    .FirstOrDefaultAsync(dailyPlan => dailyPlan.Date == date.Value);
+
+                if (dailyPlan is null)
+                {
+                    dailyPlan = new DailyPlan
+                    {
+                        Date = date.Value,
+                        Name = $"Daily Plan {date.Value}"
+                    };
+                }
             }
 
             DailyPlan = dailyPlan;
+            DailyPlanDate = dailyPlan.Date;
             DailyPlanItem.DailyPlanId = dailyPlan.Id;
             DailyPlanItem.ItemType = DailyPlanItemType.Ingredient;
 
@@ -46,38 +74,92 @@ namespace MealBuilder.Web.Pages.DailyPlans
             ModelState.Remove("DailyPlanItem.DailyPlan");
             ModelState.Remove("DailyPlanItem.Recipe");
             ModelState.Remove("DailyPlanItem.Ingredient");
+            ModelState.Remove("DailyPlanItem.PreparedRecipeBatch");
 
             DailyPlanItem.ItemType = DailyPlanItemType.Ingredient;
             DailyPlanItem.RecipeId = null;
+            DailyPlanItem.PreparedRecipeBatchId = null;
             DailyPlanItem.ServingsCount = null;
 
             if (DailyPlanItem.IngredientId is null)
             {
-                ModelState.AddModelError("DailyPlanItem.IngredientId", "Ingredient is required.");
+                ModelState.AddModelError(
+                    "DailyPlanItem.IngredientId",
+                    "Ingredient is required.");
             }
 
             if (DailyPlanItem.Grams is null || DailyPlanItem.Grams <= 0)
             {
-                ModelState.AddModelError("DailyPlanItem.Grams", "Grams must be greater than 0.");
+                ModelState.AddModelError(
+                    "DailyPlanItem.Grams",
+                    "Grams must be greater than 0.");
+            }
+
+            if (DailyPlanItem.DailyPlanId <= 0 && !DailyPlanDate.HasValue)
+            {
+                ModelState.AddModelError(
+                    nameof(DailyPlanDate),
+                    "Daily plan date is required.");
+            }
+
+            DailyPlan? dailyPlan = null;
+
+            if (DailyPlanItem.DailyPlanId > 0)
+            {
+                dailyPlan = await _context.DailyPlans
+                    .FindAsync(DailyPlanItem.DailyPlanId);
+
+                if (dailyPlan is null)
+                {
+                    return NotFound();
+                }
+            }
+            else if (DailyPlanDate.HasValue)
+            {
+                dailyPlan = await _context.DailyPlans
+                    .FirstOrDefaultAsync(dailyPlan =>
+                        dailyPlan.Date == DailyPlanDate.Value);
             }
 
             if (!ModelState.IsValid)
             {
-                DailyPlan? dailyPlan = await _context.DailyPlans.FindAsync(DailyPlanItem.DailyPlanId);
-
-                if (dailyPlan is not null)
+                if (dailyPlan is null)
                 {
-                    DailyPlan = dailyPlan;
+                    if (!DailyPlanDate.HasValue)
+                    {
+                        return BadRequest();
+                    }
+
+                    dailyPlan = new DailyPlan
+                    {
+                        Date = DailyPlanDate.Value,
+                        Name = $"Daily Plan {DailyPlanDate.Value}"
+                    };
                 }
+
+                DailyPlan = dailyPlan;
 
                 await LoadIngredientsAsync();
                 return Page();
             }
 
+            if (dailyPlan is null)
+            {
+                dailyPlan = new DailyPlan
+                {
+                    Date = DailyPlanDate!.Value,
+                    Name = $"Daily Plan {DailyPlanDate.Value}"
+                };
+
+                _context.DailyPlans.Add(dailyPlan);
+            }
+
+            DailyPlanItem.DailyPlan = dailyPlan;
+
             _context.DailyPlanItems.Add(DailyPlanItem);
             await _context.SaveChangesAsync();
 
-            return RedirectToPage("./Details", new { id = DailyPlanItem.DailyPlanId });
+            return RedirectToPage("./Details", new { id = dailyPlan.Id });
         }
 
         private async Task LoadIngredientsAsync()

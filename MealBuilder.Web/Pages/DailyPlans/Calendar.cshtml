@@ -45,7 +45,6 @@
     <thead>
         <tr>
             <th>Date</th>
-            <th>Daily Plan</th>
             <th>Calories</th>
             <th>Protein</th>
             <th>Fiber</th>
@@ -57,15 +56,19 @@
         @foreach (var day in Model.Days)
         {
             <tr>
-                <td>@day.Date</td>
                 <td>
                     @if (day.DailyPlan is null)
                     {
-                        <a asp-page="./Create" asp-route-date="@day.Date.ToString("yyyy-MM-dd")">Create daily plan</a>
+                        <a asp-page="./Details" asp-route-date="@day.Date.ToString("yyyy-MM-dd")">
+                            @day.Date
+                        </a>
                     }
                     else
                     {
-                        <a asp-page="./Details" asp-route-id="@day.DailyPlan.Id">@day.DailyPlan.Name</a>
+                        <a asp-page="./Details"
+                           asp-route-id="@day.DailyPlan.Id">
+                            @day.Date
+                        </a>
                     }
                 </td>
                 <td>@day.Totals.Calories.ToString("0.00")</td>

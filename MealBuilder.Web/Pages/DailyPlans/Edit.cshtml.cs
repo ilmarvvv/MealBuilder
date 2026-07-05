@@ -18,16 +18,37 @@ namespace MealBuilder.Web.Pages.DailyPlans
         [BindProperty]
         public DailyPlan DailyPlan { get; set; } = new();
 
-        public async Task<IActionResult> OnGetAsync(int id)
+        public async Task<IActionResult> OnGetAsync(int? id, DateOnly? date)
         {
-            DailyPlan? dailyPlan = await _context.DailyPlans.FindAsync(id);
-
-            if (dailyPlan is null)
+            if (id.HasValue)
             {
-                return NotFound();
+                DailyPlan? dailyPlan = await _context.DailyPlans
+                    .FindAsync(id.Value);
+
+                if (dailyPlan is null)
+                {
+                    return NotFound();
+                }
+
+                DailyPlan = dailyPlan;
+
+                return Page();
             }
 
-            DailyPlan = dailyPlan;
+            if (!date.HasValue)
+            {
+                return BadRequest();
+            }
+
+            DailyPlan? existingDailyPlan = await _context.DailyPlans
+                .FirstOrDefaultAsync(dailyPlan =>
+                    dailyPlan.Date == date.Value);
+
+            DailyPlan = existingDailyPlan ?? new DailyPlan
+            {
+                Date = date.Value,
+                Name = $"Daily Plan {date.Value}"
+            };
 
             return Page();
         }
@@ -35,11 +56,15 @@ namespace MealBuilder.Web.Pages.DailyPlans
         public async Task<IActionResult> OnPostAsync()
         {
             bool dailyPlanDateAlreadyExists = await _context.DailyPlans
-                .AnyAsync(dailyPlan => dailyPlan.Date == DailyPlan.Date && dailyPlan.Id != DailyPlan.Id);
+                .AnyAsync(dailyPlan =>
+                    dailyPlan.Date == DailyPlan.Date &&
+                    dailyPlan.Id != DailyPlan.Id);
 
             if (dailyPlanDateAlreadyExists)
             {
-                ModelState.AddModelError("DailyPlan.Date", "A daily plan already exists for this date.");
+                ModelState.AddModelError(
+                    "DailyPlan.Date",
+                    "A daily plan already exists for this date.");
             }
 
             if (!ModelState.IsValid)
@@ -47,10 +72,33 @@ namespace MealBuilder.Web.Pages.DailyPlans
                 return Page();
             }
 
-            _context.Attach(DailyPlan).State = EntityState.Modified;
+            DailyPlan dailyPlan;
+
+            if (DailyPlan.Id > 0)
+            {
+                DailyPlan? existingDailyPlan = await _context.DailyPlans
+                    .FindAsync(DailyPlan.Id);
+
+                if (existingDailyPlan is null)
+                {
+                    return NotFound();
+                }
+
+                existingDailyPlan.Name = DailyPlan.Name;
+                existingDailyPlan.Date = DailyPlan.Date;
+                existingDailyPlan.Description = DailyPlan.Description;
+
+                dailyPlan = existingDailyPlan;
+            }
+            else
+            {
+                dailyPlan = DailyPlan;
+                _context.DailyPlans.Add(dailyPlan);
+            }
+
             await _context.SaveChangesAsync();
 
-            return RedirectToPage("./Details", new { id = DailyPlan.Id });
+            return RedirectToPage("./Details", new { id = dailyPlan.Id });
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿@page "{id:int}"
+﻿@page "{id:int?}"
 @model MealBuilder.Web.Pages.DailyPlans.AddPreparedBatchModel
 
 @{
@@ -11,6 +11,7 @@
 
 <form method="post">
     <input type="hidden" asp-for="DailyPlanItem.DailyPlanId" />
+    <input type="hidden" asp-for="DailyPlanDate" />
     <input type="hidden" asp-for="DailyPlanItem.ItemType" />
 
     <div class="mb-3">
@@ -28,7 +29,18 @@
     </div>
 
     <button type="submit" class="btn btn-primary">Add</button>
-    <a asp-page="./Details" asp-route-id="@Model.DailyPlan.Id" class="btn btn-secondary">Cancel</a>
+    @if (Model.DailyPlan.Id > 0)
+    {
+        <a asp-page="./Details"
+           asp-route-id="@Model.DailyPlan.Id"
+           class="btn btn-secondary">Cancel</a>
+    }
+    else
+    {
+        <a asp-page="./Details"
+           asp-route-date="@Model.DailyPlan.Date.ToString("yyyy-MM-dd")"
+           class="btn btn-secondary">Cancel</a>
+    }
 </form>
 
 @section Scripts {

@@ -1,4 +1,4 @@
-﻿@page "{id:int}"
+﻿@page "{id:int?}"
 @model MealBuilder.Web.Pages.DailyPlans.EditModel
 
 @{
@@ -29,7 +29,18 @@
     </div>
 
     <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-page="./Details" asp-route-id="@Model.DailyPlan.Id" class="btn btn-secondary">Cancel</a>
+    @if (Model.DailyPlan.Id > 0)
+    {
+        <a asp-page="./Details"
+           asp-route-id="@Model.DailyPlan.Id"
+           class="btn btn-secondary">Cancel</a>
+    }
+    else
+    {
+        <a asp-page="./Details"
+           asp-route-date="@Model.DailyPlan.Date.ToString("yyyy-MM-dd")"
+           class="btn btn-secondary">Cancel</a>
+    }
 </form>
 
 @section Scripts {

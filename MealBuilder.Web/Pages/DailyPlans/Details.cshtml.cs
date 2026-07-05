@@ -25,9 +25,11 @@ namespace MealBuilder.Web.Pages.DailyPlans
 
         public RecipeNutritionTotals Totals { get; set; } = new();
 
-        public async Task<IActionResult> OnGetAsync(int id)
+        public bool IsPersisted => DailyPlan.Id > 0;
+
+        public async Task<IActionResult> OnGetAsync(int? id, DateOnly? date)
         {
-            DailyPlan? dailyPlan = await _context.DailyPlans
+            IQueryable<DailyPlan> query = _context.DailyPlans
                 .Include(dailyPlan => dailyPlan.DailyPlanItems)
                 .ThenInclude(dailyPlanItem => dailyPlanItem.Ingredient)
                 .Include(dailyPlan => dailyPlan.DailyPlanItems)
@@ -45,12 +47,40 @@ namespace MealBuilder.Web.Pages.DailyPlans
                 .ThenInclude(recipe => recipe!.Components)
                 .ThenInclude(recipeComponent => recipeComponent.ComponentRecipe)
                 .ThenInclude(componentRecipe => componentRecipe.RecipeIngredients)
-                .ThenInclude(recipeIngredient => recipeIngredient.Ingredient)
-                .FirstOrDefaultAsync(dailyPlan => dailyPlan.Id == id);
+                .ThenInclude(recipeIngredient => recipeIngredient.Ingredient);
 
-            if (dailyPlan is null)
+            DailyPlan? dailyPlan;
+
+            if (id.HasValue)
             {
-                return NotFound();
+                dailyPlan = await query
+                    .FirstOrDefaultAsync(dailyPlan => dailyPlan.Id == id.Value);
+
+                if (dailyPlan is null)
+                {
+                    return NotFound();
+                }
+            }
+            else
+            {
+                if (!date.HasValue)
+                {
+                    return BadRequest();
+                }
+
+                dailyPlan = await query
+                    .FirstOrDefaultAsync(dailyPlan => dailyPlan.Date == date.Value);
+
+                if (dailyPlan is null)
+                {
+                    DailyPlan = new DailyPlan
+                    {
+                        Date = date.Value,
+                        Name = $"Daily Plan {date.Value}"
+                    };
+
+                    return Page();
+                }
             }
 
             DailyPlan = dailyPlan;
