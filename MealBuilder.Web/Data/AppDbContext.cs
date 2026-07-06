@@ -1,9 +1,11 @@
-﻿using MealBuilder.Web.Models;
+﻿using MealBuilder.Web.Identity;
+using MealBuilder.Web.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace MealBuilder.Web.Data
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext<ApplicationUser>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options)
@@ -28,6 +30,8 @@ namespace MealBuilder.Web.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<RecipeIngredient>()
                 .HasOne(recipeIngredient => recipeIngredient.Ingredient)
                 .WithMany(ingredient => ingredient.RecipeIngredients)
