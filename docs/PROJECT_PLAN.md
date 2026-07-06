@@ -169,17 +169,17 @@ Notes:
 - component recipe nutrition values should be included in parent recipe total values
 - in the first UI version, recipe ingredients and recipe components will be shown as two separate tables
 
-### Menu
+### DailyPlan
 
-A daily meal plan for a specific date.
+A food plan for one specific date.
 
-It is needed so the user can plan recipes and individual ingredients for a specific day and see total nutrition values for that day.
+It allows the user to plan prepared recipe batches and individual ingredients for a day and see the total nutrition values for that date.
 
 Responsibility:
-- represent one daily meal plan
-- group recipes and individual ingredients planned for a specific date
-- provide a base for calculating daily nutrition totals
-- support future weekly and monthly planning views
+- represent one daily food plan
+- group planned food items for a specific date
+- provide the source for daily nutrition totals
+- support calendar, weekly, and future monthly views
 
 Main data:
 - name
@@ -187,79 +187,80 @@ Main data:
 - description
 
 Relationships:
-- has many `MenuItem` records
+- has many `DailyPlanItem` records
 
 Notes:
-- one menu represents one specific day
-- menus can be created for future dates to support planning ahead
-- the same date should normally have only one menu
-- menu totals are calculated from its menu items
-- menu does not store nutrition totals directly in the first version
-- weekly and monthly views can be built later by grouping daily menus by date
+- one `DailyPlan` represents one specific date
+- the same date can have only one saved daily plan
+- an empty date can be viewed from Calendar without immediately saving a record
+- a daily plan is created only after the user adds an item or saves changes
+- nutrition totals are calculated from daily plan items and are not stored directly
 
-### MenuItem
+### DailyPlanItem
 
-A single food item inside a daily menu.
+A single planned food item inside a `DailyPlan`.
 
-It can represent either a recipe or an individual ingredient planned for a specific day.
+In the current UI, it represents either an individual ingredient measured in grams or servings from a prepared recipe batch.
 
 Responsibility:
-- connect a menu with one planned food item
-- allow recipes to be added to a daily menu
-- allow individual ingredients to be added to a daily menu
+- connect a daily plan with one planned food item
 - store the planned amount for that item
+- contribute nutrition values to the daily total
 
 Main data:
-- menu id
+- daily plan id
 - item type
-- recipe id
 - ingredient id
+- prepared recipe batch id
 - servings count
 - grams
 
 Relationships:
-- belongs to one `Menu`
-- can reference one `Recipe`
+- belongs to one `DailyPlan`
 - can reference one `Ingredient`
+- can reference one `PreparedRecipeBatch`
+- can temporarily reference one legacy `Recipe`
 
 Notes:
-- `ItemType` defines whether the item is a recipe or an ingredient
-- if `ItemType` is `Recipe`, the item uses `RecipeId` and `ServingsCount`
-- if `ItemType` is `Ingredient`, the item uses `IngredientId` and `Grams`
-- `ServingsCount` must be greater than 0 for recipe items
-- `Grams` must be greater than 0 for ingredient items
-- in the first version, one menu item should not reference both a recipe and an ingredient at the same time
-- prepared recipe batch tracking can be added later
+- `ItemType` determines which relationship and quantity field are used
+- ingredient items use `IngredientId` and `Grams`
+- prepared batch items use `PreparedRecipeBatchId` and `ServingsCount`
+- the quantity must be greater than 0
+- one item must reference only the entity required by its item type
+- direct recipe items are no longer created by the UI and their legacy support should be removed later
 
 ### PreparedRecipeBatch
 
-A specific cooked batch of a recipe.
+An editable snapshot of a recipe that represents one prepared or planned batch.
 
-For example, the user can create a `Burger` recipe and then cook one batch of it on 21/05/2026 with 8 servings. This cooked batch can be used in menus across multiple days until the servings run out.
+For example, the user can create a `Burger` recipe, create a batch with 8 servings, adjust its copied contents, and allocate those servings across consecutive daily plans.
 
 Responsibility:
-- represent a cooked batch of one recipe
-- store when the recipe was cooked
-- store how many servings were prepared
-- allow menu planning based on available prepared food
-- help calculate how many servings are already used and how many remain
+- represent a prepared copy of one recipe
+- preserve copied recipe contents and nutrition values as snapshot data
+- store the allocation start date, total servings, and planned days
+- track how many servings are allocated and how many remain
 
 Main data:
-- recipe id
+- source recipe id
+- recipe name snapshot
 - cooked date
 - total servings
+- planned days
+- prepared batch snapshot items
 
 Relationships:
-- belongs to one `Recipe`
-- can be used by many `MenuItem` records
+- references one source `Recipe`
+- has many `PreparedRecipeBatchItem` snapshot records
+- can be referenced by many `DailyPlanItem` records
 
 Notes:
-- `TotalServings` must be greater than 0
-- used servings are calculated from menu items that reference this batch
-- remaining servings are calculated as: total servings - used servings
-- a prepared batch should not be shown as available when remaining servings are 0
-- in the first version, batch nutrition values come from the related recipe
-- if the recipe changes later, we may need to decide whether old batches keep old nutrition values or use updated recipe values
+- changing the source recipe does not silently change an existing batch snapshot
+- `CookedDate` currently acts as the allocation start date
+- servings are distributed across consecutive dates using `PlannedDays`
+- used servings are calculated from daily plan items that reference the batch
+- remaining servings are calculated as total servings minus used servings
+- nutrition values are calculated from stored batch snapshot items
 
 ## 4. Main Scenarios: What the User Can Do
 
@@ -303,15 +304,17 @@ The user can specify how many days a dish lasts.
 
 The user can see nutrition values for one day.
 
-### Working With Menus
+### Working With Daily Plans
 
-The user can create a menu for a day or selected period.
+The user can open any date from Calendar and see an existing or empty daily plan.
 
-The user can add several recipes or individual products to a menu.
+The user can add prepared recipe batch servings or individual ingredients to the selected day.
 
-The user can see total calories, protein, fiber, sugar, salt, and other values for the menu.
+The system creates a saved daily plan only after the user adds an item or saves changes.
 
-The user can change menu contents or remove an item from the menu.
+The user can see total calories, protein, fiber, sugar, salt, and other values for the day.
+
+The user can change planned quantities or remove items from the daily plan.
 
 ### Searching and Reusing Data
 
@@ -391,13 +394,21 @@ Values for one portion are calculated as total recipe values divided by the numb
 
 Values for one day are calculated as total recipe values divided by the number of days.
 
-### Menus
+### Daily Plans
 
-A menu can contain recipes, individual ingredients, or prepared dishes.
+One saved `DailyPlan` can exist for each date.
 
-The quantity of each menu item must be greater than 0.
+A daily plan can contain individual ingredients or prepared recipe batches.
 
-Total menu values are the sum of all menu item values.
+Direct recipes must be converted into prepared batches before they are added through the current UI.
+
+The quantity of each daily plan item must be greater than 0.
+
+A prepared batch item cannot use more servings than remain available in that batch.
+
+Total daily plan values are the sum of all daily plan item values.
+
+Opening an empty calendar date must not create a database record until the user saves a change or adds an item.
 
 ### First Version Scope
 
@@ -578,163 +589,344 @@ This milestone goes through the existing system from ingredients to menus and re
 
 #### 12.1 Ingredient Refinement
 
-- [ ] Add optional grams-per-piece value
+- [x] Add optional grams-per-piece value
   - Show on Create, Edit, and Details pages.
   - Do not show on the Index page in the first version.
   - If entered, value must be between 0.01 and 10000.
-- [ ] Add optional grams-per-milliliter value
+- [x] Add optional grams-per-milliliter value
   - Show on Create, Edit, and Details pages.
   - Do not show on the Index page in the first version.
   - If entered, value must be between 0.01 and 10000.
-- [ ] Add optional notes field
+- [x] Add optional notes field
   - Show on Create, Edit, and Details pages.
   - Do not show on the Index page in the first version.
-- [ ] Keep ingredient nutrition values per 100g
-- [ ] Keep all calculations gram-based
-- [ ] Treat ingredient name as the product and food state description
-- [ ] Do not require globally unique ingredient names in the first version
-- [ ] Keep raw/cooked state out of the Ingredient model for now
-- [ ] Review unknown nutrition values versus real zero values
+- [x] Keep ingredient nutrition values per 100g
+- [x] Keep all calculations gram-based
+- [x] Treat ingredient name as the product and food state description
+- [x] Do not require globally unique ingredient names in the first version
+- [x] Keep raw/cooked state out of the Ingredient model for now
+- [x] Review unknown nutrition values versus real zero values
   - For now, unknown nutrition values are stored as 0.
   - This is a simplification for the first version.
-- [ ] Review ingredient deletion rules when ingredient is already used in recipes or menus
+- [x] Review ingredient deletion rules when ingredient is already used in recipes or menus
   - If an ingredient is used in recipes or menus, do not delete it.
   - Archive or deactivate workflow can be added later.
 
 #### 12.2 Recipe Refinement
 
-- [ ] Decide whether recipes should use live ingredient values or ingredient snapshots
+- [x] Decide whether recipes should use live ingredient values or ingredient snapshots
   - For now, recipes use live ingredient values.
   - Ingredient snapshots can be added later for published or shared recipes.
-- [ ] Keep recipe description as simple optional text in the first version
-- [ ] Move structured recipe instructions to Future Ideas
-- [ ] Move recipe images to Future Ideas
-- [ ] Move recipe storage and expiration information to Future Ideas
-- [ ] Do not require globally unique recipe names in the first version
-- [ ] Prevent deleting a recipe if it is used in recipe components, menus, or prepared batches
-- [ ] Keep recipe servings as default output servings
-- [ ] Move recipe days from Recipe to PreparedRecipeBatch
-- [ ] Use menu items and prepared batches for actual user-specific consumption
-- [ ] Add optional recipe final weight in grams
-  - If not set, estimate recipe weight from ingredients and components.
-  - Show warning or helper text that final weight is approximate.
-  - Use final weight for more accurate recipe component calculations.
+- [x] Keep recipe description as simple optional text in the first version
+- [x] Move structured recipe instructions to Future Ideas
+- [x] Move recipe images to Future Ideas
+- [x] Move recipe storage and expiration information to Future Ideas
+- [x] Do not require globally unique recipe names in the first version
+- [x] Prevent deleting a recipe if it is used in recipe components, menus, or prepared batches
+- [x] Keep recipe servings as default output servings
+- [x] Move recipe days from Recipe to PreparedRecipeBatch
+- [x] Use menu items and prepared batches for actual user-specific consumption
+- [x] Move recipe final weight to Future Ideas
 
 #### 12.3 Recipe Ingredient Units
 
-- [ ] Add ingredient amount unit enum
-- [ ] Store original quantity and unit for recipe ingredients
-- [ ] Keep calculated grams for recipe calculations
-- [ ] Convert quantity to grams when adding or editing recipe ingredients
-- [ ] Validate pieces only when ingredient has grams-per-piece
-- [ ] Validate milliliters only when ingredient has grams-per-milliliter
-- [ ] Show original quantity and calculated grams in recipe details
+- [x] Keep recipe ingredient input grams-only in this milestone
+- [x] Move piece and milliliter input support to Future Ideas
 
 #### 12.4 Recipe Components
 
-- [ ] Keep recipe components grams-only in the first version
-- [ ] Use recipe final weight for more accurate component calculations when available
-- [ ] Use estimated recipe weight when final weight is not set
-- [ ] Prevent deleting a recipe if it is used as a component in another recipe
-- [ ] Keep recipe components based on live recipe values in the first version
-- [ ] Move recipe component snapshots to Future Ideas
+- [x] Keep recipe components grams-only in the first version
+- [x] Keep recipe component calculations approximate in this milestone
+- [x] Prevent deleting a recipe if it is used as a component in another recipe
+- [x] Keep recipe components based on live recipe values in the first version
+- [x] Move recipe component snapshots to Future Ideas
 
 #### 12.5 Prepared Batches
 
-- [ ] Treat PreparedRecipeBatch as cooked food inventory
-- [ ] Add start date to prepared batches
-- [ ] Add planned days to prepared batches
-- [ ] Calculate servings per day from prepared batch total servings / planned days
-- [ ] Consider automatically creating menu items across planned days when a batch is created
-- [ ] Add Create Batch action from Recipe Details
-- [ ] Preselect recipe when creating a prepared batch from Recipe Details
-- [ ] Store recipe name snapshot when a prepared batch is created
-- [ ] Store recipe nutrition totals snapshot when a prepared batch is created
-- [ ] Use prepared batch snapshot values for menu calculations
-- [ ] Allow different batches of the same recipe to have different nutrition values
-- [ ] Move full ingredient-level batch snapshots to Future Ideas
-- [ ] Move recipe versioning to Future Ideas
+- [x] Treat PreparedRecipeBatch as cooked food inventory
+- [x] Use cooked date as the start date for prepared batch planning
+- [x] Add planned days to prepared batches
+- [x] Calculate servings per day from prepared batch total servings / planned days
+- [x] Automatically create menu items across planned days when a batch is created
+- [x] Add Create Batch action from Recipe Details
+- [x] Preselect recipe when creating a prepared batch from Recipe Details
+- [x] Store recipe name snapshot when a prepared batch is created
+- [x] Store recipe nutrition totals snapshot when a prepared batch is created
+- [x] Use prepared batch snapshot values for menu calculations
+- [x] Allow different batches of the same recipe to have different nutrition values
+- [x] Move full ingredient-level batch snapshots to Future Ideas
+- [x] Move recipe versioning to Future Ideas
 
 #### 12.6 Daily Plans and Menu Items
 
-- [ ] Treat each Menu as one daily food plan
-- [ ] Keep one menu per date
-- [ ] Allow ingredients and prepared batch servings to be added to any day
-- [ ] Store original quantity and unit for ingredient menu items
-- [ ] Keep calculated grams for ingredient menu item calculations
-- [ ] Convert quantity to grams when adding or editing ingredient menu items
-- [ ] Validate pieces only when ingredient has grams-per-piece
-- [ ] Validate milliliters only when ingredient has grams-per-milliliter
-- [ ] Show original quantity and calculated grams in menu details
+- [x] Treat each Menu as one daily food plan
+- [x] Keep one menu per date
+- [x] Allow ingredients and prepared batch servings to be added to any day
+- [x] Keep direct ingredient menu items grams-only in this milestone
+- [x] Move menu item piece and milliliter input support to Future Ideas
+- [x] Stop creating direct recipe menu items from the UI
+  - Recipes should be used through prepared batches in the main flow.
+- [x] Keep legacy direct recipe menu item display support temporarily
+  - Old recipe menu items may still be shown if they already exist in the database.
+  - Full removal can be done later after it is safe.
 
 #### 12.7 Calculations and Validation
 
-- [ ] Keep ingredient calculation formula: value per 100g * grams / 100
-- [ ] Use calculated grams for recipe ingredient calculations
-- [ ] Use calculated grams for ingredient menu item calculations
-- [ ] Use recipe final weight for recipe component calculations when available
-- [ ] Use estimated recipe weight when final weight is not available
-- [ ] Calculate prepared batch nutrition from stored batch snapshot values
-- [ ] Calculate prepared batch per-serving values from snapshot totals / total servings
-- [ ] Calculate daily menu totals as the sum of menu item values
-- [ ] Calculate calendar daily average from seven daily totals
-- [ ] Validate ingredient name is required
-- [ ] Validate ingredient nutrition value ranges
-- [ ] Validate ingredient grams-per-piece and grams-per-milliliter are positive when entered
-- [ ] Prevent deleting ingredients that are already used in recipes or menus
-- [ ] Validate recipe name is required
-- [ ] Validate recipe servings are greater than 0
-- [ ] Validate recipe final weight is greater than 0 when entered
-- [ ] Prevent deleting recipes that are used in components, menus, or prepared batches
-- [ ] Validate recipe ingredient quantity is greater than 0
-- [ ] Validate recipe ingredient unit is selected
-- [ ] Validate recipe ingredient grams after conversion are greater than 0
-- [ ] Validate pieces only when ingredient has grams-per-piece
-- [ ] Validate milliliters only when ingredient has grams-per-milliliter
-- [ ] Validate recipe component grams are greater than 0
-- [ ] Prevent recipe from directly containing itself as a component
-- [ ] Prevent duplicate recipe components
-- [ ] Review indirect recipe component cycle validation
-- [ ] Validate prepared batch recipe is required
-- [ ] Validate prepared batch total servings are greater than 0
-- [ ] Validate prepared batch planned days are greater than 0
-- [ ] Validate prepared batch start date and cooked date rules
-- [ ] Prevent using more prepared batch servings than remain
-- [ ] Keep one menu per date
-- [ ] Validate menu item quantity is greater than 0
-- [ ] Validate ingredient menu item unit conversion rules
-- [ ] Validate prepared batch menu item does not exceed remaining servings
+- [x] Keep ingredient calculation formula: value per 100g * grams / 100
+- [x] Use grams for recipe ingredient calculations
+- [x] Use grams for direct ingredient menu item calculations
+- [x] Calculate prepared batch nutrition from stored batch snapshot values
+- [x] Calculate prepared batch per-serving values from snapshot totals / total servings
+- [x] Calculate daily menu totals as the sum of menu item values
+- [x] Calculate calendar daily average from seven daily totals
+- [x] Validate ingredient name is required
+- [x] Validate ingredient nutrition value ranges
+- [x] Validate ingredient grams-per-piece and grams-per-milliliter are positive when entered
+- [x] Prevent deleting ingredients that are already used in recipes or menus
+- [x] Validate recipe name is required
+- [x] Validate recipe servings are greater than 0
+- [x] Prevent deleting recipes that are used in components, menus, or prepared batches
+- [x] Validate recipe ingredient quantity is greater than 0
+- [x] Validate recipe component grams are greater than 0
+- [x] Prevent recipe from directly containing itself as a component
+- [x] Prevent duplicate recipe components
+- [x] Move indirect recipe component cycle validation to Future Ideas
+- [x] Validate prepared batch recipe is required
+- [x] Validate prepared batch total servings are greater than 0
+- [x] Validate prepared batch planned days are greater than 0
+- [x] Use cooked date as the prepared batch planning start date
+- [x] Prevent using more prepared batch servings than remain
+- [x] Keep one menu per date
+- [x] Validate menu item quantity is greater than 0
+- [x] Validate prepared batch menu item does not exceed remaining servings
 
 #### 12.8 User Flows and Documentation
 
-- [ ] Review Create/Edit/Details ingredient flow with conversion fields and notes
-- [ ] Review recipe creation as a draft-like workflow
-- [ ] Review adding ingredients to recipes with quantity, unit, and calculated grams
-- [ ] Review adding recipe components to recipes with grams
-- [ ] Review recipe totals, per-serving values, and final weight behavior
-- [ ] Review creating prepared batches from Recipe Details
-- [ ] Review prepared batch creation with preselected recipe, start date, planned days, and snapshot values
-- [ ] Review daily menu planning as one daily food plan per date
-- [ ] Review adding direct ingredients to daily plans with quantity, unit, and calculated grams
-- [ ] Review adding prepared batch servings to daily plans
-- [ ] Review calendar day creation and daily average behavior
-- [ ] Review safe delete behavior for used ingredients, recipes, and prepared batches
-- [ ] Update entity descriptions after domain changes
-- [ ] Update business rules after unit and snapshot changes
-- [ ] Update implementation plan after each completed domain area
-- [ ] Update README if project description becomes outdated
+- [x] Review Create/Edit/Details ingredient flow with conversion fields and notes
+- [x] Review adding ingredients to recipes with grams
+- [x] Review adding recipe components to recipes with grams
+- [x] Review recipe totals and per-serving values
+- [x] Review creating prepared batches from Recipe Details
+- [x] Review prepared batch creation with preselected recipe, start date, planned days, and snapshot values
+- [x] Review daily planning as one `DailyPlan` per date
+- [x] Review adding direct ingredients to daily plans with grams
+- [x] Review adding prepared batch servings to daily plans
+- [x] Review calendar day creation and daily average behavior
+- [x] Review safe delete behavior for used ingredients, recipes, and prepared batches
+- [x] Update entity descriptions after domain changes
+- [x] Update business rules after domain changes
+- [x] Update implementation plan after each completed domain area
+- [x] Review README and keep its current project title
 
-### Milestone 13: Users and Authentication
+#### 12.9 Recipe Flow Refinement
 
-Goal: make the app ready for multiple users.
+##### 12.9.1 Recipe Core and Summary Refinement
 
-### Milestone 14: Existing Feature Improvements
+- [x] Refine recipe core
+  - Add default planned days.
+  - Add default servings per day.
+  - Keep total servings calculated from default planned days * default servings per day.
+  - Add prep time.
+  - Add cook time.
+  - Add optional final weight.
+  - Keep recipe categories out of the core model for now.
+- [x] Refine Recipe Create page
+  - Structure the page as a reusable recipe form.
+  - Add a Basic Information section.
+  - Show category as a placeholder only.
+- [x] Refine Recipe Edit page
+  - Reuse the same form structure as Recipe Create.
+  - Keep editable recipe core fields in one clear place.
+- [x] Refine Recipe Details summary
+  - Show recipe totals, per-day values, and per-serving values clearly.
+  - Show recipe weight using manual final weight when available, otherwise estimated weight.
+  - Show ingredients and recipe components as one recipe contents summary.
+- [x] Add mixed recipe weight handling
+  - Use manual final weight when set.
+  - Otherwise use estimated weight from recipe contents.
+- [x] Combine ingredient and recipe component display
+  - Use one recipe contents summary for Ingredients and Recipes.
+- [x] Add recipe contents ordering
+  - Add position numbers for ingredients and recipe components inside a recipe.
+  - Show recipe contents in position order.
+  - Keep positions continuous without duplicates or gaps.
+  - Allow changing recipe content position by entering a position number.
 
-Goal: improve the features that already exist.
+##### 12.9.2 Recipe Edit Flow Refinement
+
+- [x] Make Recipe Details read-only
+  - Remove add, edit, remove, and position editing controls from Recipe Details.
+  - Keep Recipe Details focused on review, nutrition summary, recipe contents, and prepared batch creation.
+- [x] Use Recipe Edit as the main place for editing recipe contents
+  - Move add ingredient and add recipe component actions to Recipe Edit.
+  - Move edit, remove, and position controls to Recipe Edit.
+- [x] Redirect Recipe Create to Recipe Edit after saving
+  - Allow the user to create basic recipe information first.
+  - Continue filling recipe contents in Recipe Edit.
+- [x] Show nutrition summary on Recipe Edit
+  - Show total recipe, per-day, and per-serving values.
+  - Update values after recipe contents are changed and the page reloads.
+
+#### 12.10 Editable Prepared Batch Snapshot
+
+Goal: treat a prepared batch as an editable cooked copy of a recipe that can be planned across specific days.
+
+- [x] Refine prepared batch snapshot concept
+  - `Recipe` is the reusable template.
+  - `PreparedRecipeBatch` is the cooked/planned copy created from a recipe.
+  - Editing a prepared batch must not change the original recipe.
+  - Later changes to the original recipe must not silently change already created prepared batches.
+- [x] Add prepared batch item snapshot model
+  - Add one snapshot item model for both copied ingredients and copied recipe components.
+  - Store item type, source ingredient or source recipe reference, name snapshot, grams, nutrition snapshot values, and position.
+  - Use copied snapshot values for batch calculations instead of live recipe values.
+- [x] Copy recipe contents into prepared batch items when a batch is created
+  - Copy recipe ingredients.
+  - Copy recipe components as recipe-type snapshot items.
+  - Keep item positions in the same order as the source recipe.
+- [x] Show prepared batch items on Prepared Batch Details
+  - Show item type, name, grams, calories, protein, fiber, sugar, and salt.
+  - Show batch nutrition summary from prepared batch items.
+- [x] Separate Prepared Batch Details and Edit pages
+  - Keep Details as a read-only page.
+  - Move add, edit, remove, and reorder actions to Edit.
+- [x] Allow editing prepared batch items before final planning
+  - Allow adding an ingredient snapshot item.
+  - Allow adding a recipe snapshot item.
+  - Allow changing grams.
+  - Allow removing items.
+  - Allow changing item position.
+- [x] Allow changing batch total servings and planned days before saving the plan
+  - Use recipe defaults as starting values.
+  - Allow user to override total servings and planned days for the cooked batch.
+- [x] Save the prepared batch into daily menus after confirming the plan
+  - Split servings across planned days.
+  - Create or reuse one menu per date.
+  - Add prepared batch menu items for each planned day.
+- [x] Allow editing daily servings after the batch is planned
+  - Allow changing how much of the prepared batch is eaten on a specific day.
+  - Recalculate remaining future servings when daily servings change.
+
+#### 12.11 Core Workflow Validation and Stabilization
+
+Goal: review and stabilize the current single-user core functionality before planning Milestone 13.
+
+#### 12.11.1 Ingredients and Daily Planning Review
+
+Goal: review the current ingredient and daily planning workflows before continuing stabilization.
+
+- [x] Review the Ingredients workflow
+  - Ingredient CRUD works well enough for the current version.
+
+- [x] Review the Menu and Calendar concept
+  - `Menu` currently represents one daily food plan.
+  - `Calendar` displays multiple daily food plans across dates.
+  - The current model works, but the name `Menu` may be confusing later.
+
+#### 12.11.2 Days and Calendar Review
+
+Goal: review and adjust days, calendar behavior, and related workflow issues found during testing.
+
+- [x] Rename `Menu` to `DailyPlan`
+  - Rename related models, pages, service, routes, and database tables.
+  - Preserve existing data through a rename-only migration.
+
+- [x] Keep consecutive-day batch allocation for the current version
+  - Use `CookedDate` as the allocation start date.
+  - Distribute servings across consecutive days using `PlannedDays` and servings per day.
+  - Keep selecting individual meal dates as a future improvement.
+
+- [x] Add on-demand daily plan workflow from Calendar
+  - Remove the separate Daily Plan column and use the date as the navigation link.
+  - Open an existing daily plan by ID or show a virtual empty daily plan by date.
+  - Do not save an empty daily plan when the user only views it.
+  - Create the daily plan after the user successfully adds an ingredient or prepared batch, or saves other changes.
+  - Adjust Edit and Delete actions for virtual daily plans that have not been saved yet.
+
+### Milestone 13: Users, Ownership, and Direct Publishing
+
+Goal: make the application ready for multiple users with private data, a public catalog, direct publishing, and reactive administrator controls.
+
+#### 13.1 Authentication Foundation
+
+- [ ] Add ASP.NET Core Identity
+- [ ] Add user registration
+- [ ] Add login and logout
+- [ ] Add authenticated user navigation
+- [ ] Protect private application pages
+- [ ] Allow anonymous access only to the public catalog and published details
+- [ ] Add an initial administrator account safely without hardcoded credentials
+
+#### 13.2 Data Ownership and Authorization
+
+- [ ] Add ownership to user-created ingredients and recipes
+- [ ] Make prepared batches and daily plans belong to their creator
+- [ ] Reset the local database before applying the final ownership schema
+- [ ] Allow users to view and edit their own private data
+- [ ] Prevent users from viewing or changing another user's private data
+- [ ] Enforce ownership rules on the server, not only in the UI
+
+#### 13.3 Direct Ingredient and Recipe Publishing
+
+- [ ] Add automatic validation before publication
+  - Require a name.
+  - Require at least one ingredient or recipe component.
+  - Require valid quantities and servings.
+  - Require successful nutrition calculations.
+  - Require every dependency to be published and immutable or preserved as a publication snapshot.
+- [ ] Allow an owner to publish a valid private ingredient or recipe directly
+- [ ] Make published ingredients and recipes immutable
+- [ ] Create a private copy when an owner or administrator needs to modify published content
+- [ ] Replace the active public version after the corrected private copy is published
+- [ ] Archive the previous public version instead of changing it silently
+- [ ] Allow an owner to unpublish their own content only when it is not used by other published content
+- [ ] Prevent unpublishing a dependency that is still used by published recipes
+- [ ] Allow an administrator to inspect dependent public content and unpublish the affected chain when necessary
+- [ ] Allow guests and authenticated users to view published content
+
+#### 13.4 Save a Private Recipe Copy
+
+- [ ] Allow a user to save a private copy of a published recipe
+- [ ] Copy recipe core fields, ingredient rows, component rows, quantities, and positions
+- [ ] Assign the copied recipe to the current user
+- [ ] Keep references to immutable published ingredients and recipe components shared by default
+- [ ] Create a private ingredient or recipe component copy only when the user wants to modify it
+- [ ] Replace only the selected recipe ingredient or component reference with the new private copy
+- [ ] Copy snapshot-only special dependencies into private records when required
+- [ ] Ensure later edits to the private copy do not change the published recipe
+
+#### 13.5 Reactive Administrator Controls
+
+- [ ] Allow an administrator to view public content management information
+- [ ] Allow an administrator to unpublish problematic ingredients or recipes
+- [ ] Restrict administrative actions to the `Admin` role
+- [ ] Keep reporting, automatic abuse detection, and advanced moderation for future improvements
+
+#### 13.6 Verification and Documentation
+
+- [ ] Verify registration, login, logout, and protected page behavior
+- [ ] Verify ownership isolation between at least two users
+- [ ] Verify guest access to published content and denial of private content
+- [ ] Verify direct ingredient and recipe publishing
+- [ ] Verify saving and editing a private recipe copy
+- [ ] Verify administrator authorization and unpublish actions
+- [ ] Verify the clean database initialization workflow
+- [ ] Confirm that the project builds without warnings or errors
+- [ ] Update project documentation after the final rules are implemented
+### Milestone 14: Final Refinement
+
+Goal: perform a final end-to-end review and refine the completed Razor Pages application before starting the API and frontend transition.
+
+This milestone will be planned after Milestone 13 based on the issues and improvement opportunities found in the completed multi-user application.
 
 ### Milestone 15: API and Frontend Planning
 
 Goal: plan the transition from Razor Pages to an API-based application and choose the future frontend technology.
+
+- [ ] Design full recipe creation flow for the API/frontend version
+  - Allow creating a recipe with ingredients and recipe components in one flow.
+  - Avoid the temporary Razor Pages two-step flow where the basic recipe is created first and contents are added later.
+  - Decide how the frontend should manage unsaved recipe contents before the recipe is saved.
 
 ## 7. Future Ideas
 
@@ -746,7 +938,15 @@ This section contains ideas that may be useful for the project in the future, bu
 
 - [ ] Add ingredient category
 
+- [ ] Add ingredient descriptions
+  - Store a longer user-facing description for ingredients.
+  - Keep technical or personal notes separate from the public description.
+
 - [ ] Add image support for ingredients
+  - Allow up to 3 images per ingredient.
+  - Private draft ingredients may have 0-3 images.
+  - Published or shared ingredients should have 1-3 images.
+  - The first image should be treated as the main image.
   - Decide later how images should be stored.
 
 - [ ] Add ingredient data source
@@ -760,6 +960,16 @@ This section contains ideas that may be useful for the project in the future, bu
 
 - [ ] Improve ingredient search and display
 
+- [ ] Allow creating a new ingredient from recipe ingredient selection
+  - When adding an ingredient to a recipe and the needed ingredient does not exist, allow creating it without leaving the recipe flow.
+  - After the ingredient is created, return to the recipe ingredient add flow with the new ingredient available for selection.
+
+- [ ] Use ingredient conversion fields in recipe and menu input
+  - Allow users to enter ingredients by pieces when `GramsPerPiece` is available.
+  - Allow users to enter ingredients by milliliters when `GramsPerMilliliter` is available.
+  - Convert entered quantity to grams for all calculations.
+  - Store or display the original quantity and calculated grams when useful.
+
 - [ ] Add ingredient archive or deactivate workflow
   - Used ingredients should probably be hidden instead of deleted.
 
@@ -770,6 +980,10 @@ This section contains ideas that may be useful for the project in the future, bu
   - AI can analyze a photo of a nutrition label, extract available values, and suggest missing values when possible.
 
 ### Nutrients and Health Data
+
+- [ ] Add a BMI calculator
+  - Step 1: create a standalone tool that calculates BMI from height and weight.
+  - Step 2: integrate BMI tracking with the menu calendar.
 
 - [ ] Add vitamins and micronutrients
   - Decide later which vitamins and micronutrients should be tracked first.
@@ -782,6 +996,14 @@ This section contains ideas that may be useful for the project in the future, bu
 
 ### Recipe and Calculation Improvements
 
+- [ ] Add recipe categories
+  - Categories are not needed in the current milestone.
+  - For now, recipe pages may show a placeholder such as `Category: Future idea`.
+
+- [ ] Rename recipe `Servings` to `TotalServings`
+  - `Servings` currently means the total number of servings in a recipe.
+  - A clearer name can be introduced later when the recipe core model is cleaned up further.
+
 - [ ] Add recipe versioning
   - Preserve recipe versions so prepared batches and published recipes can point to a stable recipe version.
 
@@ -791,6 +1013,14 @@ This section contains ideas that may be useful for the project in the future, bu
 - [ ] Add recipe ingredient choice groups
   - Allow choosing one ingredient from several alternatives.
   - Example: raisins, cranberries, or dried apricots.
+
+- [ ] Improve recipe contents ordering UI
+  - Allow moving recipe contents up and down with a better interface.
+  - Consider drag-and-drop reordering.
+
+- [ ] Replace recipe content type strings with safer values
+  - Avoid comparing string values such as `Ingredient` and `Recipe` directly in Razor Pages.
+  - Use an enum or shared constants when the flow becomes more complex.
 
 - [ ] Add structured recipe instructions
   - Support multiple instruction blocks or ordered steps.
@@ -832,14 +1062,21 @@ This section contains ideas that may be useful for the project in the future, bu
 
 ### Menu Planning Improvements
 
-- [ ] Add full prepared batch ingredient snapshots
-  - Preserve the exact ingredients and components used when a batch was cooked.
+- [ ] Add advanced prepared batch snapshot history
+  - Preserve deeper source details, edit history, and recipe version references if the basic prepared batch snapshot model is not enough.
 
-- [ ] Auto-fill menu days from prepared batch
-  - When a batch is created with a start date and planned days, automatically create menu items for those days.
+- [ ] Remove direct `Recipe` support from `DailyPlanItem`
+  - A daily plan should contain only prepared recipe batches and individual ingredients.
+  - A recipe must be converted into a prepared batch before it can be allocated to daily plans.
+  - Check existing data before removing the recipe relationship and enum value.
 
-- [ ] Rename Menu to a more accurate domain name
-  - For example, DailyPlan or DailyFoodPlan.
+- [ ] Allow selecting specific meal dates for prepared batches
+  - Open a calendar when creating a prepared batch.
+  - Preselect meal dates from the recipe planning defaults.
+  - Allow users to add or remove individual eating days.
+  - Set planned days from the number of selected dates.
+  - Calculate total servings from selected dates and servings per day.
+  - Create or reuse daily plans only for the selected dates.
 
 - [ ] Plan meals for families or multiple people
   - Review how servings, prepared batches, and daily plans should work for several people.
@@ -848,17 +1085,20 @@ This section contains ideas that may be useful for the project in the future, bu
 
 - [ ] Show missing daily nutrition when prepared food runs out
 
-### Sharing and Users
+### Advanced Sharing and Publishing
 
-- [ ] Add private user-owned ingredients and recipes
+- [ ] Add AI-assisted publication formatting
+  - Let AI prepare a recipe publication draft in the required public format.
+  - Require the user to review, edit, and confirm the result before direct publication.
+  - Do not let AI silently change ingredients, quantities, servings, or nutrition values.
 
-- [ ] Add public ingredient catalog
+- [ ] Add reporting and automatic abuse detection for public content
 
-- [ ] Allow users to request publishing private ingredients and recipes
+- [ ] Add trusted-user or reputation-based publishing controls if direct publishing needs additional protection
 
-- [ ] Add admin approval workflow for shared ingredients and recipes
+- [ ] Add groups and group-specific administrators
 
-- [ ] Preserve published recipe ingredients so later edits do not silently change published recipes
+- [ ] Add publication version history and audit information
 
 ### General Improvements
 
@@ -866,4 +1106,9 @@ This section contains ideas that may be useful for the project in the future, bu
 
 - [ ] Improve UI
 
-- [ ] Add tests
+- [ ] Add automated tests for calculation logic
+  - Test `RecipeCalculationService`.
+  - Test `MenuCalculationService`.
+  - Test prepared batch nutrition calculations.
+  - Test daily menu totals.
+  - Test edge cases such as empty recipes, zero values, recipe components, and prepared batch servings.

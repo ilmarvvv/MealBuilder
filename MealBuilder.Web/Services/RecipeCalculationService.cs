@@ -15,7 +15,7 @@ namespace MealBuilder.Web.Services
 
             foreach (RecipeComponent recipeComponent in recipe.Components)
             {
-                decimal componentTotalWeight = CalculateRecipeWeight(recipeComponent.ComponentRecipe);
+                decimal componentTotalWeight = CalculateEffectiveWeight(recipeComponent.ComponentRecipe);
 
                 if (componentTotalWeight <= 0)
                 {
@@ -63,7 +63,7 @@ namespace MealBuilder.Web.Services
             totals.Salt += recipeIngredient.Ingredient.SaltPer100g * recipeIngredient.Grams / 100;
         }
 
-        private static decimal CalculateRecipeWeight(Recipe recipe)
+        public decimal CalculateEstimatedWeight(Recipe recipe)
         {
             decimal totalWeight = 0;
 
@@ -78,6 +78,11 @@ namespace MealBuilder.Web.Services
             }
 
             return totalWeight;
+        }
+
+        public decimal CalculateEffectiveWeight(Recipe recipe)
+        {
+            return recipe.FinalWeightGrams ?? CalculateEstimatedWeight(recipe);
         }
     }
 }

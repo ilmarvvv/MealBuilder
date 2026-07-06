@@ -17,8 +17,10 @@
             <th>Recipe</th>
             <th>Cooked Date</th>
             <th>Total Servings</th>
-            <th>Used Servings</th>
-            <th>Remaining Servings</th>
+            <th>Planned Days</th>
+            <th>Servings Per Day</th>
+            <th>Allocated Servings</th>
+            <th>Unallocated Servings</th>
             <th></th>
         </tr>
     </thead>
@@ -26,11 +28,13 @@
         @foreach (var summary in Model.PreparedRecipeBatchSummaries)
         {
             <tr>
-                <td>@summary.PreparedRecipeBatch.Recipe?.Name</td>
+                <td>@summary.PreparedRecipeBatch.RecipeNameSnapshot</td>
                 <td>@summary.PreparedRecipeBatch.CookedDate</td>
                 <td>@summary.PreparedRecipeBatch.TotalServings</td>
-                <td>@summary.UsedServings</td>
-                <td>@summary.RemainingServings</td>
+                <td>@summary.PreparedRecipeBatch.PlannedDays</td>
+                <td>@summary.ServingsPerDay.ToString("0.00")</td>
+                <td>@summary.AllocatedServings</td>
+                <td>@summary.UnallocatedServings</td>
                 <td>
                     <a asp-page="./Details" asp-route-id="@summary.PreparedRecipeBatch.Id">Details</a>
                     <a asp-page="./Delete" asp-route-id="@summary.PreparedRecipeBatch.Id">Delete</a>

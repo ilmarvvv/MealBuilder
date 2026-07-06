@@ -16,5 +16,8 @@ namespace MealBuilder.Web.Models
 
         [Range(0.01, 100000)]
         public decimal Grams { get; set; }
+
+        [Range(1, 1000)]
+        public int Position { get; set; } = 1;
     }
 }

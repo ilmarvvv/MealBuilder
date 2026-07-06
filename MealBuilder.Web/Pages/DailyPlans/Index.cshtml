@@ -1,0 +1,45 @@
+﻿@page
+@model MealBuilder.Web.Pages.DailyPlans.IndexModel
+
+@{
+    ViewData["Title"] = "Daily Plans";
+}
+
+<h1>Daily Plans</h1>
+
+<p>
+    <a asp-page="./Create" class="btn btn-primary">Create Daily Plan</a>
+</p>
+
+@if (Model.DailyPlans.Count == 0)
+{
+    <p>No daily Plans have been added yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var dailyPlan in Model.DailyPlans)
+            {
+                <tr>
+                    <td>@dailyPlan.Date</td>
+                    <td>@dailyPlan.Name</td>
+                    <td>@dailyPlan.Description</td>
+                    <td>
+                        <a asp-page="./Details" asp-route-id="@dailyPlan.Id">Details</a>
+                        <a asp-page="./Edit" asp-route-id="@dailyPlan.Id">Edit</a>
+                        <a asp-page="./Delete" asp-route-id="@dailyPlan.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

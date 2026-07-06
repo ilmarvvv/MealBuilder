@@ -50,7 +50,7 @@ namespace MealBuilder.Web.Pages.Recipes
             _context.RecipeIngredients.Update(RecipeIngredient);
             await _context.SaveChangesAsync();
 
-            return RedirectToPage("./Details", new { id = RecipeIngredient.RecipeId });
+            return RedirectToPage("./Edit", new { id = RecipeIngredient.RecipeId });
         }
     }
 }

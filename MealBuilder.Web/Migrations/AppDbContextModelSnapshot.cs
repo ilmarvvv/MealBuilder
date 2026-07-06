@@ -17,38 +17,7 @@ namespace MealBuilder.Web.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.7");
 
-            modelBuilder.Entity("MealBuilder.Web.Models.Ingredient", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<decimal>("CaloriesPer100g")
-                        .HasColumnType("TEXT");
-
-                    b.Property<decimal>("FiberPer100g")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
-
-                    b.Property<decimal>("ProteinPer100g")
-                        .HasColumnType("TEXT");
-
-                    b.Property<decimal>("SaltPer100g")
-                        .HasColumnType("TEXT");
-
-                    b.Property<decimal>("SugarPer100g")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Ingredients");
-                });
-
-            modelBuilder.Entity("MealBuilder.Web.Models.Menu", b =>
+            modelBuilder.Entity("MealBuilder.Web.Models.DailyPlan", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -71,13 +40,16 @@ namespace MealBuilder.Web.Migrations
                     b.HasIndex("Date")
                         .IsUnique();
 
-                    b.ToTable("Menus");
+                    b.ToTable("DailyPlans");
                 });
 
-            modelBuilder.Entity("MealBuilder.Web.Models.MenuItem", b =>
+            modelBuilder.Entity("MealBuilder.Web.Models.DailyPlanItem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("DailyPlanId")
                         .HasColumnType("INTEGER");
 
                     b.Property<decimal?>("Grams")
@@ -87,9 +59,6 @@ namespace MealBuilder.Web.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("ItemType")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("MenuId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("PreparedRecipeBatchId")
@@ -103,15 +72,56 @@ namespace MealBuilder.Web.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IngredientId");
+                    b.HasIndex("DailyPlanId");
 
-                    b.HasIndex("MenuId");
+                    b.HasIndex("IngredientId");
 
                     b.HasIndex("PreparedRecipeBatchId");
 
                     b.HasIndex("RecipeId");
 
-                    b.ToTable("MenuItems");
+                    b.ToTable("DailyPlanItems");
+                });
+
+            modelBuilder.Entity("MealBuilder.Web.Models.Ingredient", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("CaloriesPer100g")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("FiberPer100g")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("GramsPerMilliliter")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("GramsPerPiece")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("ProteinPer100g")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("SaltPer100g")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("SugarPer100g")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Ingredients");
                 });
 
             modelBuilder.Entity("MealBuilder.Web.Models.PreparedRecipeBatch", b =>
@@ -123,8 +133,16 @@ namespace MealBuilder.Web.Migrations
                     b.Property<DateOnly>("CookedDate")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("PlannedDays")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("RecipeId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("RecipeNameSnapshot")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
 
                     b.Property<decimal>("TotalServings")
                         .HasColumnType("TEXT");
@@ -136,17 +154,81 @@ namespace MealBuilder.Web.Migrations
                     b.ToTable("PreparedRecipeBatches");
                 });
 
+            modelBuilder.Entity("MealBuilder.Web.Models.PreparedRecipeBatchItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("CaloriesSnapshot")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("FiberSnapshot")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("Grams")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ItemType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("NameSnapshot")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("PreparedRecipeBatchId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("ProteinSnapshot")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("SaltSnapshot")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("SourceIngredientId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("SourceRecipeId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("SugarSnapshot")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PreparedRecipeBatchId");
+
+                    b.HasIndex("SourceIngredientId");
+
+                    b.HasIndex("SourceRecipeId");
+
+                    b.ToTable("PreparedRecipeBatchItems");
+                });
+
             modelBuilder.Entity("MealBuilder.Web.Models.Recipe", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Days")
+                    b.Property<int>("CookTimeMinutes")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("DefaultPlannedDays")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("DefaultServingsPerDay")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Description")
                         .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("FinalWeightGrams")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
@@ -154,7 +236,7 @@ namespace MealBuilder.Web.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Servings")
+                    b.Property<int>("PrepTimeMinutes")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -175,6 +257,9 @@ namespace MealBuilder.Web.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<int>("ParentRecipeId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Position")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -199,6 +284,9 @@ namespace MealBuilder.Web.Migrations
                     b.Property<int>("IngredientId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("Position")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("RecipeId")
                         .HasColumnType("INTEGER");
 
@@ -211,32 +299,32 @@ namespace MealBuilder.Web.Migrations
                     b.ToTable("RecipeIngredients");
                 });
 
-            modelBuilder.Entity("MealBuilder.Web.Models.MenuItem", b =>
+            modelBuilder.Entity("MealBuilder.Web.Models.DailyPlanItem", b =>
                 {
-                    b.HasOne("MealBuilder.Web.Models.Ingredient", "Ingredient")
-                        .WithMany("MenuItems")
-                        .HasForeignKey("IngredientId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("MealBuilder.Web.Models.Menu", "Menu")
-                        .WithMany("MenuItems")
-                        .HasForeignKey("MenuId")
+                    b.HasOne("MealBuilder.Web.Models.DailyPlan", "DailyPlan")
+                        .WithMany("DailyPlanItems")
+                        .HasForeignKey("DailyPlanId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("MealBuilder.Web.Models.Ingredient", "Ingredient")
+                        .WithMany("DailyPlanItems")
+                        .HasForeignKey("IngredientId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("MealBuilder.Web.Models.PreparedRecipeBatch", "PreparedRecipeBatch")
-                        .WithMany("MenuItems")
+                        .WithMany("DailyPlanItems")
                         .HasForeignKey("PreparedRecipeBatchId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("MealBuilder.Web.Models.Recipe", "Recipe")
-                        .WithMany("MenuItems")
+                        .WithMany("DailyPlanItems")
                         .HasForeignKey("RecipeId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("Ingredient");
+                    b.Navigation("DailyPlan");
 
-                    b.Navigation("Menu");
+                    b.Navigation("Ingredient");
 
                     b.Navigation("PreparedRecipeBatch");
 
@@ -248,10 +336,35 @@ namespace MealBuilder.Web.Migrations
                     b.HasOne("MealBuilder.Web.Models.Recipe", "Recipe")
                         .WithMany("PreparedRecipeBatches")
                         .HasForeignKey("RecipeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Recipe");
+                });
+
+            modelBuilder.Entity("MealBuilder.Web.Models.PreparedRecipeBatchItem", b =>
+                {
+                    b.HasOne("MealBuilder.Web.Models.PreparedRecipeBatch", "PreparedRecipeBatch")
+                        .WithMany("Items")
+                        .HasForeignKey("PreparedRecipeBatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MealBuilder.Web.Models.Ingredient", "SourceIngredient")
+                        .WithMany()
+                        .HasForeignKey("SourceIngredientId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("MealBuilder.Web.Models.Recipe", "SourceRecipe")
+                        .WithMany()
+                        .HasForeignKey("SourceRecipeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("PreparedRecipeBatch");
+
+                    b.Navigation("SourceIngredient");
+
+                    b.Navigation("SourceRecipe");
                 });
 
             modelBuilder.Entity("MealBuilder.Web.Models.RecipeComponent", b =>
@@ -278,7 +391,7 @@ namespace MealBuilder.Web.Migrations
                     b.HasOne("MealBuilder.Web.Models.Ingredient", "Ingredient")
                         .WithMany("RecipeIngredients")
                         .HasForeignKey("IngredientId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("MealBuilder.Web.Models.Recipe", "Recipe")
@@ -292,28 +405,30 @@ namespace MealBuilder.Web.Migrations
                     b.Navigation("Recipe");
                 });
 
+            modelBuilder.Entity("MealBuilder.Web.Models.DailyPlan", b =>
+                {
+                    b.Navigation("DailyPlanItems");
+                });
+
             modelBuilder.Entity("MealBuilder.Web.Models.Ingredient", b =>
                 {
-                    b.Navigation("MenuItems");
+                    b.Navigation("DailyPlanItems");
 
                     b.Navigation("RecipeIngredients");
                 });
 
-            modelBuilder.Entity("MealBuilder.Web.Models.Menu", b =>
-                {
-                    b.Navigation("MenuItems");
-                });
-
             modelBuilder.Entity("MealBuilder.Web.Models.PreparedRecipeBatch", b =>
                 {
-                    b.Navigation("MenuItems");
+                    b.Navigation("DailyPlanItems");
+
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("MealBuilder.Web.Models.Recipe", b =>
                 {
                     b.Navigation("Components");
 
-                    b.Navigation("MenuItems");
+                    b.Navigation("DailyPlanItems");
 
                     b.Navigation("PreparedRecipeBatches");
 

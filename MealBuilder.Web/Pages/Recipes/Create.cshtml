@@ -8,6 +8,8 @@
 <h1>Create Recipe</h1>
 
 <form method="post">
+    <h2>Basic Information</h2>
+
     <div class="mb-3">
         <label asp-for="Recipe.Name" class="form-label"></label>
         <input asp-for="Recipe.Name" class="form-control" />
@@ -21,21 +23,71 @@
     </div>
 
     <div class="mb-3">
-        <label asp-for="Recipe.Servings" class="form-label"></label>
-        <input asp-for="Recipe.Servings" class="form-control" />
-        <span asp-validation-for="Recipe.Servings" class="text-danger"></span>
+        <label class="form-label">Category</label>
+        <input class="form-control" value="Future idea" disabled />
     </div>
 
     <div class="mb-3">
-        <label asp-for="Recipe.Days" class="form-label"></label>
-        <input asp-for="Recipe.Days" class="form-control" />
-        <span asp-validation-for="Recipe.Days" class="text-danger"></span>
+        <label asp-for="Recipe.DefaultPlannedDays" class="form-label">Planned days</label>
+        <input asp-for="Recipe.DefaultPlannedDays" class="form-control" />
+        <span asp-validation-for="Recipe.DefaultPlannedDays" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary">Save</button>
+    <div class="mb-3">
+        <label asp-for="Recipe.DefaultServingsPerDay" class="form-label">Servings per day</label>
+        <input asp-for="Recipe.DefaultServingsPerDay" class="form-control" />
+        <span asp-validation-for="Recipe.DefaultServingsPerDay" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Total servings</label>
+        <div id="total-servings" class="form-control-plaintext">
+            @Model.Recipe.TotalServings
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Recipe.PrepTimeMinutes" class="form-label">Prep time minutes</label>
+        <input asp-for="Recipe.PrepTimeMinutes" class="form-control" />
+        <span asp-validation-for="Recipe.PrepTimeMinutes" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Recipe.CookTimeMinutes" class="form-label">Cook time minutes</label>
+        <input asp-for="Recipe.CookTimeMinutes" class="form-control" />
+        <span asp-validation-for="Recipe.CookTimeMinutes" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Recipe.FinalWeightGrams" class="form-label">Final weight grams</label>
+        <input asp-for="Recipe.FinalWeightGrams" class="form-control" />
+        <span asp-validation-for="Recipe.FinalWeightGrams" class="text-danger"></span>
+    </div>
+
+    <h2>Actions</h2>
+
+    <button type="submit" class="btn btn-primary">Create Recipe</button>
     <a asp-page="./Index" class="btn btn-secondary">Cancel</a>
 </form>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const plannedDaysInput = document.getElementById("Recipe_DefaultPlannedDays");
+        const servingsPerDayInput = document.getElementById("Recipe_DefaultServingsPerDay");
+        const totalServingsDisplay = document.getElementById("total-servings");
+
+        function updateTotalServings() {
+            const plannedDays = Number(plannedDaysInput.value) || 0;
+            const servingsPerDay = Number(servingsPerDayInput.value) || 0;
+
+            totalServingsDisplay.textContent = plannedDays * servingsPerDay;
+        }
+
+        plannedDaysInput.addEventListener("input", updateTotalServings);
+        servingsPerDayInput.addEventListener("input", updateTotalServings);
+
+        updateTotalServings();
+    </script>
 }

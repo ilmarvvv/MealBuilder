@@ -4,8 +4,14 @@
     {
         public PreparedRecipeBatch PreparedRecipeBatch { get; set; } = new();
 
-        public decimal UsedServings { get; set; }
+        public decimal AllocatedServings { get; set; }
 
-        public decimal RemainingServings => PreparedRecipeBatch.TotalServings - UsedServings;
+        public decimal ServingsPerDay =>
+            PreparedRecipeBatch.TotalServings /
+            PreparedRecipeBatch.PlannedDays;
+
+        public decimal UnallocatedServings =>
+            PreparedRecipeBatch.TotalServings -
+            AllocatedServings;
     }
 }

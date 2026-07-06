@@ -17,11 +17,16 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
 
         public PreparedRecipeBatchSummary PreparedRecipeBatchSummary { get; set; } = new();
 
+        public RecipeNutritionTotals ItemTotals { get; set; } = new();
+
+        public RecipeNutritionTotals ItemPerServingTotals { get; set; } = new();
+
         public async Task<IActionResult> OnGetAsync(int id)
         {
             PreparedRecipeBatch? preparedRecipeBatch = await _context.PreparedRecipeBatches
                 .Include(preparedRecipeBatch => preparedRecipeBatch.Recipe)
-                .Include(preparedRecipeBatch => preparedRecipeBatch.MenuItems)
+                .Include(preparedRecipeBatch => preparedRecipeBatch.DailyPlanItems)
+                .Include(preparedRecipeBatch => preparedRecipeBatch.Items)
                 .FirstOrDefaultAsync(preparedRecipeBatch => preparedRecipeBatch.Id == id);
 
             if (preparedRecipeBatch is null)
@@ -29,15 +34,36 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
                 return NotFound();
             }
 
-            decimal usedServings = preparedRecipeBatch.MenuItems
-                .Where(menuItem => menuItem.ServingsCount is not null)
-                .Sum(menuItem => menuItem.ServingsCount!.Value);
+            decimal allocatedServings = preparedRecipeBatch.DailyPlanItems
+                .Where(dailyPlanItem => dailyPlanItem.ServingsCount is not null)
+                .Sum(dailyPlanItem => dailyPlanItem.ServingsCount!.Value);
 
             PreparedRecipeBatchSummary = new PreparedRecipeBatchSummary
             {
                 PreparedRecipeBatch = preparedRecipeBatch,
-                UsedServings = usedServings
+                AllocatedServings = allocatedServings
             };
+
+            ItemTotals = new RecipeNutritionTotals
+            {
+                Calories = preparedRecipeBatch.Items.Sum(item => item.CaloriesSnapshot),
+                Protein = preparedRecipeBatch.Items.Sum(item => item.ProteinSnapshot),
+                Fiber = preparedRecipeBatch.Items.Sum(item => item.FiberSnapshot),
+                Sugar = preparedRecipeBatch.Items.Sum(item => item.SugarSnapshot),
+                Salt = preparedRecipeBatch.Items.Sum(item => item.SaltSnapshot)
+            };
+
+            if (preparedRecipeBatch.TotalServings > 0)
+            {
+                ItemPerServingTotals = new RecipeNutritionTotals
+                {
+                    Calories = ItemTotals.Calories / preparedRecipeBatch.TotalServings,
+                    Protein = ItemTotals.Protein / preparedRecipeBatch.TotalServings,
+                    Fiber = ItemTotals.Fiber / preparedRecipeBatch.TotalServings,
+                    Sugar = ItemTotals.Sugar / preparedRecipeBatch.TotalServings,
+                    Salt = ItemTotals.Salt / preparedRecipeBatch.TotalServings
+                };
+            }
 
             return Page();
         }

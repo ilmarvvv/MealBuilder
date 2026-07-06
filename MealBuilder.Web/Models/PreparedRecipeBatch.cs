@@ -15,10 +15,19 @@ namespace MealBuilder.Web.Models
         [DataType(DataType.Date)]
         public DateOnly CookedDate { get; set; } = DateOnly.FromDateTime(DateTime.Today);
 
-        [Range(1, 1000)]
+        [Range(1, 36500)]
         public decimal TotalServings { get; set; }
 
-        public List<MenuItem> MenuItems { get; set; } = [];
+        [Range(1, 365)]
+        public int PlannedDays { get; set; } = 1;
+
+        [Required]
+        [StringLength(100)]
+        public string RecipeNameSnapshot { get; set; } = string.Empty;
+
+        public List<PreparedRecipeBatchItem> Items { get; set; } = [];
+
+        public List<DailyPlanItem> DailyPlanItems { get; set; } = [];
 
     }
 }

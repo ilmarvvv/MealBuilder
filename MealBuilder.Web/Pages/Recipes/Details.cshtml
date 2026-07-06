@@ -8,24 +8,50 @@
 <h1>Recipe Details</h1>
 
 <dl class="row">
-    <dt class="col-sm-2">Name</dt>
-    <dd class="col-sm-10">@Model.Recipe.Name</dd>
+    <dt class="col-sm-4 col-md-3">Name</dt>
+    <dd class="col-sm-8 col-md-9">@Model.Recipe.Name</dd>
 
-    <dt class="col-sm-2">Description</dt>
-    <dd class="col-sm-10">@Model.Recipe.Description</dd>
+    <dt class="col-sm-4 col-md-3">Description</dt>
+    <dd class="col-sm-8 col-md-9">@Model.Recipe.Description</dd>
 
-    <dt class="col-sm-2">Servings</dt>
-    <dd class="col-sm-10">@Model.Recipe.Servings</dd>
+    <dt class="col-sm-4 col-md-3">Category</dt>
+    <dd class="col-sm-8 col-md-9">Future idea</dd>
 
-    <dt class="col-sm-2">Days</dt>
-    <dd class="col-sm-10">@Model.Recipe.Days</dd>
+    <dt class="col-sm-4 col-md-3">Planned days</dt>
+    <dd class="col-sm-8 col-md-9">@Model.Recipe.DefaultPlannedDays</dd>
+
+    <dt class="col-sm-4 col-md-3">Servings per day</dt>
+    <dd class="col-sm-8 col-md-9">@Model.Recipe.DefaultServingsPerDay</dd>
+
+    <dt class="col-sm-4 col-md-3">Total servings</dt>
+    <dd class="col-sm-8 col-md-9">@Model.Recipe.TotalServings</dd>
+
+    <dt class="col-sm-4 col-md-3">Prep time minutes</dt>
+    <dd class="col-sm-8 col-md-9">@Model.Recipe.PrepTimeMinutes</dd>
+
+    <dt class="col-sm-4 col-md-3">Cook time minutes</dt>
+    <dd class="col-sm-8 col-md-9">@Model.Recipe.CookTimeMinutes</dd>
+
+    <dt class="col-sm-4 col-md-3">Recipe weight</dt>
+    <dd class="col-sm-8 col-md-9">
+        @Model.EffectiveWeightGrams.ToString("0.##") g
+        @if (Model.Recipe.FinalWeightGrams is null)
+        {
+            <span class="text-muted">(estimated)</span>
+        }
+        else
+        {
+            <span class="text-muted">(manual)</span>
+        }
+    </dd>
 </dl>
 
-<h2>Totals</h2>
+<h2>Nutrition Summary</h2>
 
 <table class="table">
     <thead>
         <tr>
+            <th>Type</th>
             <th>Calories</th>
             <th>Protein</th>
             <th>Fiber</th>
@@ -35,29 +61,23 @@
     </thead>
     <tbody>
         <tr>
+            <td>Total recipe</td>
             <td>@Model.Totals.Calories.ToString("0.00")</td>
             <td>@Model.Totals.Protein.ToString("0.00")</td>
             <td>@Model.Totals.Fiber.ToString("0.00")</td>
             <td>@Model.Totals.Sugar.ToString("0.00")</td>
             <td>@Model.Totals.Salt.ToString("0.00")</td>
         </tr>
-    </tbody>
-</table>
-
-<h2>Per Serving</h2>
-
-<table class="table">
-    <thead>
         <tr>
-            <th>Calories</th>
-            <th>Protein</th>
-            <th>Fiber</th>
-            <th>Sugar</th>
-            <th>Salt</th>
+            <td>Per day</td>
+            <td>@Model.PerDayTotals.Calories.ToString("0.00")</td>
+            <td>@Model.PerDayTotals.Protein.ToString("0.00")</td>
+            <td>@Model.PerDayTotals.Fiber.ToString("0.00")</td>
+            <td>@Model.PerDayTotals.Sugar.ToString("0.00")</td>
+            <td>@Model.PerDayTotals.Salt.ToString("0.00")</td>
         </tr>
-    </thead>
-    <tbody>
         <tr>
+            <td>Per serving</td>
             <td>@Model.PerServingTotals.Calories.ToString("0.00")</td>
             <td>@Model.PerServingTotals.Protein.ToString("0.00")</td>
             <td>@Model.PerServingTotals.Fiber.ToString("0.00")</td>
@@ -67,120 +87,47 @@
     </tbody>
 </table>
 
-<h2>Per Day</h2>
+<h2>Recipe Contents</h2>
 
-<p>Servings per day: @Model.ServingsPerDay.ToString("0.00")</p>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Calories</th>
-            <th>Protein</th>
-            <th>Fiber</th>
-            <th>Sugar</th>
-            <th>Salt</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>@Model.PerDayTotals.Calories.ToString("0.00")</td>
-            <td>@Model.PerDayTotals.Protein.ToString("0.00")</td>
-            <td>@Model.PerDayTotals.Fiber.ToString("0.00")</td>
-            <td>@Model.PerDayTotals.Sugar.ToString("0.00")</td>
-            <td>@Model.PerDayTotals.Salt.ToString("0.00")</td>
-        </tr>
-    </tbody>
-</table>
-
-<h2>Ingredients</h2>
-
-<p>
-    <a asp-page="./AddIngredient" asp-route-id="@Model.Recipe.Id" class="btn btn-primary">Add Ingredient</a>
-</p>
-
-@if (Model.Recipe.RecipeIngredients.Count == 0)
+@if (Model.RecipeContentSummaries.Count == 0)
 {
-    <p>No ingredients have been added to this recipe yet.</p>
+    <p>No recipe contents have been added yet.</p>
 }
 else
 {
     <table class="table">
         <thead>
             <tr>
-                <th>Ingredient</th>
+                <th>Position</th>
+                <th>Type</th>
+                <th>Name</th>
                 <th>Grams</th>
                 <th>Calories</th>
                 <th>Protein</th>
                 <th>Fiber</th>
-                <th></th>
+                <th>Sugar</th>
+                <th>Salt</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var recipeIngredient in Model.Recipe.RecipeIngredients)
+            @foreach (var item in Model.RecipeContentSummaries)
             {
-                decimal calories = recipeIngredient.Ingredient.CaloriesPer100g * recipeIngredient.Grams / 100;
-                decimal protein = recipeIngredient.Ingredient.ProteinPer100g * recipeIngredient.Grams / 100;
-                decimal fiber = recipeIngredient.Ingredient.FiberPer100g * recipeIngredient.Grams / 100;
-
                 <tr>
-                    <td>@recipeIngredient.Ingredient.Name</td>
-                    <td>@recipeIngredient.Grams</td>
-                    <td>@calories</td>
-                    <td>@protein</td>
-                    <td>@fiber</td>
-                    <td>
-                        <a asp-page="./EditIngredient" asp-route-id="@recipeIngredient.Id">Edit</a>
-
-                        <form method="post" asp-page-handler="RemoveIngredient" class="d-inline">
-                            <input type="hidden" name="recipeIngredientId" value="@recipeIngredient.Id" />
-                            <button type="submit" class="btn btn-link p-0">Remove</button>
-                        </form>
-                    </td>
+                    <td>@item.Position</td>
+                    <td>@item.Type</td>
+                    <td>@item.Name</td>
+                    <td>@item.Grams.ToString("0.##")</td>
+                    <td>@item.Calories.ToString("0.00")</td>
+                    <td>@item.Protein.ToString("0.00")</td>
+                    <td>@item.Fiber.ToString("0.00")</td>
+                    <td>@item.Sugar.ToString("0.00")</td>
+                    <td>@item.Salt.ToString("0.00")</td>
                 </tr>
             }
         </tbody>
     </table>
 }
 
-<h2>Recipe Components</h2>
-
-<p>
-    <a asp-page="./AddComponent" asp-route-id="@Model.Recipe.Id" class="btn btn-primary">Add Recipe Component</a>
-</p>
-
-@if (Model.Recipe.Components.Count == 0)
-{
-    <p>No recipe components have been added to this recipe yet.</p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Recipe</th>
-                <th>Grams</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var recipeComponent in Model.Recipe.Components)
-            {
-                <tr>
-                    <td>@recipeComponent.ComponentRecipe.Name</td>
-                    <td>@recipeComponent.Grams</td>
-                    <td>
-                        <a asp-page="./EditComponent" asp-route-id="@recipeComponent.Id">Edit</a>
-
-                        <form method="post" asp-page-handler="RemoveComponent" class="d-inline">
-                            <input type="hidden" name="recipeComponentId" value="@recipeComponent.Id" />
-                            <button type="submit" class="btn btn-link p-0">Remove</button>
-                        </form>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-
+<a asp-page="/PreparedRecipeBatches/Create" asp-route-recipeId="@Model.Recipe.Id" class="btn btn-primary">Create Prepared Batch</a>
 <a asp-page="./Edit" asp-route-id="@Model.Recipe.Id" class="btn btn-primary">Edit</a>
 <a asp-page="./Index" class="btn btn-secondary">Back</a>

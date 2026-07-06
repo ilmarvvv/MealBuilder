@@ -22,8 +22,7 @@ else
             <tr>
                 <th>Name</th>
                 <th>Description</th>
-                <th>Servings</th>
-                <th>Days</th>
+                <th>Total Servings</th>
                 <th></th>
             </tr>
         </thead>
@@ -33,8 +32,7 @@ else
                 <tr>
                     <td>@recipe.Name</td>
                     <td>@recipe.Description</td>
-                    <td>@recipe.Servings</td>
-                    <td>@recipe.Days</td>
+                    <td>@recipe.TotalServings</td>
                     <td>
                         <a asp-page="./Details" asp-route-id="@recipe.Id">Details</a> |
                         <a asp-page="./Edit" asp-route-id="@recipe.Id">Edit</a> |

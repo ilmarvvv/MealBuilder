@@ -1,0 +1,33 @@
+﻿@page "{id:int}"
+@model MealBuilder.Web.Pages.PreparedRecipeBatches.AddIngredientModel
+
+@{
+    ViewData["Title"] = "Add Batch Ingredient";
+}
+
+<h1>Add Batch Ingredient</h1>
+
+<form method="post">
+    <input type="hidden" asp-for="PreparedRecipeBatchId" />
+
+    <div class="mb-3">
+        <label asp-for="IngredientId" class="form-label">Ingredient</label>
+        <select asp-for="IngredientId" asp-items="Model.Ingredients" class="form-select">
+            <option value="">Select ingredient</option>
+        </select>
+        <span asp-validation-for="IngredientId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Grams" class="form-label"></label>
+        <input asp-for="Grams" class="form-control" />
+        <span asp-validation-for="Grams" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add</button>
+    <a asp-page="./Edit" asp-route-id="@Model.PreparedRecipeBatchId" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

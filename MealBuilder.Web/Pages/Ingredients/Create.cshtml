@@ -44,6 +44,24 @@
         <span asp-validation-for="Ingredient.SaltPer100g" class="text-danger"></span>
     </div>
 
+    <div class="mb-3">
+        <label asp-for="Ingredient.GramsPerPiece" class="form-label"></label>
+        <input asp-for="Ingredient.GramsPerPiece" class="form-control" />
+        <span asp-validation-for="Ingredient.GramsPerPiece" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Ingredient.GramsPerMilliliter" class="form-label"></label>
+        <input asp-for="Ingredient.GramsPerMilliliter" class="form-control" />
+        <span asp-validation-for="Ingredient.GramsPerMilliliter" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Ingredient.Notes" class="form-label"></label>
+        <textarea asp-for="Ingredient.Notes" class="form-control"></textarea>
+        <span asp-validation-for="Ingredient.Notes" class="text-danger"></span>
+    </div>
+
     <button type="submit" class="btn btn-primary">Save</button>
     <a asp-page="./Index" class="btn btn-secondary">Cancel</a>
 </form>

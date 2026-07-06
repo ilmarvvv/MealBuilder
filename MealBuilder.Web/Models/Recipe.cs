@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MealBuilder.Web.Models
 {
@@ -13,11 +14,23 @@ namespace MealBuilder.Web.Models
         [StringLength(1000)]
         public string? Description { get; set; }
 
-        [Range(1, 100)]
-        public int Servings { get; set; } = 1;
-
         [Range(1, 365)]
-        public int Days { get; set; } = 1;
+        public int DefaultPlannedDays { get; set; } = 1;
+
+        [Range(1, 100)]
+        public int DefaultServingsPerDay { get; set; } = 1;
+
+        [NotMapped]
+        public int TotalServings => DefaultPlannedDays * DefaultServingsPerDay;
+
+        [Range(0, 10000)]
+        public int PrepTimeMinutes { get; set; }
+
+        [Range(0, 10000)]
+        public int CookTimeMinutes { get; set; }
+
+        [Range(0.01, 100000)]
+        public decimal? FinalWeightGrams { get; set; }
 
         public List<RecipeIngredient> RecipeIngredients { get; set; } = [];
 
@@ -25,7 +38,7 @@ namespace MealBuilder.Web.Models
 
         public List<RecipeComponent> UsedAsComponentInRecipes { get; set; } = [];
 
-        public List<MenuItem> MenuItems { get; set; } = [];
+        public List<DailyPlanItem> DailyPlanItems { get; set; } = [];
 
         public List<PreparedRecipeBatch> PreparedRecipeBatches { get; set; } = [];
 

@@ -1,0 +1,48 @@
+﻿@page "{id:int?}"
+@model MealBuilder.Web.Pages.DailyPlans.AddIngredientModel
+
+@{
+    ViewData["Title"] = "Add Ingredient to Daily Plan";
+}
+
+<h1>Add Ingredient to Daily Plan</h1>
+
+<h2>@Model.DailyPlan.Name - @Model.DailyPlan.Date</h2>
+
+<form method="post">
+    <input type="hidden" asp-for="DailyPlanItem.DailyPlanId" />
+    <input type="hidden" asp-for="DailyPlanDate" />
+    <input type="hidden" asp-for="DailyPlanItem.ItemType" />
+
+    <div class="mb-3">
+        <label asp-for="DailyPlanItem.IngredientId" class="form-label">Ingredient</label>
+        <select asp-for="DailyPlanItem.IngredientId" asp-items="Model.Ingredients" class="form-control">
+            <option value="">Select ingredient</option>
+        </select>
+        <span asp-validation-for="DailyPlanItem.IngredientId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="DailyPlanItem.Grams" class="form-label"></label>
+        <input asp-for="DailyPlanItem.Grams" class="form-control" />
+        <span asp-validation-for="DailyPlanItem.Grams" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add</button>
+    @if (Model.DailyPlan.Id > 0)
+    {
+        <a asp-page="./Details"
+           asp-route-id="@Model.DailyPlan.Id"
+           class="btn btn-secondary">Cancel</a>
+    }
+    else
+    {
+        <a asp-page="./Details"
+           asp-route-date="@Model.DailyPlan.Date.ToString("yyyy-MM-dd")"
+           class="btn btn-secondary">Cancel</a>
+    }
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

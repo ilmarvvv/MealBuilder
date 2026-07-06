@@ -1,0 +1,127 @@
+﻿@page "{id:int}"
+@model MealBuilder.Web.Pages.PreparedRecipeBatches.EditModel
+
+@{
+    ViewData["Title"] = "Edit Prepared Batch";
+}
+
+<h1>Edit Prepared Batch</h1>
+
+<dl class="row">
+    <dt class="col-sm-3">Recipe</dt>
+    <dd class="col-sm-9">@Model.PreparedRecipeBatchSummary.PreparedRecipeBatch.RecipeNameSnapshot</dd>
+
+    <dt class="col-sm-3">Cooked Date</dt>
+    <dd class="col-sm-9">@Model.PreparedRecipeBatchSummary.PreparedRecipeBatch.CookedDate</dd>
+
+    <dt class="col-sm-3">Total Servings</dt>
+    <dd class="col-sm-9">@Model.PreparedRecipeBatchSummary.PreparedRecipeBatch.TotalServings</dd>
+
+    <dt class="col-sm-3">Planned Days</dt>
+    <dd class="col-sm-9">@Model.PreparedRecipeBatchSummary.PreparedRecipeBatch.PlannedDays</dd>
+
+    <dt class="col-sm-3">Servings Per Day</dt>
+    <dd class="col-sm-9">@Model.PreparedRecipeBatchSummary.ServingsPerDay.ToString("0.00")</dd>
+
+    <dt class="col-sm-3">Allocated Servings</dt>
+    <dd class="col-sm-9">@Model.PreparedRecipeBatchSummary.AllocatedServings</dd>
+
+    <dt class="col-sm-3">Unallocated Servings</dt>
+    <dd class="col-sm-9">@Model.PreparedRecipeBatchSummary.UnallocatedServings</dd>
+</dl>
+
+<h2>Nutrition Summary</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Calories</th>
+            <th>Protein</th>
+            <th>Fiber</th>
+            <th>Sugar</th>
+            <th>Salt</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Total batch</td>
+            <td>@Model.ItemTotals.Calories.ToString("0.00")</td>
+            <td>@Model.ItemTotals.Protein.ToString("0.00")</td>
+            <td>@Model.ItemTotals.Fiber.ToString("0.00")</td>
+            <td>@Model.ItemTotals.Sugar.ToString("0.00")</td>
+            <td>@Model.ItemTotals.Salt.ToString("0.00")</td>
+        </tr>
+        <tr>
+            <td>Per serving</td>
+            <td>@Model.ItemPerServingTotals.Calories.ToString("0.00")</td>
+            <td>@Model.ItemPerServingTotals.Protein.ToString("0.00")</td>
+            <td>@Model.ItemPerServingTotals.Fiber.ToString("0.00")</td>
+            <td>@Model.ItemPerServingTotals.Sugar.ToString("0.00")</td>
+            <td>@Model.ItemPerServingTotals.Salt.ToString("0.00")</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Batch Items</h2>
+
+@if (Model.PreparedRecipeBatchSummary.PreparedRecipeBatch.Items.Count == 0)
+{
+    <p>No batch items have been saved for this prepared batch.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Position</th>
+                <th>Type</th>
+                <th>Name</th>
+                <th>Grams</th>
+                <th>Calories</th>
+                <th>Protein</th>
+                <th>Fiber</th>
+                <th>Sugar</th>
+                <th>Salt</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.PreparedRecipeBatchSummary.PreparedRecipeBatch.Items.OrderBy(item => item.Position))
+            {
+                <tr>
+                    <td>
+                        <form method="post" asp-page-handler="ChangeItemPosition" class="d-flex gap-2">
+                            <input type="hidden" name="preparedRecipeBatchItemId" value="@item.Id" />
+                            <input type="number" name="newPosition" value="@item.Position" min="1" class="form-control form-control-sm" style="width: 80px;" />
+                            <button type="submit" class="btn btn-link p-0">Set</button>
+                        </form>
+                    </td>
+                    <td>@item.ItemType</td>
+                    <td>@item.NameSnapshot</td>
+                    <td>@item.Grams.ToString("0.##")</td>
+                    <td>@item.CaloriesSnapshot.ToString("0.00")</td>
+                    <td>@item.ProteinSnapshot.ToString("0.00")</td>
+                    <td>@item.FiberSnapshot.ToString("0.00")</td>
+                    <td>@item.SugarSnapshot.ToString("0.00")</td>
+                    <td>@item.SaltSnapshot.ToString("0.00")</td>
+                    <td>
+                        <a asp-page="./EditItem" asp-route-id="@item.Id">Edit</a>
+                        <form method="post" asp-page-handler="RemoveItem" class="d-inline">
+                            <input type="hidden" name="preparedRecipeBatchItemId" value="@item.Id" />
+                            <button type="submit" class="btn btn-link p-0">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<div class="mb-3">
+    <a asp-page="./AddIngredient" asp-route-id="@Model.PreparedRecipeBatchSummary.PreparedRecipeBatch.Id" class="btn btn-primary">Add Ingredient</a>
+    <a asp-page="./AddRecipe" asp-route-id="@Model.PreparedRecipeBatchSummary.PreparedRecipeBatch.Id" class="btn btn-primary">Add Recipe</a>
+</div>
+
+<a asp-page="./Details" asp-route-id="@Model.PreparedRecipeBatchSummary.PreparedRecipeBatch.Id" class="btn btn-secondary">Details</a>
+<a asp-page="./Index" class="btn btn-secondary">Back</a>

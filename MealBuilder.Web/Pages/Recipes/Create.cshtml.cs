@@ -31,7 +31,7 @@ namespace MealBuilder.Web.Pages.Recipes
             _context.Recipes.Add(Recipe);
             await _context.SaveChangesAsync();
 
-            return RedirectToPage("./Index");
+            return RedirectToPage("./Edit", new { id = Recipe.Id });
         }
     }
 }

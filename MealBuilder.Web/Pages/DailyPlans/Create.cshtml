@@ -1,0 +1,35 @@
+﻿@page
+@model MealBuilder.Web.Pages.DailyPlans.CreateModel
+
+@{
+    ViewData["Title"] = "Create Daily Plan";
+}
+
+<h1>Create Daily Plan</h1>
+
+<form method="post">
+    <div class="mb-3">
+        <label asp-for="DailyPlan.Name" class="form-label"></label>
+        <input asp-for="DailyPlan.Name" class="form-control" />
+        <span asp-validation-for="DailyPlan.Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="DailyPlan.Date" class="form-label"></label>
+        <input asp-for="DailyPlan.Date" class="form-control" type="date" />
+        <span asp-validation-for="DailyPlan.Date" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="DailyPlan.Description" class="form-label"></label>
+        <textarea asp-for="DailyPlan.Description" class="form-control"></textarea>
+        <span asp-validation-for="DailyPlan.Description" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-page="./Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

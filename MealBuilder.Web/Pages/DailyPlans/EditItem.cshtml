@@ -1,0 +1,43 @@
+﻿@page "{id:int}"
+@model MealBuilder.Web.Pages.DailyPlans.EditItemModel
+
+@{
+    ViewData["Title"] = "Edit Daily Plan Item";
+}
+
+<h1>Edit Daily Plan Item</h1>
+
+<h2>@Model.ItemName</h2>
+
+<form method="post">
+    <input type="hidden" asp-for="DailyPlanItem.Id" />
+    <input type="hidden" asp-for="DailyPlanItem.DailyPlanId" />
+    <input type="hidden" asp-for="DailyPlanItem.ItemType" />
+    <input type="hidden" asp-for="DailyPlanItem.RecipeId" />
+    <input type="hidden" asp-for="DailyPlanItem.IngredientId" />
+    <input type="hidden" asp-for="DailyPlanItem.PreparedRecipeBatchId" />
+
+    @if (Model.DailyPlanItem.ItemType == MealBuilder.Web.Models.DailyPlanItemType.PreparedRecipeBatch)
+    {
+        <div class="mb-3">
+            <label asp-for="DailyPlanItem.ServingsCount" class="form-label">Servings</label>
+            <input asp-for="DailyPlanItem.ServingsCount" class="form-control" />
+            <span asp-validation-for="DailyPlanItem.ServingsCount" class="text-danger"></span>
+        </div>
+    }
+    else if (Model.DailyPlanItem.ItemType == MealBuilder.Web.Models.DailyPlanItemType.Ingredient)
+    {
+        <div class="mb-3">
+            <label asp-for="DailyPlanItem.Grams" class="form-label"></label>
+            <input asp-for="DailyPlanItem.Grams" class="form-control" />
+            <span asp-validation-for="DailyPlanItem.Grams" class="text-danger"></span>
+        </div>
+    }
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-page="./Details" asp-route-id="@Model.DailyPlanItem.DailyPlanId" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
