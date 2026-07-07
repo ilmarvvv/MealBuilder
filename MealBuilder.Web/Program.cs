@@ -7,7 +7,13 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRazorPages();
+builder.Services.AddRazorPages(options =>
+{
+    options.Conventions.AuthorizeFolder("/Ingredients");
+    options.Conventions.AuthorizeFolder("/Recipes");
+    options.Conventions.AuthorizeFolder("/DailyPlans");
+    options.Conventions.AuthorizeFolder("/PreparedRecipeBatches");
+});
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
