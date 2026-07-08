@@ -49,4 +49,9 @@ app.MapStaticAssets();
 app.MapRazorPages()
    .WithStaticAssets();
 
+
+await InitialAdminSeeder.SeedAsync(
+    app.Services,
+    app.Configuration);
+
 app.Run();
