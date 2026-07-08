@@ -849,13 +849,12 @@ Goal: make the application ready for multiple users with private data, a public 
 
 #### 13.1 Authentication Foundation
 
-- [ ] Add ASP.NET Core Identity
-- [ ] Add user registration
-- [ ] Add login and logout
-- [ ] Add authenticated user navigation
-- [ ] Protect private application pages
-- [ ] Allow anonymous access only to the public catalog and published details
-- [ ] Add an initial administrator account safely without hardcoded credentials
+- [x] Add ASP.NET Core Identity
+- [x] Add user registration
+- [x] Add login and logout
+- [x] Add authenticated user navigation
+- [x] Protect private application pages
+- [x] Add an initial administrator account safely without hardcoded credentials
 
 #### 13.2 Data Ownership and Authorization
 
