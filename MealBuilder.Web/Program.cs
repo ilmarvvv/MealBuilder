@@ -25,6 +25,9 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<AppDbContext>();
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<CurrentUserAccessor>();
+
 builder.Services.AddScoped<RecipeCalculationService>();
 builder.Services.AddScoped<DailyPlanCalculationService>();
 
