@@ -32,6 +32,12 @@ namespace MealBuilder.Web.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Ingredient>()
+                .HasOne(ingredient => ingredient.Owner)
+                .WithMany(user => user.Ingredients)
+                .HasForeignKey(ingredient => ingredient.OwnerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<RecipeIngredient>()
                 .HasOne(recipeIngredient => recipeIngredient.Ingredient)
                 .WithMany(ingredient => ingredient.RecipeIngredients)

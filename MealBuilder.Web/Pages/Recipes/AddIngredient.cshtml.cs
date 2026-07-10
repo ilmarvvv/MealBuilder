@@ -1,4 +1,5 @@
 using MealBuilder.Web.Data;
+using MealBuilder.Web.Identity;
 using MealBuilder.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -10,10 +11,12 @@ namespace MealBuilder.Web.Pages.Recipes
     public class AddIngredientModel : PageModel
     {
         private readonly AppDbContext _context;
+        private readonly CurrentUserAccessor _currentUser;
 
-        public AddIngredientModel(AppDbContext context)
+        public AddIngredientModel(AppDbContext context, CurrentUserAccessor currentUser)
         {
             _context = context;
+            _currentUser = currentUser;
         }
 
         public Recipe Recipe { get; set; } = new();
@@ -45,6 +48,18 @@ namespace MealBuilder.Web.Pages.Recipes
             ModelState.Remove("RecipeIngredient.Recipe");
             ModelState.Remove("RecipeIngredient.Ingredient");
 
+            bool ingredientExists = await _context.Ingredients
+                .AnyAsync(ingredient =>
+                    ingredient.Id == RecipeIngredient.IngredientId &&
+                    ingredient.OwnerId == _currentUser.UserId);
+
+            if (!ingredientExists)
+            {
+                ModelState.AddModelError(
+                    "RecipeIngredient.IngredientId",
+                    "Ingredient was not found.");
+            }
+
             if (!ModelState.IsValid)
             {
                 Recipe? recipe = await _context.Recipes.FindAsync(RecipeIngredient.RecipeId);
@@ -75,6 +90,7 @@ namespace MealBuilder.Web.Pages.Recipes
         private async Task LoadIngredientsAsync()
         {
             List<Ingredient> ingredients = await _context.Ingredients
+                .Where(ingredient => ingredient.OwnerId == _currentUser.UserId)
                 .OrderBy(ingredient => ingredient.Name)
                 .ToListAsync();
 

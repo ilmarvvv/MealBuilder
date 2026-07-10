@@ -1,4 +1,5 @@
 using MealBuilder.Web.Data;
+using MealBuilder.Web.Identity;
 using MealBuilder.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -10,10 +11,12 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
     public class AddIngredientModel : PageModel
     {
         private readonly AppDbContext _context;
+        private readonly CurrentUserAccessor _currentUser;
 
-        public AddIngredientModel(AppDbContext context)
+        public AddIngredientModel(AppDbContext context, CurrentUserAccessor currentUser)
         {
             _context = context;
+            _currentUser = currentUser;
         }
 
         public PreparedRecipeBatch PreparedRecipeBatch { get; set; } = new();
@@ -64,7 +67,9 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
             }
 
             Ingredient? ingredient = await _context.Ingredients
-                .FirstOrDefaultAsync(ingredient => ingredient.Id == IngredientId);
+                .FirstOrDefaultAsync(ingredient =>
+                    ingredient.Id == IngredientId &&
+                    ingredient.OwnerId == _currentUser.UserId);
 
             if (ingredient is null)
             {
@@ -106,6 +111,7 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
         private async Task LoadIngredientsAsync()
         {
             List<Ingredient> ingredients = await _context.Ingredients
+                .Where(ingredient => ingredient.OwnerId == _currentUser.UserId)
                 .OrderBy(ingredient => ingredient.Name)
                 .ToListAsync();
 

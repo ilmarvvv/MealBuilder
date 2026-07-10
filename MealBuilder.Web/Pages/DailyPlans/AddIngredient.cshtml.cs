@@ -1,4 +1,5 @@
 using MealBuilder.Web.Data;
+using MealBuilder.Web.Identity;
 using MealBuilder.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -10,10 +11,12 @@ namespace MealBuilder.Web.Pages.DailyPlans
     public class AddIngredientModel : PageModel
     {
         private readonly AppDbContext _context;
+        private readonly CurrentUserAccessor _currentUser;
 
-        public AddIngredientModel(AppDbContext context)
+        public AddIngredientModel(AppDbContext context, CurrentUserAccessor currentUser)
         {
             _context = context;
+            _currentUser = currentUser;
         }
 
         public DailyPlan DailyPlan { get; set; } = new();
@@ -86,6 +89,20 @@ namespace MealBuilder.Web.Pages.DailyPlans
                 ModelState.AddModelError(
                     "DailyPlanItem.IngredientId",
                     "Ingredient is required.");
+            }
+            else
+            {
+                bool ingredientExists = await _context.Ingredients
+                    .AnyAsync(ingredient =>
+                        ingredient.Id == DailyPlanItem.IngredientId &&
+                        ingredient.OwnerId == _currentUser.UserId);
+
+                if (!ingredientExists)
+                {
+                    ModelState.AddModelError(
+                        "DailyPlanItem.IngredientId",
+                        "Ingredient was not found.");
+                }
             }
 
             if (DailyPlanItem.Grams is null || DailyPlanItem.Grams <= 0)
@@ -165,6 +182,7 @@ namespace MealBuilder.Web.Pages.DailyPlans
         private async Task LoadIngredientsAsync()
         {
             List<Ingredient> ingredients = await _context.Ingredients
+                .Where(ingredient => ingredient.OwnerId == _currentUser.UserId)
                 .OrderBy(ingredient => ingredient.Name)
                 .ToListAsync();
 
