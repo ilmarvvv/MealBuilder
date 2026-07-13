@@ -1,4 +1,5 @@
 using MealBuilder.Web.Data;
+using MealBuilder.Web.Identity;
 using MealBuilder.Web.Models;
 using MealBuilder.Web.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -13,11 +14,16 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
     {
         private readonly AppDbContext _context;
         private readonly RecipeCalculationService _recipeCalculationService;
+        private readonly CurrentUserAccessor _currentUser;
 
-        public CreateModel(AppDbContext context, RecipeCalculationService recipeCalculationService)
+        public CreateModel(
+            AppDbContext context, 
+            RecipeCalculationService recipeCalculationService, 
+            CurrentUserAccessor currentUser)
         {
             _context = context;
             _recipeCalculationService = recipeCalculationService;
+            _currentUser = currentUser;
         }
 
         [BindProperty]
@@ -36,7 +42,9 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
             if (recipeId is not null)
             {
                 Recipe? recipe = await _context.Recipes
-                    .FirstOrDefaultAsync(recipe => recipe.Id == recipeId.Value);
+                    .FirstOrDefaultAsync(recipe =>
+                        recipe.Id == recipeId.Value &&
+                        recipe.OwnerId == _currentUser.UserId);
 
                 if (recipe is not null)
                 {
@@ -71,7 +79,9 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
                 .ThenInclude(recipeComponent => recipeComponent.ComponentRecipe)
                 .ThenInclude(componentRecipe => componentRecipe.RecipeIngredients)
                 .ThenInclude(recipeIngredient => recipeIngredient.Ingredient)
-                .FirstOrDefaultAsync(recipe => recipe.Id == PreparedRecipeBatch.RecipeId);
+                .FirstOrDefaultAsync(recipe =>
+                    recipe.Id == PreparedRecipeBatch.RecipeId &&
+                    recipe.OwnerId == _currentUser.UserId);
 
             if (recipe is null)
             {
@@ -162,6 +172,7 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
         private async Task LoadRecipeSelectListAsync()
         {
             List<Recipe> recipes = await _context.Recipes
+                .Where(recipe => recipe.OwnerId == _currentUser.UserId)
                 .OrderBy(recipe => recipe.Name)
                 .ToListAsync();
 

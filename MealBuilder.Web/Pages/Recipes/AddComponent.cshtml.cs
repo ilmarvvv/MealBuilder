@@ -1,4 +1,5 @@
 using MealBuilder.Web.Data;
+using MealBuilder.Web.Identity;
 using MealBuilder.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -10,10 +11,12 @@ namespace MealBuilder.Web.Pages.Recipes
     public class AddComponentModel : PageModel
     {
         private readonly AppDbContext _context;
+        private readonly CurrentUserAccessor _currentUser;
 
-        public AddComponentModel(AppDbContext context)
+        public AddComponentModel(AppDbContext context, CurrentUserAccessor currentUser)
         {
             _context = context;
+            _currentUser = currentUser;
         }
 
         public Recipe Recipe { get; set; } = new();
@@ -25,7 +28,10 @@ namespace MealBuilder.Web.Pages.Recipes
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
-            Recipe? recipe = await _context.Recipes.FindAsync(id);
+            Recipe? recipe = await _context.Recipes
+                .FirstOrDefaultAsync(recipe =>
+                    recipe.Id == id &&
+                    recipe.OwnerId == _currentUser.UserId);
 
             if (recipe is null)
             {
@@ -50,6 +56,28 @@ namespace MealBuilder.Web.Pages.Recipes
                 ModelState.AddModelError("RecipeComponent.ComponentRecipeId", "A recipe cannot contain itself.");
             }
 
+            bool parentRecipeExists = await _context.Recipes
+                .AnyAsync(recipe =>
+                    recipe.Id == RecipeComponent.ParentRecipeId &&
+                    recipe.OwnerId == _currentUser.UserId);
+
+            if (!parentRecipeExists)
+            {
+                return NotFound();
+            }
+
+            bool componentRecipeExists = await _context.Recipes
+                .AnyAsync(recipe =>
+                    recipe.Id == RecipeComponent.ComponentRecipeId &&
+                    recipe.OwnerId == _currentUser.UserId);
+
+            if (!componentRecipeExists)
+            {
+                ModelState.AddModelError(
+                    "RecipeComponent.ComponentRecipeId",
+                    "Recipe component was not found.");
+            }
+
             bool duplicateExists = await _context.RecipeComponents
                 .AnyAsync(recipeComponent =>
                     recipeComponent.ParentRecipeId == RecipeComponent.ParentRecipeId &&
@@ -62,7 +90,10 @@ namespace MealBuilder.Web.Pages.Recipes
 
             if (!ModelState.IsValid)
             {
-                Recipe? recipe = await _context.Recipes.FindAsync(RecipeComponent.ParentRecipeId);
+                Recipe? recipe = await _context.Recipes
+                    .FirstOrDefaultAsync(recipe =>
+                        recipe.Id == RecipeComponent.ParentRecipeId &&
+                        recipe.OwnerId == _currentUser.UserId);
 
                 if (recipe is not null)
                 {
@@ -95,7 +126,9 @@ namespace MealBuilder.Web.Pages.Recipes
                 .ToListAsync();
 
             List<Recipe> recipes = await _context.Recipes
-                .Where(recipe => recipe.Id != parentRecipeId)
+                .Where(recipe =>
+                    recipe.Id != parentRecipeId &&
+                    recipe.OwnerId == _currentUser.UserId)
                 .Where(recipe => !alreadyAddedComponentRecipeIds.Contains(recipe.Id))
                 .OrderBy(recipe => recipe.Name)
                 .ToListAsync();

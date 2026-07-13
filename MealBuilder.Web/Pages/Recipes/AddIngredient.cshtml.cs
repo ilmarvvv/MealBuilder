@@ -28,7 +28,10 @@ namespace MealBuilder.Web.Pages.Recipes
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
-            Recipe? recipe = await _context.Recipes.FindAsync(id);
+            Recipe? recipe = await _context.Recipes
+                .FirstOrDefaultAsync(recipe =>
+                    recipe.Id == id &&
+                    recipe.OwnerId == _currentUser.UserId);
 
             if (recipe is null)
             {
@@ -60,9 +63,22 @@ namespace MealBuilder.Web.Pages.Recipes
                     "Ingredient was not found.");
             }
 
+            bool recipeExists = await _context.Recipes
+                .AnyAsync(recipe =>
+                    recipe.Id == RecipeIngredient.RecipeId &&
+                    recipe.OwnerId == _currentUser.UserId);
+
+            if (!recipeExists)
+            {
+                return NotFound();
+            }
+
             if (!ModelState.IsValid)
             {
-                Recipe? recipe = await _context.Recipes.FindAsync(RecipeIngredient.RecipeId);
+                Recipe? recipe = await _context.Recipes
+                    .FirstOrDefaultAsync(recipe =>
+                        recipe.Id == RecipeIngredient.RecipeId &&
+                        recipe.OwnerId == _currentUser.UserId);
 
                 if (recipe is not null)
                 {

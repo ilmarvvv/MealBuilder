@@ -1,4 +1,5 @@
 using MealBuilder.Web.Data;
+using MealBuilder.Web.Identity;
 using MealBuilder.Web.Models;
 using MealBuilder.Web.Services;
 using MealBuilder.Web.ViewModels;
@@ -13,11 +14,16 @@ namespace MealBuilder.Web.Pages.Recipes
     {
         private readonly AppDbContext _context;
         private readonly RecipeCalculationService _recipeCalculationService;
+        private readonly CurrentUserAccessor _currentUser;
 
-        public EditModel(AppDbContext context, RecipeCalculationService recipeCalculationService)
+        public EditModel(
+            AppDbContext context, 
+            RecipeCalculationService recipeCalculationService, 
+            CurrentUserAccessor currentUser)
         {
             _context = context;
             _recipeCalculationService = recipeCalculationService;
+            _currentUser = currentUser;
         }
 
         [BindProperty]
@@ -60,16 +66,36 @@ namespace MealBuilder.Web.Pages.Recipes
                 return Page();
             }
 
-            _context.Recipes.Update(Recipe);
+            Recipe? recipeToUpdate = await _context.Recipes
+                .FirstOrDefaultAsync(recipe =>
+                    recipe.Id == Recipe.Id &&
+                    recipe.OwnerId == _currentUser.UserId);
+
+            if (recipeToUpdate is null)
+            {
+                return NotFound();
+            }
+
+            recipeToUpdate.Name = Recipe.Name;
+            recipeToUpdate.Description = Recipe.Description;
+            recipeToUpdate.DefaultPlannedDays = Recipe.DefaultPlannedDays;
+            recipeToUpdate.DefaultServingsPerDay = Recipe.DefaultServingsPerDay;
+            recipeToUpdate.PrepTimeMinutes = Recipe.PrepTimeMinutes;
+            recipeToUpdate.CookTimeMinutes = Recipe.CookTimeMinutes;
+            recipeToUpdate.FinalWeightGrams = Recipe.FinalWeightGrams;
+
             await _context.SaveChangesAsync();
 
-            return RedirectToPage("./Edit", new { id = Recipe.Id });
+            return RedirectToPage("./Edit", new { id = recipeToUpdate.Id });
         }
 
         public async Task<IActionResult> OnPostRemoveIngredientAsync(int recipeIngredientId)
         {
             RecipeIngredient? recipeIngredient = await _context.RecipeIngredients
-                .FindAsync(recipeIngredientId);
+                .Include(recipeIngredient => recipeIngredient.Recipe)
+                .FirstOrDefaultAsync(recipeIngredient =>
+                    recipeIngredient.Id == recipeIngredientId &&
+                    recipeIngredient.Recipe.OwnerId == _currentUser.UserId);
 
             if (recipeIngredient is null)
             {
@@ -90,7 +116,10 @@ namespace MealBuilder.Web.Pages.Recipes
         public async Task<IActionResult> OnPostRemoveComponentAsync(int recipeComponentId)
         {
             RecipeComponent? recipeComponent = await _context.RecipeComponents
-                .FindAsync(recipeComponentId);
+                .Include(recipeComponent => recipeComponent.ParentRecipe)
+                .FirstOrDefaultAsync(recipeComponent =>
+                    recipeComponent.Id == recipeComponentId &&
+                    recipeComponent.ParentRecipe.OwnerId == _currentUser.UserId);
 
             if (recipeComponent is null)
             {
@@ -119,7 +148,11 @@ namespace MealBuilder.Web.Pages.Recipes
 
             if (contentType == "Ingredient")
             {
-                recipeIngredient = await _context.RecipeIngredients.FindAsync(contentId);
+                recipeIngredient = await _context.RecipeIngredients
+                    .Include(recipeIngredient => recipeIngredient.Recipe)
+                    .FirstOrDefaultAsync(recipeIngredient =>
+                        recipeIngredient.Id == contentId &&
+                        recipeIngredient.Recipe.OwnerId == _currentUser.UserId);
 
                 if (recipeIngredient is null)
                 {
@@ -130,7 +163,11 @@ namespace MealBuilder.Web.Pages.Recipes
             }
             else
             {
-                recipeComponent = await _context.RecipeComponents.FindAsync(contentId);
+                recipeComponent = await _context.RecipeComponents
+                    .Include(recipeComponent => recipeComponent.ParentRecipe)
+                    .FirstOrDefaultAsync(recipeComponent =>
+                        recipeComponent.Id == contentId &&
+                        recipeComponent.ParentRecipe.OwnerId == _currentUser.UserId);
 
                 if (recipeComponent is null)
                 {
@@ -166,7 +203,9 @@ namespace MealBuilder.Web.Pages.Recipes
         private async Task<List<RecipeContentPositionItem>> LoadRecipeContentPositionItemsAsync(int recipeId)
         {
             List<RecipeContentPositionItem> ingredientItems = await _context.RecipeIngredients
-                .Where(recipeIngredient => recipeIngredient.RecipeId == recipeId)
+                .Where(recipeIngredient =>
+                    recipeIngredient.RecipeId == recipeId &&
+                    recipeIngredient.Recipe.OwnerId == _currentUser.UserId)
                 .Select(recipeIngredient => new RecipeContentPositionItem
                 {
                     Id = recipeIngredient.Id,
@@ -176,7 +215,9 @@ namespace MealBuilder.Web.Pages.Recipes
                 .ToListAsync();
 
             List<RecipeContentPositionItem> componentItems = await _context.RecipeComponents
-                .Where(recipeComponent => recipeComponent.ParentRecipeId == recipeId)
+                .Where(recipeComponent =>
+                    recipeComponent.ParentRecipeId == recipeId &&
+                    recipeComponent.ParentRecipe.OwnerId == _currentUser.UserId)
                 .Select(recipeComponent => new RecipeContentPositionItem
                 {
                     Id = recipeComponent.Id,
@@ -202,7 +243,11 @@ namespace MealBuilder.Web.Pages.Recipes
 
                 if (contentItem.ContentType == "Ingredient")
                 {
-                    RecipeIngredient? recipeIngredient = await _context.RecipeIngredients.FindAsync(contentItem.Id);
+                    RecipeIngredient? recipeIngredient = await _context.RecipeIngredients
+                        .Include(recipeIngredient => recipeIngredient.Recipe)
+                        .FirstOrDefaultAsync(recipeIngredient =>
+                            recipeIngredient.Id == contentItem.Id &&
+                            recipeIngredient.Recipe.OwnerId == _currentUser.UserId);
 
                     if (recipeIngredient is not null)
                     {
@@ -211,7 +256,11 @@ namespace MealBuilder.Web.Pages.Recipes
                 }
                 else
                 {
-                    RecipeComponent? recipeComponent = await _context.RecipeComponents.FindAsync(contentItem.Id);
+                    RecipeComponent? recipeComponent = await _context.RecipeComponents
+                        .Include(recipeComponent => recipeComponent.ParentRecipe)
+                        .FirstOrDefaultAsync(recipeComponent =>
+                            recipeComponent.Id == contentItem.Id &&
+                            recipeComponent.ParentRecipe.OwnerId == _currentUser.UserId);
 
                     if (recipeComponent is not null)
                     {
@@ -233,13 +282,17 @@ namespace MealBuilder.Web.Pages.Recipes
         private async Task ReorderRecipeContentsAsync(int recipeId)
         {
             List<RecipeIngredient> recipeIngredients = await _context.RecipeIngredients
-                .Where(recipeIngredient => recipeIngredient.RecipeId == recipeId)
+                .Where(recipeIngredient =>
+                    recipeIngredient.RecipeId == recipeId &&
+                    recipeIngredient.Recipe.OwnerId == _currentUser.UserId)
                 .OrderBy(recipeIngredient => recipeIngredient.Position)
                 .ThenBy(recipeIngredient => recipeIngredient.Id)
                 .ToListAsync();
 
             List<RecipeComponent> recipeComponents = await _context.RecipeComponents
-                .Where(recipeComponent => recipeComponent.ParentRecipeId == recipeId)
+                .Where(recipeComponent =>
+                    recipeComponent.ParentRecipeId == recipeId &&
+                    recipeComponent.ParentRecipe.OwnerId == _currentUser.UserId)
                 .OrderBy(recipeComponent => recipeComponent.Position)
                 .ThenBy(recipeComponent => recipeComponent.Id)
                 .ToListAsync();
@@ -268,7 +321,7 @@ namespace MealBuilder.Web.Pages.Recipes
                 .ThenInclude(recipeComponent => recipeComponent.ComponentRecipe)
                 .ThenInclude(componentRecipe => componentRecipe.RecipeIngredients)
                 .ThenInclude(recipeIngredient => recipeIngredient.Ingredient)
-                .FirstOrDefaultAsync(recipe => recipe.Id == id);
+                .FirstOrDefaultAsync(recipe => recipe.Id == id && recipe.OwnerId == _currentUser.UserId);
         }
 
         private void LoadRecipeViewData(Recipe recipe)

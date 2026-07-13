@@ -1,4 +1,5 @@
 using MealBuilder.Web.Data;
+using MealBuilder.Web.Identity;
 using MealBuilder.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -9,10 +10,12 @@ namespace MealBuilder.Web.Pages.Recipes
     public class DeleteModel : PageModel
     {
         private readonly AppDbContext _context;
+        private readonly CurrentUserAccessor _currentUser;
 
-        public DeleteModel(AppDbContext context)
+        public DeleteModel(AppDbContext context, CurrentUserAccessor currentUser)
         {
             _context = context;
+            _currentUser = currentUser;
         }
 
         public Recipe Recipe { get; set; } = new();
@@ -21,7 +24,10 @@ namespace MealBuilder.Web.Pages.Recipes
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
-            Recipe? recipe = await _context.Recipes.FindAsync(id);
+            Recipe? recipe = await _context.Recipes
+                .FirstOrDefaultAsync(recipe =>
+                    recipe.Id == id &&
+                    recipe.OwnerId == _currentUser.UserId);
 
             if (recipe is null)
             {
@@ -36,7 +42,10 @@ namespace MealBuilder.Web.Pages.Recipes
 
         public async Task<IActionResult> OnPostAsync(int id)
         {
-            Recipe? recipe = await _context.Recipes.FindAsync(id);
+            Recipe? recipe = await _context.Recipes
+                .FirstOrDefaultAsync(recipe =>
+                    recipe.Id == id &&
+                    recipe.OwnerId == _currentUser.UserId);
 
             if (recipe is null)
             {

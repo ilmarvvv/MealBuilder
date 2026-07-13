@@ -6,5 +6,7 @@ namespace MealBuilder.Web.Identity
     public class ApplicationUser : IdentityUser
     {
         public List<Ingredient> Ingredients { get; set; } = [];
+
+        public List<Recipe> Recipes { get; set; } = [];
     }
 }

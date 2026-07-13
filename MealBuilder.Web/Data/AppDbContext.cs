@@ -38,6 +38,12 @@ namespace MealBuilder.Web.Data
                 .HasForeignKey(ingredient => ingredient.OwnerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Recipe>()
+                .HasOne(recipe => recipe.Owner)
+                .WithMany(user => user.Recipes)
+                .HasForeignKey(recipe => recipe.OwnerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<RecipeIngredient>()
                 .HasOne(recipeIngredient => recipeIngredient.Ingredient)
                 .WithMany(ingredient => ingredient.RecipeIngredients)

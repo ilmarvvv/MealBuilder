@@ -1,4 +1,5 @@
 using MealBuilder.Web.Data;
+using MealBuilder.Web.Identity;
 using MealBuilder.Web.Models;
 using MealBuilder.Web.Services;
 using MealBuilder.Web.ViewModels;
@@ -12,11 +13,16 @@ namespace MealBuilder.Web.Pages.Recipes
     {
         private readonly AppDbContext _context;
         private readonly RecipeCalculationService _recipeCalculationService;
+        private readonly CurrentUserAccessor _currentUser;
 
-        public DetailsModel(AppDbContext context, RecipeCalculationService recipeCalculationService)
+        public DetailsModel(
+            AppDbContext context,
+            RecipeCalculationService recipeCalculationService,
+            CurrentUserAccessor currentUser)
         {
             _context = context;
             _recipeCalculationService = recipeCalculationService;
+            _currentUser = currentUser;
         }
 
         public Recipe Recipe { get; set; } = new();
@@ -42,7 +48,7 @@ namespace MealBuilder.Web.Pages.Recipes
                 .ThenInclude(recipeComponent => recipeComponent.ComponentRecipe)
                 .ThenInclude(componentRecipe => componentRecipe.RecipeIngredients)
                 .ThenInclude(recipeIngredient => recipeIngredient.Ingredient)
-                .FirstOrDefaultAsync(recipe => recipe.Id == id);
+                .FirstOrDefaultAsync(recipe => recipe.Id == id && recipe.OwnerId == _currentUser.UserId);
 
             if (recipe is null)
             {
