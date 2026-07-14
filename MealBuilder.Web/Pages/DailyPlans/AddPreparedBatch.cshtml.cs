@@ -1,9 +1,11 @@
 using MealBuilder.Web.Data;
+using MealBuilder.Web.Identity;
 using MealBuilder.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MealBuilder.Web.Pages.DailyPlans
 {
@@ -11,9 +13,12 @@ namespace MealBuilder.Web.Pages.DailyPlans
     {
         private readonly AppDbContext _context;
 
-        public AddPreparedBatchModel(AppDbContext context)
+        private readonly CurrentUserAccessor _currentUser;
+
+        public AddPreparedBatchModel(AppDbContext context, CurrentUserAccessor currentUser)
         {
             _context = context;
+            _currentUser = currentUser;
         }
 
         public DailyPlan DailyPlan { get; set; } = new();
@@ -32,7 +37,10 @@ namespace MealBuilder.Web.Pages.DailyPlans
 
             if (id.HasValue)
             {
-                dailyPlan = await _context.DailyPlans.FindAsync(id.Value);
+                dailyPlan = await _context.DailyPlans
+                    .FirstOrDefaultAsync(dailyPlan =>
+                        dailyPlan.Id == id.Value &&
+                        dailyPlan.OwnerId == _currentUser.UserId);
 
                 if (dailyPlan is null)
                 {
@@ -47,12 +55,15 @@ namespace MealBuilder.Web.Pages.DailyPlans
                 }
 
                 dailyPlan = await _context.DailyPlans
-                    .FirstOrDefaultAsync(dailyPlan => dailyPlan.Date == date.Value);
+                    .FirstOrDefaultAsync(dailyPlan =>
+                        dailyPlan.Date == date.Value &&
+                        dailyPlan.OwnerId == _currentUser.UserId);
 
                 if (dailyPlan is null)
                 {
                     dailyPlan = new DailyPlan
                     {
+                        OwnerId = _currentUser.UserId,
                         Date = date.Value,
                         Name = $"Daily Plan {date.Value}"
                     };
@@ -111,8 +122,9 @@ namespace MealBuilder.Web.Pages.DailyPlans
                         .Include(preparedRecipeBatch =>
                             preparedRecipeBatch.DailyPlanItems)
                         .FirstOrDefaultAsync(preparedRecipeBatch =>
-                            preparedRecipeBatch.Id ==
-                            DailyPlanItem.PreparedRecipeBatchId);
+                            preparedRecipeBatch.Id == DailyPlanItem.PreparedRecipeBatchId &&
+                            preparedRecipeBatch.Recipe != null &&
+                            preparedRecipeBatch.Recipe.OwnerId == _currentUser.UserId);
 
                 if (preparedRecipeBatch is null)
                 {
@@ -146,7 +158,9 @@ namespace MealBuilder.Web.Pages.DailyPlans
             if (DailyPlanItem.DailyPlanId > 0)
             {
                 dailyPlan = await _context.DailyPlans
-                    .FindAsync(DailyPlanItem.DailyPlanId);
+                    .FirstOrDefaultAsync(dailyPlan =>
+                        dailyPlan.Id == DailyPlanItem.DailyPlanId &&
+                        dailyPlan.OwnerId == _currentUser.UserId);
 
                 if (dailyPlan is null)
                 {
@@ -157,7 +171,8 @@ namespace MealBuilder.Web.Pages.DailyPlans
             {
                 dailyPlan = await _context.DailyPlans
                     .FirstOrDefaultAsync(dailyPlan =>
-                        dailyPlan.Date == DailyPlanDate.Value);
+                        dailyPlan.Date == DailyPlanDate.Value &&
+                        dailyPlan.OwnerId == _currentUser.UserId);
             }
 
             if (!ModelState.IsValid)
@@ -171,6 +186,7 @@ namespace MealBuilder.Web.Pages.DailyPlans
 
                     dailyPlan = new DailyPlan
                     {
+                        OwnerId = _currentUser.UserId,
                         Date = DailyPlanDate.Value,
                         Name = $"Daily Plan {DailyPlanDate.Value}"
                     };
@@ -186,6 +202,7 @@ namespace MealBuilder.Web.Pages.DailyPlans
             {
                 dailyPlan = new DailyPlan
                 {
+                    OwnerId = _currentUser.UserId,
                     Date = DailyPlanDate!.Value,
                     Name = $"Daily Plan {DailyPlanDate.Value}"
                 };
@@ -204,6 +221,9 @@ namespace MealBuilder.Web.Pages.DailyPlans
         private async Task LoadPreparedRecipeBatchesAsync()
         {
             List<PreparedRecipeBatch> preparedRecipeBatches = await _context.PreparedRecipeBatches
+                .Where(preparedRecipeBatch =>
+                    preparedRecipeBatch.Recipe != null &&
+                    preparedRecipeBatch.Recipe.OwnerId == _currentUser.UserId)
                 .Include(preparedRecipeBatch => preparedRecipeBatch.DailyPlanItems)
                 .OrderBy(preparedRecipeBatch => preparedRecipeBatch.RecipeNameSnapshot)
                 .ThenByDescending(preparedRecipeBatch => preparedRecipeBatch.CookedDate)

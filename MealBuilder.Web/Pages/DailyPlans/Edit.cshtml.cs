@@ -1,4 +1,5 @@
 using MealBuilder.Web.Data;
+using MealBuilder.Web.Identity;
 using MealBuilder.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -9,10 +10,12 @@ namespace MealBuilder.Web.Pages.DailyPlans
     public class EditModel : PageModel
     {
         private readonly AppDbContext _context;
+        private readonly CurrentUserAccessor _currentUser;
 
-        public EditModel(AppDbContext context)
+        public EditModel(AppDbContext context, CurrentUserAccessor currentUser)
         {
             _context = context;
+            _currentUser = currentUser;
         }
 
         [BindProperty]
@@ -23,7 +26,9 @@ namespace MealBuilder.Web.Pages.DailyPlans
             if (id.HasValue)
             {
                 DailyPlan? dailyPlan = await _context.DailyPlans
-                    .FindAsync(id.Value);
+                    .FirstOrDefaultAsync(dailyPlan =>
+                        dailyPlan.Id == id.Value &&
+                        dailyPlan.OwnerId == _currentUser.UserId);
 
                 if (dailyPlan is null)
                 {
@@ -42,7 +47,8 @@ namespace MealBuilder.Web.Pages.DailyPlans
 
             DailyPlan? existingDailyPlan = await _context.DailyPlans
                 .FirstOrDefaultAsync(dailyPlan =>
-                    dailyPlan.Date == date.Value);
+                    dailyPlan.Date == date.Value &&
+                    dailyPlan.OwnerId == _currentUser.UserId);
 
             DailyPlan = existingDailyPlan ?? new DailyPlan
             {
@@ -58,7 +64,8 @@ namespace MealBuilder.Web.Pages.DailyPlans
             bool dailyPlanDateAlreadyExists = await _context.DailyPlans
                 .AnyAsync(dailyPlan =>
                     dailyPlan.Date == DailyPlan.Date &&
-                    dailyPlan.Id != DailyPlan.Id);
+                    dailyPlan.Id != DailyPlan.Id &&
+                    dailyPlan.OwnerId == _currentUser.UserId);
 
             if (dailyPlanDateAlreadyExists)
             {
@@ -77,7 +84,9 @@ namespace MealBuilder.Web.Pages.DailyPlans
             if (DailyPlan.Id > 0)
             {
                 DailyPlan? existingDailyPlan = await _context.DailyPlans
-                    .FindAsync(DailyPlan.Id);
+                    .FirstOrDefaultAsync(dailyPlan =>
+                        dailyPlan.Id == DailyPlan.Id &&
+                        dailyPlan.OwnerId == _currentUser.UserId);
 
                 if (existingDailyPlan is null)
                 {
@@ -92,6 +101,8 @@ namespace MealBuilder.Web.Pages.DailyPlans
             }
             else
             {
+                DailyPlan.OwnerId = _currentUser.UserId;
+
                 dailyPlan = DailyPlan;
                 _context.DailyPlans.Add(dailyPlan);
             }

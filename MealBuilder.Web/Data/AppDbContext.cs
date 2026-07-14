@@ -44,6 +44,12 @@ namespace MealBuilder.Web.Data
                 .HasForeignKey(recipe => recipe.OwnerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<DailyPlan>()
+                .HasOne(dailyPlan => dailyPlan.Owner)
+                .WithMany(user => user.DailyPlans)
+                .HasForeignKey(dailyPlan => dailyPlan.OwnerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<RecipeIngredient>()
                 .HasOne(recipeIngredient => recipeIngredient.Ingredient)
                 .WithMany(ingredient => ingredient.RecipeIngredients)
@@ -71,8 +77,12 @@ namespace MealBuilder.Web.Data
                 .IsUnique();
 
             modelBuilder.Entity<DailyPlan>()
-                .HasIndex(dailyPlan => dailyPlan.Date)
-                .IsUnique();
+                 .HasIndex(dailyPlan => new
+                 {
+                     dailyPlan.OwnerId,
+                     dailyPlan.Date
+                 })
+                 .IsUnique();
 
             modelBuilder.Entity<DailyPlanItem>()
                 .HasOne(dailyPlanItem => dailyPlanItem.DailyPlan)

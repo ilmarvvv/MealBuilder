@@ -1,4 +1,5 @@
 using MealBuilder.Web.Data;
+using MealBuilder.Web.Identity;
 using MealBuilder.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -10,9 +11,12 @@ namespace MealBuilder.Web.Pages.DailyPlans
     {
         private readonly AppDbContext _context;
 
-        public EditItemModel(AppDbContext context)
+        private readonly CurrentUserAccessor _currentUser;
+
+        public EditItemModel(AppDbContext context, CurrentUserAccessor currentUser)
         {
             _context = context;
+            _currentUser = currentUser;
         }
 
         [BindProperty]
@@ -27,7 +31,9 @@ namespace MealBuilder.Web.Pages.DailyPlans
                 .Include(dailyPlanItem => dailyPlanItem.Ingredient)
                 .Include(dailyPlanItem => dailyPlanItem.PreparedRecipeBatch)
                 .ThenInclude(preparedRecipeBatch => preparedRecipeBatch!.Recipe)
-                .FirstOrDefaultAsync(dailyPlanItem => dailyPlanItem.Id == id);
+                .FirstOrDefaultAsync(dailyPlanItem =>
+                    dailyPlanItem.Id == id &&
+                    dailyPlanItem.DailyPlan.OwnerId == _currentUser.UserId);
 
             if (dailyPlanItem is null)
             {
@@ -42,66 +48,80 @@ namespace MealBuilder.Web.Pages.DailyPlans
 
         public async Task<IActionResult> OnPostAsync()
         {
-            ModelState.Remove("DailyPlanItem.DailyPlan");
-            ModelState.Remove("DailyPlanItem.Recipe");
-            ModelState.Remove("DailyPlanItem.Ingredient");
-            ModelState.Remove("DailyPlanItem.PreparedRecipeBatch");
+            int dailyPlanItemId = DailyPlanItem.Id;
+            decimal? submittedServingsCount = DailyPlanItem.ServingsCount;
+            decimal? submittedGrams = DailyPlanItem.Grams;
+
+            DailyPlanItem? existingDailyPlanItem = await _context.DailyPlanItems
+                .Include(dailyPlanItem => dailyPlanItem.Recipe)
+                .Include(dailyPlanItem => dailyPlanItem.Ingredient)
+                .Include(dailyPlanItem => dailyPlanItem.PreparedRecipeBatch)
+                .ThenInclude(preparedRecipeBatch => preparedRecipeBatch!.Recipe)
+                .FirstOrDefaultAsync(dailyPlanItem =>
+                    dailyPlanItem.Id == dailyPlanItemId &&
+                    dailyPlanItem.DailyPlan.OwnerId == _currentUser.UserId);
+
+            if (existingDailyPlanItem is null)
+            {
+                return NotFound();
+            }
+
+            DailyPlanItem = existingDailyPlanItem;
+            ModelState.Clear();
 
             if (DailyPlanItem.ItemType == DailyPlanItemType.Recipe)
             {
-                DailyPlanItem.IngredientId = null;
-                DailyPlanItem.Grams = null;
+                DailyPlanItem.ServingsCount = submittedServingsCount;
 
-                if (DailyPlanItem.ServingsCount is null || DailyPlanItem.ServingsCount <= 0)
+                if (submittedServingsCount is null || submittedServingsCount <= 0)
                 {
-                    ModelState.AddModelError("DailyPlanItem.ServingsCount", "Servings count must be greater than 0.");
+                    ModelState.AddModelError(
+                        "DailyPlanItem.ServingsCount",
+                        "Servings count must be greater than 0.");
                 }
             }
             else if (DailyPlanItem.ItemType == DailyPlanItemType.PreparedRecipeBatch)
             {
-                DailyPlanItem.RecipeId = null;
-                DailyPlanItem.IngredientId = null;
-                DailyPlanItem.Grams = null;
+                DailyPlanItem.ServingsCount = submittedServingsCount;
 
-                if (DailyPlanItem.ServingsCount is null || DailyPlanItem.ServingsCount <= 0)
+                if (submittedServingsCount is null || submittedServingsCount <= 0)
                 {
-                    ModelState.AddModelError("DailyPlanItem.ServingsCount", "Servings count must be greater than 0.");
+                    ModelState.AddModelError(
+                        "DailyPlanItem.ServingsCount",
+                        "Servings count must be greater than 0.");
                 }
-
-                await ValidatePreparedBatchServingsAsync();
+                else
+                {
+                    await ValidatePreparedBatchServingsAsync();
+                }
             }
             else if (DailyPlanItem.ItemType == DailyPlanItemType.Ingredient)
             {
-                DailyPlanItem.RecipeId = null;
-                DailyPlanItem.ServingsCount = null;
+                DailyPlanItem.Grams = submittedGrams;
 
-                if (DailyPlanItem.Grams is null || DailyPlanItem.Grams <= 0)
+                if (submittedGrams is null || submittedGrams <= 0)
                 {
-                    ModelState.AddModelError("DailyPlanItem.Grams", "Grams must be greater than 0.");
+                    ModelState.AddModelError(
+                        "DailyPlanItem.Grams",
+                        "Grams must be greater than 0.");
                 }
+            }
+            else
+            {
+                return BadRequest();
             }
 
             if (!ModelState.IsValid)
             {
-                DailyPlanItem? existingDailyPlanItem = await _context.DailyPlanItems
-                    .Include(dailyPlanItem => dailyPlanItem.Recipe)
-                    .Include(dailyPlanItem => dailyPlanItem.Ingredient)
-                    .Include(dailyPlanItem => dailyPlanItem.PreparedRecipeBatch)
-                    .ThenInclude(preparedRecipeBatch => preparedRecipeBatch!.Recipe)
-                    .FirstOrDefaultAsync(dailyPlanItem => dailyPlanItem.Id == DailyPlanItem.Id);
-
-                if (existingDailyPlanItem is not null)
-                {
-                    ItemName = GetItemName(existingDailyPlanItem);
-                }
-
+                ItemName = GetItemName(DailyPlanItem);
                 return Page();
             }
 
-            _context.DailyPlanItems.Update(DailyPlanItem);
             await _context.SaveChangesAsync();
 
-            return RedirectToPage("./Details", new { id = DailyPlanItem.DailyPlanId });
+            return RedirectToPage(
+                "./Details",
+                new { id = DailyPlanItem.DailyPlanId });
         }
 
         private async Task ValidatePreparedBatchServingsAsync()
@@ -113,7 +133,10 @@ namespace MealBuilder.Web.Pages.DailyPlans
 
             PreparedRecipeBatch? preparedRecipeBatch = await _context.PreparedRecipeBatches
                 .Include(preparedRecipeBatch => preparedRecipeBatch.DailyPlanItems)
-                .FirstOrDefaultAsync(preparedRecipeBatch => preparedRecipeBatch.Id == DailyPlanItem.PreparedRecipeBatchId);
+                .FirstOrDefaultAsync(preparedRecipeBatch =>
+                    preparedRecipeBatch.Id == DailyPlanItem.PreparedRecipeBatchId &&
+                    preparedRecipeBatch.Recipe != null &&
+                    preparedRecipeBatch.Recipe.OwnerId == _currentUser.UserId);
 
             if (preparedRecipeBatch is null)
             {

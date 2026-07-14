@@ -8,5 +8,7 @@ namespace MealBuilder.Web.Identity
         public List<Ingredient> Ingredients { get; set; } = [];
 
         public List<Recipe> Recipes { get; set; } = [];
+
+        public List<DailyPlan> DailyPlans { get; set; } = [];
     }
 }

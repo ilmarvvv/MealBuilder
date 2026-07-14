@@ -1,4 +1,5 @@
 using MealBuilder.Web.Data;
+using MealBuilder.Web.Identity;
 using MealBuilder.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -9,10 +10,12 @@ namespace MealBuilder.Web.Pages.DailyPlans
     public class CreateModel : PageModel
     {
         private readonly AppDbContext _context;
+        private readonly CurrentUserAccessor _currentUser;
 
-        public CreateModel(AppDbContext context)
+        public CreateModel(AppDbContext context, CurrentUserAccessor currentUser)
         {
             _context = context;
+            _currentUser = currentUser;
         }
 
         [BindProperty]
@@ -26,7 +29,10 @@ namespace MealBuilder.Web.Pages.DailyPlans
         public async Task<IActionResult> OnPostAsync()
         {
             bool dailyPlanDateAlreadyExists = await _context.DailyPlans
-                .AnyAsync(dailyPlan => dailyPlan.Date == DailyPlan.Date);
+                .AnyAsync(dailyPlan =>
+                    dailyPlan.OwnerId == _currentUser.UserId &&
+                    dailyPlan.Date == DailyPlan.Date);
+
 
             if (dailyPlanDateAlreadyExists)
             {
@@ -37,6 +43,8 @@ namespace MealBuilder.Web.Pages.DailyPlans
             {
                 return Page();
             }
+
+            DailyPlan.OwnerId = _currentUser.UserId;
 
             _context.DailyPlans.Add(DailyPlan);
             await _context.SaveChangesAsync();

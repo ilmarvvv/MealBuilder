@@ -35,7 +35,10 @@ namespace MealBuilder.Web.Pages.DailyPlans
 
             if (id.HasValue)
             {
-                dailyPlan = await _context.DailyPlans.FindAsync(id.Value);
+                dailyPlan = await _context.DailyPlans
+                    .FirstOrDefaultAsync(dailyPlan =>
+                        dailyPlan.Id == id.Value &&
+                        dailyPlan.OwnerId == _currentUser.UserId);
 
                 if (dailyPlan is null)
                 {
@@ -50,7 +53,9 @@ namespace MealBuilder.Web.Pages.DailyPlans
                 }
 
                 dailyPlan = await _context.DailyPlans
-                    .FirstOrDefaultAsync(dailyPlan => dailyPlan.Date == date.Value);
+                    .FirstOrDefaultAsync(dailyPlan =>
+                        dailyPlan.Date == date.Value &&
+                        dailyPlan.OwnerId == _currentUser.UserId);
 
                 if (dailyPlan is null)
                 {
@@ -124,7 +129,9 @@ namespace MealBuilder.Web.Pages.DailyPlans
             if (DailyPlanItem.DailyPlanId > 0)
             {
                 dailyPlan = await _context.DailyPlans
-                    .FindAsync(DailyPlanItem.DailyPlanId);
+                    .FirstOrDefaultAsync(dailyPlan =>
+                        dailyPlan.Id == DailyPlanItem.DailyPlanId &&
+                        dailyPlan.OwnerId == _currentUser.UserId);
 
                 if (dailyPlan is null)
                 {
@@ -135,7 +142,8 @@ namespace MealBuilder.Web.Pages.DailyPlans
             {
                 dailyPlan = await _context.DailyPlans
                     .FirstOrDefaultAsync(dailyPlan =>
-                        dailyPlan.Date == DailyPlanDate.Value);
+                        dailyPlan.Date == DailyPlanDate.Value &&
+                        dailyPlan.OwnerId == _currentUser.UserId);
             }
 
             if (!ModelState.IsValid)
@@ -149,7 +157,8 @@ namespace MealBuilder.Web.Pages.DailyPlans
 
                     dailyPlan = new DailyPlan
                     {
-                        Date = DailyPlanDate.Value,
+                        OwnerId = _currentUser.UserId,
+                        Date = DailyPlanDate!.Value,
                         Name = $"Daily Plan {DailyPlanDate.Value}"
                     };
                 }
@@ -164,6 +173,7 @@ namespace MealBuilder.Web.Pages.DailyPlans
             {
                 dailyPlan = new DailyPlan
                 {
+                    OwnerId = _currentUser.UserId,
                     Date = DailyPlanDate!.Value,
                     Name = $"Daily Plan {DailyPlanDate.Value}"
                 };

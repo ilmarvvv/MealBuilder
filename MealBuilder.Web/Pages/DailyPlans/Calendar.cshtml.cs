@@ -1,4 +1,5 @@
 using MealBuilder.Web.Data;
+using MealBuilder.Web.Identity;
 using MealBuilder.Web.Models;
 using MealBuilder.Web.Services;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -11,13 +12,16 @@ namespace MealBuilder.Web.Pages.DailyPlans
     {
         private readonly AppDbContext _context;
         private readonly DailyPlanCalculationService _dailyPlanCalculationService;
+        private readonly CurrentUserAccessor _currentUser;
 
         public CalendarModel(
             AppDbContext context,
-            DailyPlanCalculationService dailyPlanCalculationService)
+            DailyPlanCalculationService dailyPlanCalculationService,
+            CurrentUserAccessor currentUser)
         {
             _context = context;
             _dailyPlanCalculationService = dailyPlanCalculationService;
+            _currentUser = currentUser;
         }
 
         public List<DailyPlanCalendarDay> Days { get; set; } = [];
@@ -70,7 +74,10 @@ namespace MealBuilder.Web.Pages.DailyPlans
                 .ThenInclude(recipeComponent => recipeComponent.ComponentRecipe)
                 .ThenInclude(componentRecipe => componentRecipe.RecipeIngredients)
                 .ThenInclude(recipeIngredient => recipeIngredient.Ingredient)
-                .Where(dailyPlan => dailyPlan.Date >= weekStart && dailyPlan.Date <= weekEnd)
+                .Where(dailyPlan =>
+                    dailyPlan.OwnerId == _currentUser.UserId &&
+                    dailyPlan.Date >= weekStart &&
+                    dailyPlan.Date <= weekEnd)
                 .OrderBy(dailyPlan => dailyPlan.Date)
                 .ToListAsync();
 

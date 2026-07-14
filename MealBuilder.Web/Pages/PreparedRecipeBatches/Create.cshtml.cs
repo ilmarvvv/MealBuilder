@@ -143,12 +143,15 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
                 DateOnly dailyPlanDate = PreparedRecipeBatch.CookedDate.AddDays(dayOffset);
 
                 DailyPlan? dailyPlan = await _context.DailyPlans
-                    .FirstOrDefaultAsync(dailyPlan => dailyPlan.Date == dailyPlanDate);
+                    .FirstOrDefaultAsync(dailyPlan =>
+                        dailyPlan.Date == dailyPlanDate &&
+                        dailyPlan.OwnerId == _currentUser.UserId);
 
                 if (dailyPlan is null)
                 {
                     dailyPlan = new DailyPlan
                     {
+                        OwnerId = _currentUser.UserId,
                         Name = $"Daily Plan {dailyPlanDate}",
                         Date = dailyPlanDate
                     };

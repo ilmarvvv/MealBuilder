@@ -1,4 +1,5 @@
 using MealBuilder.Web.Data;
+using MealBuilder.Web.Identity;
 using MealBuilder.Web.Models;
 using MealBuilder.Web.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -13,12 +14,16 @@ namespace MealBuilder.Web.Pages.DailyPlans
 
         private readonly DailyPlanCalculationService _dailyPlanCalculationService;
 
+        private readonly CurrentUserAccessor _currentUser;
+
         public DetailsModel(
             AppDbContext context,
-            DailyPlanCalculationService dailyPlanCalculationService)
+            DailyPlanCalculationService dailyPlanCalculationService,
+            CurrentUserAccessor currentUser)
         {
             _context = context;
             _dailyPlanCalculationService = dailyPlanCalculationService;
+            _currentUser = currentUser;
         }
 
         public DailyPlan DailyPlan { get; set; } = new();
@@ -30,6 +35,7 @@ namespace MealBuilder.Web.Pages.DailyPlans
         public async Task<IActionResult> OnGetAsync(int? id, DateOnly? date)
         {
             IQueryable<DailyPlan> query = _context.DailyPlans
+                .Where(dailyPlan => dailyPlan.OwnerId == _currentUser.UserId)
                 .Include(dailyPlan => dailyPlan.DailyPlanItems)
                 .ThenInclude(dailyPlanItem => dailyPlanItem.Ingredient)
                 .Include(dailyPlan => dailyPlan.DailyPlanItems)
@@ -92,7 +98,9 @@ namespace MealBuilder.Web.Pages.DailyPlans
         public async Task<IActionResult> OnPostRemoveItemAsync(int dailyPlanItemId)
         {
             DailyPlanItem? dailyPlanItem = await _context.DailyPlanItems
-                .FindAsync(dailyPlanItemId);
+                .FirstOrDefaultAsync(dailyPlanItem =>
+                    dailyPlanItem.Id == dailyPlanItemId &&
+                    dailyPlanItem.DailyPlan.OwnerId == _currentUser.UserId);
 
             if (dailyPlanItem is null)
             {

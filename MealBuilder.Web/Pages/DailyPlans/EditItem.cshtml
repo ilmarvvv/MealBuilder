@@ -11,11 +11,6 @@
 
 <form method="post">
     <input type="hidden" asp-for="DailyPlanItem.Id" />
-    <input type="hidden" asp-for="DailyPlanItem.DailyPlanId" />
-    <input type="hidden" asp-for="DailyPlanItem.ItemType" />
-    <input type="hidden" asp-for="DailyPlanItem.RecipeId" />
-    <input type="hidden" asp-for="DailyPlanItem.IngredientId" />
-    <input type="hidden" asp-for="DailyPlanItem.PreparedRecipeBatchId" />
 
     @if (Model.DailyPlanItem.ItemType == MealBuilder.Web.Models.DailyPlanItemType.PreparedRecipeBatch)
     {
