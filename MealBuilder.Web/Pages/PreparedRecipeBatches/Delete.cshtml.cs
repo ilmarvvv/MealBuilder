@@ -1,4 +1,5 @@
 using MealBuilder.Web.Data;
+using MealBuilder.Web.Identity;
 using MealBuilder.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -10,9 +11,12 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
     {
         private readonly AppDbContext _context;
 
-        public DeleteModel(AppDbContext context)
+        private readonly CurrentUserAccessor _currentUser;
+
+        public DeleteModel(AppDbContext context, CurrentUserAccessor currentUser)
         {
             _context = context;
+            _currentUser = currentUser;
         }
 
         public PreparedRecipeBatchSummary PreparedRecipeBatchSummary { get; set; } = new();
@@ -24,7 +28,9 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
             PreparedRecipeBatch? preparedRecipeBatch = await _context.PreparedRecipeBatches
                 .Include(preparedRecipeBatch => preparedRecipeBatch.Recipe)
                 .Include(preparedRecipeBatch => preparedRecipeBatch.DailyPlanItems)
-                .FirstOrDefaultAsync(preparedRecipeBatch => preparedRecipeBatch.Id == id);
+                .FirstOrDefaultAsync(preparedRecipeBatch =>
+                    preparedRecipeBatch.Id == id &&
+                    preparedRecipeBatch.OwnerId == _currentUser.UserId);
 
             if (preparedRecipeBatch is null)
             {
@@ -40,7 +46,9 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
         {
             PreparedRecipeBatch? preparedRecipeBatch = await _context.PreparedRecipeBatches
                 .Include(preparedRecipeBatch => preparedRecipeBatch.DailyPlanItems)
-                .FirstOrDefaultAsync(preparedRecipeBatch => preparedRecipeBatch.Id == id);
+                .FirstOrDefaultAsync(preparedRecipeBatch =>
+                    preparedRecipeBatch.Id == id &&
+                    preparedRecipeBatch.OwnerId == _currentUser.UserId);
 
             if (preparedRecipeBatch is null)
             {

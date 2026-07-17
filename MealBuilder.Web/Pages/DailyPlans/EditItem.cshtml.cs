@@ -135,8 +135,7 @@ namespace MealBuilder.Web.Pages.DailyPlans
                 .Include(preparedRecipeBatch => preparedRecipeBatch.DailyPlanItems)
                 .FirstOrDefaultAsync(preparedRecipeBatch =>
                     preparedRecipeBatch.Id == DailyPlanItem.PreparedRecipeBatchId &&
-                    preparedRecipeBatch.Recipe != null &&
-                    preparedRecipeBatch.Recipe.OwnerId == _currentUser.UserId);
+                    preparedRecipeBatch.OwnerId == _currentUser.UserId);
 
             if (preparedRecipeBatch is null)
             {

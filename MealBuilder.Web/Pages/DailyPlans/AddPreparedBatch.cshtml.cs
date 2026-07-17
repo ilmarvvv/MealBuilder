@@ -123,8 +123,7 @@ namespace MealBuilder.Web.Pages.DailyPlans
                             preparedRecipeBatch.DailyPlanItems)
                         .FirstOrDefaultAsync(preparedRecipeBatch =>
                             preparedRecipeBatch.Id == DailyPlanItem.PreparedRecipeBatchId &&
-                            preparedRecipeBatch.Recipe != null &&
-                            preparedRecipeBatch.Recipe.OwnerId == _currentUser.UserId);
+                            preparedRecipeBatch.OwnerId == _currentUser.UserId);
 
                 if (preparedRecipeBatch is null)
                 {
@@ -222,8 +221,7 @@ namespace MealBuilder.Web.Pages.DailyPlans
         {
             List<PreparedRecipeBatch> preparedRecipeBatches = await _context.PreparedRecipeBatches
                 .Where(preparedRecipeBatch =>
-                    preparedRecipeBatch.Recipe != null &&
-                    preparedRecipeBatch.Recipe.OwnerId == _currentUser.UserId)
+                    preparedRecipeBatch.OwnerId == _currentUser.UserId)
                 .Include(preparedRecipeBatch => preparedRecipeBatch.DailyPlanItems)
                 .OrderBy(preparedRecipeBatch => preparedRecipeBatch.RecipeNameSnapshot)
                 .ThenByDescending(preparedRecipeBatch => preparedRecipeBatch.CookedDate)

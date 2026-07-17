@@ -41,7 +41,9 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
         public async Task<IActionResult> OnGetAsync(int id)
         {
             PreparedRecipeBatch? preparedRecipeBatch = await _context.PreparedRecipeBatches
-                .FirstOrDefaultAsync(batch => batch.Id == id);
+                .FirstOrDefaultAsync(batch =>
+                    batch.Id == id &&
+                    batch.OwnerId == _currentUser.UserId);
 
             if (preparedRecipeBatch is null)
             {
@@ -65,7 +67,9 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
 
             PreparedRecipeBatch? preparedRecipeBatch = await _context.PreparedRecipeBatches
                 .Include(batch => batch.Items)
-                .FirstOrDefaultAsync(batch => batch.Id == PreparedRecipeBatchId);
+                .FirstOrDefaultAsync(batch =>
+                    batch.Id == PreparedRecipeBatchId &&
+                    batch.OwnerId == _currentUser.UserId);
 
             if (preparedRecipeBatch is null)
             {

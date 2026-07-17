@@ -50,6 +50,12 @@ namespace MealBuilder.Web.Data
                 .HasForeignKey(dailyPlan => dailyPlan.OwnerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<PreparedRecipeBatch>()
+                .HasOne(preparedRecipeBatch => preparedRecipeBatch.Owner)
+                .WithMany(user => user.PreparedRecipeBatches)
+                .HasForeignKey(preparedRecipeBatch => preparedRecipeBatch.OwnerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<RecipeIngredient>()
                 .HasOne(recipeIngredient => recipeIngredient.Ingredient)
                 .WithMany(ingredient => ingredient.RecipeIngredients)

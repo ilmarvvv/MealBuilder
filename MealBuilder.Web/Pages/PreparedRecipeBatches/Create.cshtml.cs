@@ -93,6 +93,8 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
                 return Page();
             }
 
+            PreparedRecipeBatch.OwnerId = _currentUser.UserId;
+
             PreparedRecipeBatch.RecipeNameSnapshot = recipe.Name;
 
             PreparedRecipeBatch.Items = recipe.RecipeIngredients

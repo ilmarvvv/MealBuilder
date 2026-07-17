@@ -1,4 +1,5 @@
 using MealBuilder.Web.Data;
+using MealBuilder.Web.Identity;
 using MealBuilder.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -10,9 +11,12 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
     {
         private readonly AppDbContext _context;
 
-        public DetailsModel(AppDbContext context)
+        private readonly CurrentUserAccessor _currentUser;
+
+        public DetailsModel(AppDbContext context, CurrentUserAccessor currentUser)
         {
             _context = context;
+            _currentUser = currentUser;
         }
 
         public PreparedRecipeBatchSummary PreparedRecipeBatchSummary { get; set; } = new();
@@ -27,7 +31,9 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
                 .Include(preparedRecipeBatch => preparedRecipeBatch.Recipe)
                 .Include(preparedRecipeBatch => preparedRecipeBatch.DailyPlanItems)
                 .Include(preparedRecipeBatch => preparedRecipeBatch.Items)
-                .FirstOrDefaultAsync(preparedRecipeBatch => preparedRecipeBatch.Id == id);
+                .FirstOrDefaultAsync(preparedRecipeBatch =>
+                    preparedRecipeBatch.Id == id &&
+                    preparedRecipeBatch.OwnerId == _currentUser.UserId);
 
             if (preparedRecipeBatch is null)
             {

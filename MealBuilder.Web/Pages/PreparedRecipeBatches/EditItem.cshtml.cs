@@ -1,4 +1,5 @@
 using MealBuilder.Web.Data;
+using MealBuilder.Web.Identity;
 using MealBuilder.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -10,9 +11,12 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
     {
         private readonly AppDbContext _context;
 
-        public EditItemModel(AppDbContext context)
+        private readonly CurrentUserAccessor _currentUser;
+
+        public EditItemModel(AppDbContext context, CurrentUserAccessor currentUser)
         {
             _context = context;
+            _currentUser = currentUser;
         }
 
         public PreparedRecipeBatchItem PreparedRecipeBatchItem { get; set; } = new();
@@ -26,7 +30,10 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
         public async Task<IActionResult> OnGetAsync(int id)
         {
             PreparedRecipeBatchItem? item = await _context.PreparedRecipeBatchItems
-                .FirstOrDefaultAsync(item => item.Id == id);
+                .FirstOrDefaultAsync(item =>
+                    item.Id == id &&
+                    item.PreparedRecipeBatch != null &&
+                    item.PreparedRecipeBatch.OwnerId == _currentUser.UserId);
 
             if (item is null)
             {
@@ -43,7 +50,10 @@ namespace MealBuilder.Web.Pages.PreparedRecipeBatches
         public async Task<IActionResult> OnPostAsync()
         {
             PreparedRecipeBatchItem? existingItem = await _context.PreparedRecipeBatchItems
-                .FirstOrDefaultAsync(item => item.Id == PreparedRecipeBatchItemId);
+                .FirstOrDefaultAsync(item =>
+                    item.Id == PreparedRecipeBatchItemId &&
+                    item.PreparedRecipeBatch != null &&
+                    item.PreparedRecipeBatch.OwnerId == _currentUser.UserId);
 
             if (existingItem is null)
             {

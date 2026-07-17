@@ -10,5 +10,7 @@ namespace MealBuilder.Web.Identity
         public List<Recipe> Recipes { get; set; } = [];
 
         public List<DailyPlan> DailyPlans { get; set; } = [];
+
+        public List<PreparedRecipeBatch> PreparedRecipeBatches { get; set; } = [];
     }
 }
