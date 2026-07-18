@@ -843,9 +843,9 @@ Goal: review and adjust days, calendar behavior, and related workflow issues fou
   - Create the daily plan after the user successfully adds an ingredient or prepared batch, or saves other changes.
   - Adjust Edit and Delete actions for virtual daily plans that have not been saved yet.
 
-### Milestone 13: Users, Ownership, and Direct Publishing
+### Milestone 13: Authentication and Data Ownership
 
-Goal: make the application ready for multiple users with private data, a public catalog, direct publishing, and reactive administrator controls.
+Goal: make the Razor Pages application safe for multiple authenticated users with isolated private data.
 
 #### 13.1 Authentication Foundation
 
@@ -858,74 +858,170 @@ Goal: make the application ready for multiple users with private data, a public 
 
 #### 13.2 Data Ownership and Authorization
 
-- [ ] Add ownership to user-created ingredients and recipes
-- [ ] Make prepared batches and daily plans belong to their creator
-- [ ] Reset the local database before applying the final ownership schema
-- [ ] Allow users to view and edit their own private data
-- [ ] Prevent users from viewing or changing another user's private data
-- [ ] Enforce ownership rules on the server, not only in the UI
+- [x] Add ownership to user-created ingredients and recipes
+- [x] Make prepared batches and daily plans belong to their creator
+- [x] Reset the local database before applying the final ownership schema
+- [x] Allow users to view and edit their own private data
+- [x] Prevent users from viewing or changing another user's private data
+- [x] Enforce ownership rules on the server, not only in the UI
 
-#### 13.3 Direct Ingredient and Recipe Publishing
+#### 13.3 Verification and Documentation
 
-- [ ] Add automatic validation before publication
-  - Require a name.
-  - Require at least one ingredient or recipe component.
-  - Require valid quantities and servings.
-  - Require successful nutrition calculations.
-  - Require every dependency to be published and immutable or preserved as a publication snapshot.
-- [ ] Allow an owner to publish a valid private ingredient or recipe directly
-- [ ] Make published ingredients and recipes immutable
-- [ ] Create a private copy when an owner or administrator needs to modify published content
-- [ ] Replace the active public version after the corrected private copy is published
-- [ ] Archive the previous public version instead of changing it silently
-- [ ] Allow an owner to unpublish their own content only when it is not used by other published content
-- [ ] Prevent unpublishing a dependency that is still used by published recipes
-- [ ] Allow an administrator to inspect dependent public content and unpublish the affected chain when necessary
-- [ ] Allow guests and authenticated users to view published content
+- [x] Verify registration, login, logout, and protected page behavior
+- [x] Verify ownership isolation between at least two users
+- [x] Verify the clean database initialization workflow
+- [x] Confirm that the project builds without warnings or errors
+- [x] Update project documentation for the completed authentication and ownership scope
 
-#### 13.4 Save a Private Recipe Copy
+> [!NOTE]
+> The Razor Pages prototype is complete and remains as a working reference. Further development will continue in the REST API and React application.
 
-- [ ] Allow a user to save a private copy of a published recipe
-- [ ] Copy recipe core fields, ingredient rows, component rows, quantities, and positions
-- [ ] Assign the copied recipe to the current user
-- [ ] Keep references to immutable published ingredients and recipe components shared by default
-- [ ] Create a private ingredient or recipe component copy only when the user wants to modify it
-- [ ] Replace only the selected recipe ingredient or component reference with the new private copy
-- [ ] Copy snapshot-only special dependencies into private records when required
-- [ ] Ensure later edits to the private copy do not change the published recipe
+### Milestone 14: API and React Foundation
 
-#### 13.5 Reactive Administrator Controls
+Goal: create the isolated foundation for the new REST API and React application without changing the completed Razor Pages prototype.
 
-- [ ] Allow an administrator to view public content management information
-- [ ] Allow an administrator to unpublish problematic ingredients or recipes
-- [ ] Restrict administrative actions to the `Admin` role
-- [ ] Keep reporting, automatic abuse detection, and advanced moderation for future improvements
+Architecture decisions:
+- Keep all projects in the existing `MealBuilder` solution and Git repository.
+- Keep `MealBuilder.Web` unchanged as a working reference with its own database.
+- Do not create project references between `MealBuilder.Web` and the new application projects.
+- Use a separate SQLite database at `data/mealbuilder.db` for the new application.
+- Build each feature completely through Domain, API, tests, and React before moving to the next feature.
 
-#### 13.6 Verification and Documentation
+Target repository structure:
 
-- [ ] Verify registration, login, logout, and protected page behavior
-- [ ] Verify ownership isolation between at least two users
-- [ ] Verify guest access to published content and denial of private content
-- [ ] Verify direct ingredient and recipe publishing
-- [ ] Verify saving and editing a private recipe copy
-- [ ] Verify administrator authorization and unpublish actions
-- [ ] Verify the clean database initialization workflow
-- [ ] Confirm that the project builds without warnings or errors
-- [ ] Update project documentation after the final rules are implemented
-### Milestone 14: Final Refinement
+```text
+MealBuilder/
+|-- MealBuilder.sln
+|-- MealBuilder.Domain/
+|-- MealBuilder.Infrastructure/
+|-- MealBuilder.Api/
+|-- MealBuilder.Api.Tests/
+|-- MealBuilder.Client/
+`-- data/
+    `-- mealbuilder.db
+```
 
-Goal: perform a final end-to-end review and refine the completed Razor Pages application before starting the API and frontend transition.
+Project responsibilities:
 
-This milestone will be planned after Milestone 13 based on the issues and improvement opportunities found in the completed multi-user application.
+- `MealBuilder.sln`
+  - Combines all .NET projects in one solution.
 
-### Milestone 15: API and Frontend Planning
+- `MealBuilder.Domain`
+  - Contains models and business rules.
 
-Goal: plan the transition from Razor Pages to an API-based application and choose the future frontend technology.
+- `MealBuilder.Infrastructure`
+  - Contains database access, Entity Framework Core, Identity, and migrations.
 
-- [ ] Design full recipe creation flow for the API/frontend version
-  - Allow creating a recipe with ingredients and recipe components in one flow.
-  - Avoid the temporary Razor Pages two-step flow where the basic recipe is created first and contents are added later.
-  - Decide how the frontend should manage unsaved recipe contents before the recipe is saved.
+- `MealBuilder.Api`
+  - Contains the REST API used by the frontend.
+
+- `MealBuilder.Api.Tests`
+  - Contains automated tests for the API.
+
+- `MealBuilder.Client`
+  - Contains the React, TypeScript, and Vite frontend.
+
+- `data/mealbuilder.db`
+  - Stores the local SQLite database and must not be committed to Git.
+
+#### 14.1 Backend Project Structure
+
+- [ ] Create the `MealBuilder.Domain` class library
+- [ ] Create the `MealBuilder.Infrastructure` class library
+- [ ] Create the `MealBuilder.Api` ASP.NET Core Web API project
+- [ ] Create the `MealBuilder.Api.Tests` test project
+- [ ] Configure the required project references
+- [ ] Keep `MealBuilder.Web` isolated from the new projects
+
+#### 14.2 API Foundation
+
+- [ ] Configure the new `AppDbContext`, Identity, and SQLite database
+- [ ] Configure authentication, authorization, JSON responses, and errors
+- [ ] Add OpenAPI for development and manual API testing
+- [ ] Protect private endpoints from unauthenticated users
+
+#### 14.3 React Foundation
+
+- [ ] Create the separate `MealBuilder.Client` React project in the same repository
+- [ ] Use React, TypeScript, and Vite
+- [ ] Configure routing and API access
+- [ ] Implement registration, login, logout, and authenticated navigation
+- [ ] Add consistent loading, validation, and error states
+
+#### 14.4 Foundation Verification
+
+- [ ] Confirm that the API and React client run independently
+- [ ] Confirm that authentication works through React
+- [ ] Confirm that `MealBuilder.Web` still works separately
+- [ ] Confirm that the solution builds without warnings or errors
+
+### Milestone 15: Ingredients Vertical Slice
+
+Goal: complete the Ingredient workflow through Domain, REST API, automated tests, and React.
+
+#### 15.1 Ingredient Domain and API
+
+- [ ] Review the Ingredient fields and business rules before migration
+- [ ] Add the Ingredient model and persistence to the new application
+- [ ] Add Ingredient API contracts and CRUD endpoints
+- [ ] Add validation, authentication, and ownership rules
+- [ ] Add Ingredient API tests
+
+#### 15.2 Ingredient React Frontend
+
+- [ ] Implement Ingredient list, details, create, edit, and delete workflows
+- [ ] Verify validation, ownership, and navigation through React
+- [ ] Confirm the complete Ingredient workflow works end to end
+
+### Milestone 16: Recipes Vertical Slice
+
+Goal: complete the Recipe workflow through Domain, REST API, automated tests, and React.
+
+#### 16.1 Recipe Domain and API
+
+- [ ] Review Recipe, RecipeIngredient, and RecipeComponent rules before migration
+- [ ] Add Recipe models and persistence to the new application
+- [ ] Add Recipe API contracts and endpoints
+- [ ] Add nutrition calculations, validation, and ownership rules
+- [ ] Add Recipe API tests
+
+#### 16.2 Recipe React Frontend
+
+- [ ] Implement the full single-flow Recipe form
+- [ ] Support ingredients, recipe components, ordering, and nutrition summaries
+- [ ] Implement Recipe list, details, edit, and delete workflows
+- [ ] Confirm the complete Recipe workflow works end to end
+
+### Milestone 17: Meal Planning Vertical Slice
+
+Goal: complete prepared batches, daily plans, and the calendar through Domain, REST API, automated tests, and React.
+
+#### 17.1 Meal Planning Domain and API
+
+- [ ] Review PreparedRecipeBatch and DailyPlan rules before migration
+- [ ] Add meal-planning models and persistence to the new application
+- [ ] Add PreparedRecipeBatch, DailyPlan, and Calendar API endpoints
+- [ ] Add nutrition calculations, validation, and ownership rules
+- [ ] Add Meal Planning API tests
+
+#### 17.2 Meal Planning React Frontend
+
+- [ ] Implement Prepared Recipe Batch workflows
+- [ ] Implement Daily Plan workflows
+- [ ] Implement the weekly calendar and nutrition summaries
+- [ ] Confirm the complete Meal Planning workflow works end to end
+
+### Milestone 18: Final Transition
+
+Goal: verify the new application and retire the completed Razor Pages prototype.
+
+- [ ] Verify all core workflows end to end
+- [ ] Verify authentication and ownership behavior
+- [ ] Verify responsive desktop and mobile layouts
+- [ ] Confirm that the frontend, API, and tests build successfully
+- [ ] Remove `MealBuilder.Web` from the solution
+- [ ] Make `MealBuilder.Api` the primary backend host
+- [ ] Update documentation and deployment configuration
 
 ## 7. Future Ideas
 
@@ -1085,6 +1181,39 @@ This section contains ideas that may be useful for the project in the future, bu
 - [ ] Show missing daily nutrition when prepared food runs out
 
 ### Advanced Sharing and Publishing
+
+- [ ] Design direct public Ingredient and Recipe publishing after the core REST API and React frontend are complete
+  - Start with `Private` and `Published` states.
+  - Allow owners to publish valid content directly without administrator approval.
+  - Make published content read-only.
+  - Allow guests and authenticated users to view published content.
+
+- [ ] Add automatic validation before publication
+  - Require a valid name and nutrition values.
+  - Require a published recipe to contain at least one ingredient or recipe component.
+  - Require valid quantities, servings, and nutrition calculations.
+  - Require every public recipe dependency to be published and immutable.
+
+- [ ] Add safe unpublishing rules
+  - Allow an owner to unpublish content only when it is not used by other published content.
+  - Prevent unpublishing a dependency that is still used by a published recipe.
+  - Decide whether unused content should return to `Private` or use a separate publication state.
+
+- [ ] Allow users to save private copies of published recipes
+  - Copy recipe core fields, ingredient rows, component rows, quantities, and positions.
+  - Assign the copied recipe to the current user.
+  - Ensure later edits to the private copy do not change the published recipe.
+  - Decide when referenced ingredients and recipe components should remain shared or receive private copies.
+
+- [ ] Add reactive administrator controls for public content
+  - Allow administrators to inspect public content and its dependencies.
+  - Allow administrators to unpublish problematic ingredients or recipes.
+  - Restrict administrative actions to the `Admin` role.
+
+- [ ] Decide whether publication versioning is needed
+  - Prefer the simpler `Private` and `Published` workflow first.
+  - Add archived versions and publication lineage only if immutable version history becomes necessary.
+  - Avoid duplicating complete records unless preserving an older public version is required.
 
 - [ ] Add AI-assisted publication formatting
   - Let AI prepare a recipe publication draft in the required public format.
