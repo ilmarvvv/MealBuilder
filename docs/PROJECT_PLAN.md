@@ -891,7 +891,7 @@ Target repository structure:
 
 ```text
 MealBuilder/
-|-- MealBuilder.sln
+|-- MealBuilder.slnx
 |-- MealBuilder.Domain/
 |-- MealBuilder.Infrastructure/
 |-- MealBuilder.Api/
@@ -903,7 +903,7 @@ MealBuilder/
 
 Project responsibilities:
 
-- `MealBuilder.sln`
+- `MealBuilder.slnx`
   - Combines all .NET projects in one solution.
 
 - `MealBuilder.Domain`
