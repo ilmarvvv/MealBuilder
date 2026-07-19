@@ -878,16 +878,19 @@ Goal: make the Razor Pages application safe for multiple authenticated users wit
 
 ### Milestone 14: API and React Foundation
 
-Goal: create the isolated foundation for the new REST API and React application without changing the completed Razor Pages prototype.
+### Goal
 
-Architecture decisions:
+Create the isolated foundation for the new REST API and React application without changing the completed Razor Pages prototype.
+
+### Architecture Decisions
+
 - Keep all projects in the existing `MealBuilder` solution and Git repository.
 - Keep `MealBuilder.Web` unchanged as a working reference with its own database.
 - Do not create project references between `MealBuilder.Web` and the new application projects.
 - Use a separate SQLite database at `data/mealbuilder.db` for the new application.
 - Build each feature completely through Domain, API, tests, and React before moving to the next feature.
 
-Target repository structure:
+### Target Structure
 
 ```text
 MealBuilder/
@@ -924,7 +927,9 @@ Project responsibilities:
 - `data/mealbuilder.db`
   - Stores the local SQLite database and must not be committed to Git.
 
-#### 14.1 Backend Project Structure
+### Required Sub-milestones
+
+#### Milestone 14.1: Backend Project Structure
 
 - [ ] Create the `MealBuilder.Domain` class library
 - [ ] Create the `MealBuilder.Infrastructure` class library
@@ -933,23 +938,37 @@ Project responsibilities:
 - [ ] Configure the required project references
 - [ ] Keep `MealBuilder.Web` isolated from the new projects
 
-#### 14.2 API Foundation
+#### Milestone 14.2: Database and Identity Foundation
 
-- [ ] Configure the new `AppDbContext`, Identity, and SQLite database
-- [ ] Configure authentication, authorization, JSON responses, and errors
+- [ ] Configure the new `AppDbContext` in `MealBuilder.Infrastructure`
+- [ ] Configure ASP.NET Core Identity for the new application
+- [ ] Configure the separate `data/mealbuilder.db` SQLite database
+- [ ] Create and apply the initial migration
+- [ ] Keep the prototype database unchanged
+
+#### Milestone 14.3: API Foundation
+
+- [ ] Configure API controllers, routing, and JSON responses
+- [ ] Choose and document the React-to-API authentication approach
+- [ ] Configure authentication and authorization
+- [ ] Configure CORS and CSRF protection when required by the chosen authentication approach
+- [ ] Resolve the current authenticated user in API requests
+- [ ] Add consistent validation and error responses
 - [ ] Add OpenAPI for development and manual API testing
 - [ ] Protect private endpoints from unauthenticated users
 
-#### 14.3 React Foundation
+#### Milestone 14.4: React Foundation
 
-- [ ] Create the separate `MealBuilder.Client` React project in the same repository
-- [ ] Use React, TypeScript, and Vite
-- [ ] Configure routing and API access
+- [ ] Create `MealBuilder.Client` with React, TypeScript, and Vite
+- [ ] Configure routing and environment settings
+- [ ] Configure the API client for the chosen authentication approach
 - [ ] Implement registration, login, logout, and authenticated navigation
 - [ ] Add consistent loading, validation, and error states
 
-#### 14.4 Foundation Verification
+#### Milestone 14.5: Foundation Verification
 
+- [ ] Configure the API integration test infrastructure
+- [ ] Add authentication and authorization integration tests
 - [ ] Confirm that the API and React client run independently
 - [ ] Confirm that authentication works through React
 - [ ] Confirm that `MealBuilder.Web` still works separately
@@ -957,36 +976,87 @@ Project responsibilities:
 
 ### Milestone 15: Ingredients Vertical Slice
 
-Goal: complete the Ingredient workflow through Domain, REST API, automated tests, and React.
+### Goal
 
-#### 15.1 Ingredient Domain and API
+Complete the Ingredient workflow through Domain, persistence, REST API, automated tests, and React.
+
+### Required Sub-milestones
+
+#### Milestone 15.1: Ingredient Domain
 
 - [ ] Review the Ingredient fields and business rules before migration
-- [ ] Add the Ingredient model and persistence to the new application
-- [ ] Add Ingredient API contracts and CRUD endpoints
-- [ ] Add validation, authentication, and ownership rules
-- [ ] Add Ingredient API tests
+- [ ] Add the Ingredient model to `MealBuilder.Domain`
+- [ ] Add Ingredient business validation rules
 
-#### 15.2 Ingredient React Frontend
+#### Milestone 15.2: Ingredient Persistence
 
+- [ ] Add Ingredient Entity Framework Core configuration
+- [ ] Add Ingredients to `AppDbContext`
+- [ ] Create and apply the Ingredient migration
+
+#### Milestone 15.3: Ingredient API
+
+- [ ] Add Ingredient request and response contracts
+- [ ] Add Ingredient list and details endpoints
+- [ ] Add Ingredient create, update, and delete endpoints
+- [ ] Return appropriate validation errors and HTTP status codes
+- [ ] Enforce authentication and ownership in every endpoint
+
+#### Milestone 15.4: Ingredient API Tests
+
+- [ ] Test successful Ingredient CRUD operations
+- [ ] Test Ingredient validation errors
+- [ ] Test unauthenticated access
+- [ ] Test ownership isolation between two users
+
+#### Milestone 15.5: Ingredient React Frontend
+
+- [ ] Add Ingredient frontend types and API functions
 - [ ] Implement Ingredient list, details, create, edit, and delete workflows
-- [ ] Verify validation, ownership, and navigation through React
+- [ ] Add loading, validation, empty, and error states
 - [ ] Confirm the complete Ingredient workflow works end to end
 
 ### Milestone 16: Recipes Vertical Slice
 
-Goal: complete the Recipe workflow through Domain, REST API, automated tests, and React.
+### Goal
 
-#### 16.1 Recipe Domain and API
+Complete the Recipe workflow through Domain, persistence, REST API, automated tests, and React.
+
+### Required Sub-milestones
+
+#### Milestone 16.1: Recipe Domain
 
 - [ ] Review Recipe, RecipeIngredient, and RecipeComponent rules before migration
-- [ ] Add Recipe models and persistence to the new application
-- [ ] Add Recipe API contracts and endpoints
-- [ ] Add nutrition calculations, validation, and ownership rules
-- [ ] Add Recipe API tests
+- [ ] Add Recipe, RecipeIngredient, and RecipeComponent models to `MealBuilder.Domain`
+- [ ] Add recipe content ordering and relationship rules
+- [ ] Add recipe nutrition calculations
+- [ ] Add Recipe business validation rules
 
-#### 16.2 Recipe React Frontend
+#### Milestone 16.2: Recipe Persistence
 
+- [ ] Add Recipe Entity Framework Core configurations
+- [ ] Add Recipe data to `AppDbContext`
+- [ ] Create and apply the Recipe migration
+
+#### Milestone 16.3: Recipe API
+
+- [ ] Add Recipe request, response, and nutrition contracts
+- [ ] Add Recipe CRUD endpoints
+- [ ] Add RecipeIngredient operations
+- [ ] Add RecipeComponent operations
+- [ ] Support creating and updating a complete recipe in one request
+- [ ] Enforce validation, dependency, and ownership rules
+
+#### Milestone 16.4: Recipe API Tests
+
+- [ ] Test Recipe CRUD and complete recipe requests
+- [ ] Test ingredient and recipe component operations
+- [ ] Test ordering and nutrition calculations
+- [ ] Test validation and ownership isolation
+
+#### Milestone 16.5: Recipe React Frontend
+
+- [ ] Add Recipe frontend types and API functions
 - [ ] Implement the full single-flow Recipe form
 - [ ] Support ingredients, recipe components, ordering, and nutrition summaries
 - [ ] Implement Recipe list, details, edit, and delete workflows
@@ -994,18 +1064,43 @@ Goal: complete the Recipe workflow through Domain, REST API, automated tests, an
 
 ### Milestone 17: Meal Planning Vertical Slice
 
-Goal: complete prepared batches, daily plans, and the calendar through Domain, REST API, automated tests, and React.
+### Goal
 
-#### 17.1 Meal Planning Domain and API
+Complete prepared batches, daily plans, and the calendar through Domain, persistence, REST API, automated tests, and React.
+
+### Required Sub-milestones
+
+#### Milestone 17.1: Meal Planning Domain
 
 - [ ] Review PreparedRecipeBatch and DailyPlan rules before migration
-- [ ] Add meal-planning models and persistence to the new application
-- [ ] Add PreparedRecipeBatch, DailyPlan, and Calendar API endpoints
-- [ ] Add nutrition calculations, validation, and ownership rules
-- [ ] Add Meal Planning API tests
+- [ ] Add PreparedRecipeBatch and snapshot models to `MealBuilder.Domain`
+- [ ] Add DailyPlan and DailyPlanItem models to `MealBuilder.Domain`
+- [ ] Add allocation, nutrition, and date rules
 
-#### 17.2 Meal Planning React Frontend
+#### Milestone 17.2: Meal Planning Persistence
 
+- [ ] Add Meal Planning Entity Framework Core configurations
+- [ ] Add Meal Planning data to `AppDbContext`
+- [ ] Create and apply the Meal Planning migration
+
+#### Milestone 17.3: Meal Planning API
+
+- [ ] Add PreparedRecipeBatch contracts and endpoints
+- [ ] Add batch snapshot item operations
+- [ ] Add DailyPlan and DailyPlanItem contracts and endpoints
+- [ ] Add weekly Calendar and nutrition endpoints
+- [ ] Enforce allocation, validation, and ownership rules
+
+#### Milestone 17.4: Meal Planning API Tests
+
+- [ ] Test prepared batch snapshot operations
+- [ ] Test daily plan item and allocation operations
+- [ ] Test calendar and nutrition calculations
+- [ ] Test validation and ownership isolation
+
+#### Milestone 17.5: Meal Planning React Frontend
+
+- [ ] Add Meal Planning frontend types and API functions
 - [ ] Implement Prepared Recipe Batch workflows
 - [ ] Implement Daily Plan workflows
 - [ ] Implement the weekly calendar and nutrition summaries
@@ -1013,15 +1108,33 @@ Goal: complete prepared batches, daily plans, and the calendar through Domain, R
 
 ### Milestone 18: Final Transition
 
-Goal: verify the new application and retire the completed Razor Pages prototype.
+### Goal
 
-- [ ] Verify all core workflows end to end
-- [ ] Verify authentication and ownership behavior
+Verify the new application, retire the completed Razor Pages prototype, and document the final project structure.
+
+### Required Sub-milestones
+
+#### Milestone 18.1: Final Application Verification
+
+- [ ] Run all backend automated tests
+- [ ] Verify authentication and ownership behavior end to end
+- [ ] Verify Ingredient, Recipe, Prepared Batch, Daily Plan, and Calendar workflows
 - [ ] Verify responsive desktop and mobile layouts
-- [ ] Confirm that the frontend, API, and tests build successfully
-- [ ] Remove `MealBuilder.Web` from the solution
+- [ ] Confirm that the frontend and backend production builds succeed
+
+#### Milestone 18.2: Razor Pages Prototype Retirement
+
+- [ ] Confirm that the React application covers all required prototype workflows
+- [ ] Confirm that no required code or data remains only in `MealBuilder.Web`
+- [ ] Remove the `MealBuilder.Web` project from the solution and repository after explicit confirmation
 - [ ] Make `MealBuilder.Api` the primary backend host
-- [ ] Update documentation and deployment configuration
+
+#### Milestone 18.3: Final Documentation
+
+- [ ] Update the README and project setup instructions
+- [ ] Document the final architecture and project responsibilities
+- [ ] Update deployment configuration and documentation
+- [ ] Update `docs/PROJECT_PLAN.md`
 
 ## 7. Future Ideas
 

@@ -39,13 +39,3 @@ Problems discovered during implementation or verification:
 
 * ...
 * ...
-
-### Next Action
-
-Before completing the milestone, each problem must be resolved, added to a required sub-milestone, or moved to `Future Ideas`.
-
-After reviewing the milestone, select the next action:
-
-* [ ] proceed to the next main milestone
-* [ ] add or complete a required sub-milestone
-* [ ] update the project plan
