@@ -1,3 +1,7 @@
 <Solution>
+  <Project Path="MealBuilder.Api.Tests/MealBuilder.Api.Tests.csproj" Id="8b501b66-0121-4ac1-89b8-1c08ed453a1d" />
+  <Project Path="MealBuilder.Api/MealBuilder.Api.csproj" Id="30c56031-3f49-480c-9164-38a10323bb58" />
+  <Project Path="MealBuilder.Domain/MealBuilder.Domain.csproj" Id="65b6602e-4513-47af-a7c0-132d0327ed50" />
+  <Project Path="MealBuilder.Infrastructure/MealBuilder.Infrastructure.csproj" Id="3f70955f-fc57-4423-906c-7a074bd7a78e" />
   <Project Path="MealBuilder.Web/MealBuilder.Web.csproj" />
 </Solution>

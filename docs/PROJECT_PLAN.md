@@ -931,12 +931,12 @@ Project responsibilities:
 
 #### Milestone 14.1: Backend Project Structure
 
-- [ ] Create the `MealBuilder.Domain` class library
-- [ ] Create the `MealBuilder.Infrastructure` class library
-- [ ] Create the `MealBuilder.Api` ASP.NET Core Web API project
-- [ ] Create the `MealBuilder.Api.Tests` test project
-- [ ] Configure the required project references
-- [ ] Keep `MealBuilder.Web` isolated from the new projects
+- [x] Create the `MealBuilder.Domain` class library
+- [x] Create the `MealBuilder.Infrastructure` class library
+- [x] Create the `MealBuilder.Api` ASP.NET Core Web API project
+- [x] Create the `MealBuilder.Api.Tests` test project
+- [x] Configure the required project references
+- [x] Keep `MealBuilder.Web` isolated from the new projects
 
 #### Milestone 14.2: Database and Identity Foundation
 
