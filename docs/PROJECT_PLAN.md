@@ -940,11 +940,11 @@ Project responsibilities:
 
 #### Milestone 14.2: Database and Identity Foundation
 
-- [ ] Configure the new `AppDbContext` in `MealBuilder.Infrastructure`
-- [ ] Configure ASP.NET Core Identity for the new application
-- [ ] Configure the separate `data/mealbuilder.db` SQLite database
-- [ ] Create and apply the initial migration
-- [ ] Keep the prototype database unchanged
+- [x] Configure the new `AppDbContext` in `MealBuilder.Infrastructure`
+- [x] Configure ASP.NET Core Identity for the new application
+- [x] Configure the separate `data/mealbuilder.db` SQLite database
+- [x] Create and apply the initial migration
+- [x] Keep the prototype database unchanged
 
 #### Milestone 14.3: API Foundation
 
