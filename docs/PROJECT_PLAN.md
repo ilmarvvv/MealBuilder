@@ -948,14 +948,15 @@ Project responsibilities:
 
 #### Milestone 14.3: API Foundation
 
-- [ ] Configure API controllers, routing, and JSON responses
-- [ ] Choose and document the React-to-API authentication approach
-- [ ] Configure authentication and authorization
-- [ ] Configure CORS and CSRF protection when required by the chosen authentication approach
-- [ ] Resolve the current authenticated user in API requests
-- [ ] Add consistent validation and error responses
-- [ ] Add OpenAPI for development and manual API testing
-- [ ] Protect private endpoints from unauthenticated users
+- [x] Configure API controllers, routing, and JSON responses
+- [x] Use ASP.NET Core Identity cookie authentication for React-to-API requests
+- [x] Configure authentication and authorization
+- [x] Configure CORS with explicit frontend origins and credentials
+- [x] Protect authenticated state-changing requests against CSRF
+- [x] Resolve the current authenticated user in API requests
+- [x] Add consistent validation and error responses
+- [x] Add OpenAPI for development and manual API testing
+- [x] Protect private endpoints from unauthenticated users
 
 #### Milestone 14.4: React Foundation
 
