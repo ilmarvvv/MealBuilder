@@ -961,7 +961,7 @@ Project responsibilities:
 #### Milestone 14.4: React Foundation
 
 - [x] Create `MealBuilder.Client` with React, TypeScript, and Vite
-- [ ] Configure routing and environment settings
+- [x] Configure routing and environment settings
 - [ ] Configure the API client for the chosen authentication approach
 - [ ] Implement registration, login, logout, and authenticated navigation
 - [ ] Add consistent loading, validation, and error states
