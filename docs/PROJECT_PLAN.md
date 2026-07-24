@@ -962,7 +962,7 @@ Project responsibilities:
 
 - [x] Create `MealBuilder.Client` with React, TypeScript, and Vite
 - [x] Configure routing and environment settings
-- [ ] Configure the API client for the chosen authentication approach
+- [x] Configure the API client for the chosen authentication approach
 - [ ] Implement registration, login, logout, and authenticated navigation
 - [ ] Add consistent loading, validation, and error states
 
