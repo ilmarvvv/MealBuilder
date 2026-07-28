@@ -968,7 +968,7 @@ Project responsibilities:
 
 #### Milestone 14.5: Foundation Verification
 
-- [ ] Configure the API integration test infrastructure
+- [x] Configure the API integration test infrastructure
 - [ ] Add authentication and authorization integration tests
 - [ ] Confirm that the API and React client run independently
 - [ ] Confirm that authentication works through React
