@@ -1,4 +1,6 @@
 import { environment } from '../config/environment'
+import { ApiError } from './ApiError'
+import type { ApiValidationErrors } from './ApiError'
 
 const methodsRequiringCsrfToken = new Set([
   'POST',
@@ -11,6 +13,29 @@ type AntiforgeryTokenResponse = {
   token: string
 }
 
+type ProblemDetails = {
+  title?: string
+  detail?: string
+  errors?: ApiValidationErrors
+}
+
+async function createApiError(response: Response) {
+  const problemDetails = (await response
+    .json()
+    .catch(() => null)) as ProblemDetails | null
+
+  const message =
+    problemDetails?.title ??
+    problemDetails?.detail ??
+    `API request failed with status ${response.status}.`
+
+  return new ApiError(
+    message,
+    response.status,
+    problemDetails?.errors,
+  )
+}
+
 async function getCsrfToken() {
   const response = await fetch(
     new URL('/api/security/csrf-token', environment.apiBaseUrl),
@@ -20,7 +45,7 @@ async function getCsrfToken() {
   )
 
   if (!response.ok) {
-    throw new Error('Failed to retrieve the CSRF token.')
+    throw await createApiError(response)
   }
 
   const data = (await response.json()) as AntiforgeryTokenResponse
@@ -47,7 +72,7 @@ export async function apiRequest<TResponse>(
   })
 
   if (!response.ok) {
-    throw new Error(`API request failed with status ${response.status}.`)
+    throw await createApiError(response)
   }
 
   if (response.status === 204) {

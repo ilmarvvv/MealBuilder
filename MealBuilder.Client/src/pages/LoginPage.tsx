@@ -2,6 +2,9 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router'
 import { useAuth } from '../auth/useAuth'
+import { getApiErrorMessages } from '../api/getApiErrorMessages'
+import ErrorList from '../components/ErrorList'
+import LoadingIndicator from '../components/LoadingIndicator'
 
 export default function LoginPage() {
   const { user, isLoading, login } = useAuth()
@@ -9,25 +12,30 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [errors, setErrors] = useState<string[]>([])
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setIsSubmitting(true)
-    setError(null)
+    setErrors([])
 
     try {
       await login({ email, password })
       navigate('/')
-    } catch {
-      setError('Unable to log in. Check your email and password.')
+    } catch (error) {
+      setErrors(
+        getApiErrorMessages(
+          error,
+          'Unable to log in. Check your email and password.',
+        ),
+      )
     } finally {
       setIsSubmitting(false)
     }
   }
 
   if (isLoading) {
-    return <p>Loading...</p>
+    return <LoadingIndicator />
   }
 
   if (user) {
@@ -65,7 +73,7 @@ export default function LoginPage() {
           />
         </div>
 
-        {error && <p role="alert">{error}</p>}
+        <ErrorList messages={errors} />
 
         <button type="submit" disabled={isSubmitting}>
           {isSubmitting ? 'Logging in...' : 'Login'}

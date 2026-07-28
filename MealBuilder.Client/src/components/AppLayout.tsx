@@ -1,20 +1,28 @@
 import { useState } from 'react'
 import { Link, Outlet } from 'react-router'
+import { getApiErrorMessages } from '../api/getApiErrorMessages'
 import { useAuth } from '../auth/useAuth'
+import ErrorList from './ErrorList'
+import LoadingIndicator from './LoadingIndicator'
 
 export default function AppLayout() {
   const { user, isLoading, logout } = useAuth()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
-  const [logoutError, setLogoutError] = useState<string | null>(null)
+  const [errors, setErrors] = useState<string[]>([])
 
   async function handleLogout() {
     setIsLoggingOut(true)
-    setLogoutError(null)
+    setErrors([])
 
     try {
       await logout()
-    } catch {
-      setLogoutError('Unable to log out. Please try again.')
+    } catch (error) {
+      setErrors(
+        getApiErrorMessages(
+          error,
+          'Unable to log out. Please try again.',
+        ),
+      )
     } finally {
       setIsLoggingOut(false)
     }
@@ -27,7 +35,7 @@ export default function AppLayout() {
           <Link to="/">MealBuilder</Link>
 
           {isLoading ? (
-            <span>Loading...</span>
+            <LoadingIndicator message="Loading user..." />
           ) : user ? (
             <>
               <span>{user.email}</span>
@@ -47,7 +55,7 @@ export default function AppLayout() {
           )}
         </nav>
 
-        {logoutError && <p role="alert">{logoutError}</p>}
+        <ErrorList messages={errors} />
       </header>
 
       <main>
