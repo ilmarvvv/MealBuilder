@@ -970,10 +970,10 @@ Project responsibilities:
 
 - [x] Configure the API integration test infrastructure
 - [x] Add authentication and authorization integration tests
-- [ ] Confirm that the API and React client run independently
-- [ ] Confirm that authentication works through React
-- [ ] Confirm that `MealBuilder.Web` still works separately
-- [ ] Confirm that the solution builds without warnings or errors
+- [x] Confirm that the API and React client run independently
+- [x] Confirm that authentication works through React
+- [x] Confirm that `MealBuilder.Web` still works separately
+- [x] Confirm that the solution builds without warnings or errors
 
 ### Milestone 15: Ingredients Vertical Slice
 
