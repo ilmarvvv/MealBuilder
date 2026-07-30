@@ -22,7 +22,7 @@ In the future, I also want to track vitamins and other micronutrients, but stori
 
 Create a system that stores ingredients, recipes, and menus in one place.
 
-The user will be able to add ingredients with nutrition values: calories, protein, fiber, sugar, salt, vitamins, and other nutrients. Values can be stored per 100 g, per one piece, or another unit of measurement.
+The user will be able to add ingredients with nutrition values: calories, protein, fat, carbohydrates, sugars, fiber, and salt. In the current React migration scope, values are stored per 100 g.
 
 Based on saved ingredients, the user will be able to create recipes. A recipe can include ingredients, and the user can add them, remove them, or change their quantities. A finished recipe can also be reused as part of another recipe, for example as a sauce, filling, or prepared component.
 
@@ -65,29 +65,42 @@ Notes:
 
 ### Ingredient
 
-A single product with nutrition values. For example: chicken, rice, egg, olive oil, or milk.
+A reusable food or drink record with nutrition values. It can represent a basic cooking ingredient, a packaged product, a drink, or ready-to-eat purchased food. For example: chicken, rice, egg, olive oil, milk, Coca-Cola, or a store-bought burger.
 
 Responsibility:
 - store base nutrition values for a product
-- provide reusable nutrition data for recipes and menus
+- provide reusable nutrition data for recipes and daily plans
+- support direct use in daily plans without requiring a recipe
+- provide shared built-in ingredients and private user-created ingredients
 
 Main data:
 - name
 - calories per 100 g
 - protein per 100 g
+- fat per 100 g
+- carbohydrates per 100 g
+- sugars per 100 g
 - fiber per 100 g
-- sugar per 100 g
 - salt per 100 g
+- owner id for user-created ingredients
+- built-in source name, source code, and source version
 
 Relationships:
 - can be used in many recipes through `RecipeIngredient`
-- can be used directly in menus in the future
+- can be used directly in daily plans through `DailyPlanItem`
+- a user-created ingredient belongs to one application user
 
 Notes:
 - values are stored per 100 g
+- ingredient quantities in recipes and daily plans are entered in grams
+- nutrition values are non-nullable and default to 0
 - values cannot be negative
 - calories per 100 g are limited to 0-900
-- protein, fiber, sugar, and salt per 100 g are limited to 0-100
+- protein, fat, carbohydrates, sugars, fiber, and salt per 100 g are limited to 0-100
+- sugars cannot exceed carbohydrates
+- ingredient names do not have to be unique
+- built-in ingredients are shared and read-only for regular users
+- user-created ingredients are private to their owner
 
 ### Recipe
 
@@ -266,15 +279,19 @@ Notes:
 
 This section describes the main user workflows. The exact UI and technical implementation may change later.
 
-For the first version, the project is treated as a single-user local app: one user works with their own ingredients, recipes, and menus locally. User accounts, registration, and login are out of scope for the first version.
-
 ### Working With Ingredients
 
-The user can create an ingredient and store nutrition values for it.
+The user can view and reuse built-in ingredients.
 
-The user can edit ingredient data if the values were incorrect or changed.
+The user can create, edit, and delete their own ingredients.
 
-The user can find a saved ingredient and reuse it in a recipe or menu.
+The user cannot edit or delete built-in ingredients or another user's ingredients.
+
+The user can find built-in and personal ingredients and reuse them in a recipe or daily plan.
+
+Different ingredients may have the same name because records are identified by id and ownership.
+
+In the current React migration scope, all ingredient nutrition values are stored per 100 g and all ingredient quantities are entered in grams.
 
 ### Working With Recipes
 
@@ -312,7 +329,7 @@ The user can add prepared recipe batch servings or individual ingredients to the
 
 The system creates a saved daily plan only after the user adds an item or saves changes.
 
-The user can see total calories, protein, fiber, sugar, salt, and other values for the day.
+The user can see total calories, protein, fat, carbohydrates, sugars, fiber, and salt for the day.
 
 The user can change planned quantities or remove items from the daily plan.
 
@@ -334,21 +351,35 @@ Each ingredient must have a name.
 
 The ingredient name cannot be empty.
 
+Ingredient names do not have to be unique, including within one user's private ingredients.
+
 Ingredient nutrition values are stored as base values for future calculations.
 
-Calories, protein, fiber, sugar, salt, and other nutrients cannot be less than 0.
+Calories, protein, fat, carbohydrates, sugars, fiber, and salt are non-nullable and default to 0.
 
-Values measured per 100 g should not exceed physically possible limits. For example, calories per 100 g cannot be more than 900, and protein or fiber cannot be more than 100 g per 100 g of product.
+Calories, protein, fat, carbohydrates, sugars, fiber, and salt cannot be less than 0.
+
+Values measured per 100 g should not exceed physically possible limits. Calories per 100 g cannot be more than 900. Protein, fat, carbohydrates, sugars, fiber, and salt cannot be more than 100 g per 100 g of product.
+
+Sugars per 100 g cannot exceed carbohydrates per 100 g.
+
+Each ingredient is either built-in or user-created.
+
+Built-in ingredients are available to every authenticated user and are read-only for regular users.
+
+User-created ingredients belong to one user, and only their owner can view or change them.
+
+Every built-in ingredient must preserve its external source name, source code, and source version.
+
+A missing source nutrition value must not be silently converted to 0 when built-in data is prepared.
 
 ### Unit and Input Rules
 
-All calculations inside the system should be converted to grams.
+All ingredient nutrition values are stored per 100 g in the current React migration scope.
 
-If a product is entered in grams, the entered quantity is already the weight in grams.
+All ingredient quantities in recipes and daily plans are entered and calculated in grams.
 
-If a product is entered in pieces, the system must know the weight of one piece in grams.
-
-If a product is entered in pieces, the weight in grams is calculated as: weight in grams = number of pieces * grams per piece.
+Milliliter, piece, slice, and custom measurement input are not supported in the current React migration scope.
 
 The quantity of a product in a recipe or menu must be greater than 0.
 
@@ -409,14 +440,6 @@ A prepared batch item cannot use more servings than remain available in that bat
 Total daily plan values are the sum of all daily plan item values.
 
 Opening an empty calendar date must not create a database record until the user saves a change or adds an item.
-
-### First Version Scope
-
-The first version does not include user accounts, registration, or login.
-
-The first version is treated as a single-user local app.
-
-Complex measurement units, vitamins, and micronutrients can be refined later.
 
 ## 6. Implementation Plan: In What Order the Project Will Be Built
 
@@ -987,25 +1010,59 @@ Complete the Ingredient workflow through Domain, persistence, REST API, automate
 
 - [ ] Review the Ingredient fields and business rules before migration
 - [ ] Add the Ingredient model to `MealBuilder.Domain`
+- [ ] Add calories, protein, fat, carbohydrates, sugars, fiber, and salt per 100 g
+- [ ] Make nutrition values non-nullable with a default value of 0
+- [ ] Allow duplicate Ingredient names
+- [ ] Distinguish built-in Ingredients from user-created Ingredients
+- [ ] Keep all current Ingredient quantities grams-only
 - [ ] Add Ingredient business validation rules
 
 #### Milestone 15.2: Ingredient Persistence
 
 - [ ] Add Ingredient Entity Framework Core configuration
 - [ ] Add Ingredients to `AppDbContext`
+- [ ] Configure built-in Ingredient source metadata and user-created Ingredient ownership
+- [ ] Preserve BLS source code and version for every seeded Ingredient
+- [ ] Seed 20 read-only Ingredients from BLS 4.0
+  1. Chicken breast
+  2. Ground beef
+  3. Salmon
+  4. Egg
+  5. Milk
+  6. Natural yogurt
+  7. Quark
+  8. White rice
+  9. Oats
+  10. Pasta
+  11. Wheat bread
+  12. Potato
+  13. Wheat flour
+  14. Lentils
+  15. Olive oil
+  16. Butter
+  17. Tomato
+  18. Onion
+  19. Apple
+  20. Banana
+- [ ] Match the starter names to exact BLS records and import only records with all seven required nutrition values
+- [ ] Add BLS 4.0 attribution under its CC BY 4.0 license
 - [ ] Create and apply the Ingredient migration
 
 #### Milestone 15.3: Ingredient API
 
 - [ ] Add Ingredient request and response contracts
-- [ ] Add Ingredient list and details endpoints
-- [ ] Add Ingredient create, update, and delete endpoints
+- [ ] Return built-in Ingredients and the current user's Ingredients from list and details endpoints
+- [ ] Add create, update, and delete endpoints for user-created Ingredients
+- [ ] Prevent regular users from changing built-in Ingredients
 - [ ] Return appropriate validation errors and HTTP status codes
 - [ ] Enforce authentication and ownership in every endpoint
 
 #### Milestone 15.4: Ingredient API Tests
 
 - [ ] Test successful Ingredient CRUD operations
+- [ ] Test default nutrition values and duplicate Ingredient names
+- [ ] Test that authenticated users can read built-in Ingredients
+- [ ] Test that regular users cannot update or delete built-in Ingredients
 - [ ] Test Ingredient validation errors
 - [ ] Test unauthenticated access
 - [ ] Test ownership isolation between two users
@@ -1014,6 +1071,8 @@ Complete the Ingredient workflow through Domain, persistence, REST API, automate
 
 - [ ] Add Ingredient frontend types and API functions
 - [ ] Implement Ingredient list, details, create, edit, and delete workflows
+- [ ] Distinguish built-in Ingredients from personal Ingredients in the UI
+- [ ] Show edit and delete actions only for the current user's Ingredients
 - [ ] Add loading, validation, empty, and error states
 - [ ] Confirm the complete Ingredient workflow works end to end
 
@@ -1158,8 +1217,9 @@ This section contains ideas that may be useful for the project in the future, bu
   - The first image should be treated as the main image.
   - Decide later how images should be stored.
 
-- [ ] Add ingredient data source
-  - Decide later how to store whether values came from manual input, package labels, AI, or external databases.
+- [ ] Add advanced ingredient data provenance
+  - Keep the required BLS source metadata for built-in Ingredients in the current scope.
+  - Decide later how to represent manual input, package labels, AI suggestions, and additional external databases.
 
 - [ ] Add advanced ingredient state handling
   - For example, raw, cooked, peeled, or trimmed product states.
@@ -1173,11 +1233,18 @@ This section contains ideas that may be useful for the project in the future, bu
   - When adding an ingredient to a recipe and the needed ingredient does not exist, allow creating it without leaving the recipe flow.
   - After the ingredient is created, return to the recipe ingredient add flow with the new ingredient available for selection.
 
-- [ ] Use ingredient conversion fields in recipe and menu input
-  - Allow users to enter ingredients by pieces when `GramsPerPiece` is available.
-  - Allow users to enter ingredients by milliliters when `GramsPerMilliliter` is available.
-  - Convert entered quantity to grams for all calculations.
-  - Store or display the original quantity and calculated grams when useful.
+- [ ] Add fixed ingredient measurement conversions
+  - Allow ingredient nutrition values to use either a per 100 g or per 100 ml basis.
+  - Support gram, milliliter, piece, and slice input.
+  - Add an optional grams-per-milliliter conversion when both mass and volume input are needed.
+  - Add one optional piece conversion and one optional slice conversion per ingredient.
+  - Convert every entered quantity to the ingredient nutrition basis before calculating nutrition values.
+
+- [ ] Replace fixed ingredient conversions with flexible measurements
+  - Introduce `IngredientMeasurement` records only when one piece and one slice conversion per ingredient are no longer sufficient.
+  - Allow multiple named measurements such as piece, slice, bottle, can, cup, teaspoon, and tablespoon.
+  - Map every measurement to the ingredient nutrition basis in grams or milliliters.
+  - Support multiple package and portion sizes without duplicating ingredient nutrition values.
 
 - [ ] Add ingredient archive or deactivate workflow
   - Used ingredients should probably be hidden instead of deleted.
@@ -1197,8 +1264,9 @@ This section contains ideas that may be useful for the project in the future, bu
 - [ ] Add vitamins and micronutrients
   - Decide later which vitamins and micronutrients should be tracked first.
 
-- [ ] Add additional macronutrients
-  - For example, fat, carbohydrates, and saturated fat.
+- [ ] Add detailed fat breakdown
+  - Add saturated fat and unsaturated fat nutrition values.
+  - Keep both values within the total fat value.
 
 - [ ] Add optional harmful substances or food safety notes
   - For example, warnings or tracked substances for products like tuna.
@@ -1341,6 +1409,49 @@ This section contains ideas that may be useful for the project in the future, bu
 - [ ] Add groups and group-specific administrators
 
 - [ ] Add publication version history and audit information
+
+### Content and Engagement
+
+- [ ] Add a public blog
+
+- [ ] Add short verified nutrition facts or tips
+  - Show concise content without distracting from the main planning workflow.
+  - Require reliable sources and review before publishing nutrition or health information.
+
+### Food Capture and AI
+
+- [ ] Add barcode scanning
+  - Use a scanned barcode to find a matching product in a trusted internal or external database.
+  - Let the user create or complete a product when no reliable match is found.
+
+- [ ] Add AI-assisted meal photo recognition
+  - Let AI suggest detected foods, portions, and estimated nutrition values from a meal photo.
+  - Require the user to review and confirm all suggestions before saving them.
+  - Treat photo-based nutrition values as estimates rather than verified data.
+
+### Dietary Preferences and Restrictions
+
+- [ ] Add dietary preferences such as vegan and vegetarian
+
+- [ ] Add food and recipe filtering by dietary preference
+
+- [ ] Consider personalized diet planning later
+  - Keep simple preferences and filters separate from automatic diet-plan generation.
+
+### Premium and Monetization
+
+- [ ] Define free and Premium feature boundaries
+  - Keep the core meal-planning workflow useful without a subscription.
+  - Consider placing costly AI features and advanced analytics in Premium.
+
+- [ ] Research subscription and payment implementation
+  - Review payment fees, taxes, platform commissions, trial rules, and recurring billing requirements before implementation.
+
+- [ ] Validate the initial pricing hypothesis
+  - Possible monthly price: EUR 1.99.
+  - Possible annual price: EUR 14.99.
+  - Consider a three-month introductory free trial.
+  - Treat these values as hypotheses until operating costs and user demand are understood.
 
 ### General Improvements
 
