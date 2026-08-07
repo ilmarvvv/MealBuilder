@@ -1011,6 +1011,20 @@ Project responsibilities:
 - [x] Confirm that `MealBuilder.Web` still works separately
 - [x] Confirm that the solution builds without warnings or errors
 
+### React UX/UI Design Phase
+
+- [x] Define the visual direction as 70% Warm Minimal, 25% Fitness Energy, and 5% Nutrition Analytics
+- [x] Define light, dark, and system themes with orange, black, white, and gray as the core palette
+- [x] Define the desktop top navigation and mobile bottom navigation for Dashboard, Library, and Planner
+- [x] Design the shared Library flow for Ingredients and Recipes
+- [x] Design Dashboard, Planner, Add Food, and Weekly Summary layouts
+- [x] Define the daily and weekly nutrition hierarchy for calories, protein, carbohydrates and sugars, fiber, fat, and salt
+- [x] Design Ingredient and Recipe create and details workflows, including ordered Cooking Steps
+- [x] Define the initial Cooked Recipe flow with a shared remaining amount and optional portion planning
+- [x] Design Login, Register, guided and manual Onboarding, and Account Settings flows
+- [x] Define shared loading, empty, validation, error, and success states
+- [x] Define responsive behavior for desktop and mobile layouts
+
 ### Milestone 15: Ingredients Vertical Slice
 
 ### Goal
@@ -1083,7 +1097,7 @@ Complete the Ingredient workflow through Domain, persistence, REST API, automate
 #### Milestone 15.5: Ingredient React Frontend
 
 - [ ] Add Ingredient frontend types and API functions
-- [ ] Implement Ingredient list, details, create, edit, and delete workflows
+- [ ] Implement Ingredient list, details, create, edit, and delete workflows in the shared Library layout
 - [ ] Distinguish built-in Ingredients from personal Ingredients in the UI
 - [ ] Show edit and delete actions only for the current user's Ingredients
 - [ ] Add loading, validation, empty, and error states
@@ -1136,6 +1150,7 @@ Complete the Recipe workflow through Domain, persistence, REST API, automated te
 - [ ] Add Details, Ingredients, and Cooking Steps sections
 - [ ] Support Ingredient and Cooking Step ordering and live nutrition summaries
 - [ ] Implement Recipe list, details, edit, and delete workflows
+- [ ] Integrate Recipe results into the shared Library search and type filters
 - [ ] Confirm the complete Recipe workflow works end to end
 
 ### Milestone 17: User Profile and Calorie Target
@@ -1150,6 +1165,9 @@ Complete post-registration onboarding, user nutrition profile data, and a confir
 
 - [ ] Review the profile storage model and privacy requirements before migration
 - [ ] Define required and optional data for calculated and manual target setup
+- [ ] Limit the initial guided setup to adults aged 18 and over with metric age, height, and weight inputs
+- [ ] Define the initial activity-level and lose, maintain, or gain goal options
+- [ ] Keep first-version user targets calories-only
 - [ ] Select and document an evidence-based calorie calculation formula
 - [ ] Define safe input validation limits and describe calculated results as estimates
 - [ ] Require a confirmed daily calorie target before onboarding is complete
@@ -1180,8 +1198,10 @@ Complete post-registration onboarding, user nutrition profile data, and a confir
 #### Milestone 17.5: Profile React Frontend
 
 - [ ] Add the calculated and manual onboarding paths after Register
+- [ ] Implement the three-step guided flow: Body Information, Activity and Goal, and Daily Target
 - [ ] Resume incomplete Onboarding after Login
 - [ ] Add profile and calorie-target management to Account
+- [ ] Add System, Light, and Dark appearance selection
 - [ ] Allow the user to review and confirm a recalculated target
 - [ ] Show the saved calorie target in Dashboard nutrition progress
 - [ ] Confirm onboarding and target workflows work end to end
@@ -1201,7 +1221,7 @@ Complete prepared batches, daily plans, and the calendar through Domain, persist
 - [ ] Add DailyPlan and DailyPlanItem models to `MealBuilder.Domain`
 - [ ] Exclude the legacy direct Recipe relationship from the new `DailyPlanItem` model
 - [ ] Add allocated and unallocated portion rules
-- [ ] Support automatic planning by default and optional flexible planning
+- [ ] Keep the prepared amount available by default and support optional portion planning
 - [ ] Support full and partial moves between dates
 - [ ] Add daily-plan weekly-summary inclusion rules
 - [ ] Add allocation, nutrition, and date validation rules
@@ -1217,7 +1237,7 @@ Complete prepared batches, daily plans, and the calendar through Domain, persist
 - [ ] Add PreparedRecipeBatch contracts and endpoints
 - [ ] Add batch snapshot item operations
 - [ ] Add DailyPlan and DailyPlanItem contracts and endpoints
-- [ ] Create a Prepared Meal and its optional automatic allocations atomically
+- [ ] Create a prepared recipe batch and any optional planned allocations atomically
 - [ ] Add full and partial move operations that preserve the original item on failure
 - [ ] Return portions to the available amount after reduction or removal
 - [ ] Add weekly Calendar and nutrition endpoints
@@ -1227,7 +1247,7 @@ Complete prepared batches, daily plans, and the calendar through Domain, persist
 #### Milestone 18.4: Meal Planning API Tests
 
 - [ ] Test prepared batch snapshot operations
-- [ ] Test automatic and flexible allocation operations
+- [ ] Test available-amount and optional planned-allocation operations
 - [ ] Test adjust, move, remove, and insufficient-portion behavior
 - [ ] Test atomic failure behavior for preparation and move operations
 - [ ] Test daily-plan inclusion and weekly nutrition calculations
@@ -1236,12 +1256,13 @@ Complete prepared batches, daily plans, and the calendar through Domain, persist
 #### Milestone 18.5: Meal Planning React Frontend
 
 - [ ] Add Meal Planning frontend types and API functions
-- [ ] Implement the user-facing Prepared Meal and Available Portions workflows
-- [ ] Enable automatic planning by default with an option to keep portions available
-- [ ] Implement Daily Plan workflows
+- [ ] Implement the user-facing Cooked Recipe and Available Amount workflows
+- [ ] Keep the cooked amount available by default and provide an optional Plan Portions flow
+- [ ] Implement the time-sorted Daily Plan without fixed meal sections, placing items without a time last
+- [ ] Implement the two-step Add Food modal with combined Ingredient and Recipe search
 - [ ] Implement change amount, full or partial move, remove, and Undo interactions
 - [ ] Implement Dashboard daily and weekly previews
-- [ ] Implement the weekly Planner and included-day nutrition summaries
+- [ ] Implement the weekly Planner and included-day nutrition summaries with one active calorie-target line
 - [ ] Confirm the complete Meal Planning workflow works end to end
 
 ### Milestone 19: Final Transition
@@ -1338,6 +1359,11 @@ This section contains ideas that may be useful for the project in the future, bu
 - [ ] Add a BMI calculator
   - Step 1: create a standalone tool that calculates BMI from height and weight.
   - Step 2: integrate BMI tracking with the menu calendar.
+
+- [ ] Add goal pace to guided calorie target setup
+  - Allow users with a `Lose weight` or `Gain weight` goal to choose a pace.
+  - Adjust the suggested daily calorie target based on the selected pace.
+  - Define safe pace options and limits before implementation.
 
 - [ ] Add vitamins and micronutrients
   - Decide later which vitamins and micronutrients should be tracked first.
