@@ -13,6 +13,7 @@ The product combines:
 - a built-in database of common ingredients;
 - private user-created ingredients and recipes;
 - flexible meal planning;
+- a personal calorie target selected during onboarding;
 - clear daily and weekly nutrition summaries;
 - future AI assistance that reduces manual work.
 
@@ -105,14 +106,19 @@ The current design scope includes:
 - light and dark themes;
 - responsive navigation and application shell;
 - Login and Register;
+- required onboarding with calculated or manually selected calorie target;
+- editable profile and calorie-target settings;
 - Dashboard;
 - daily and weekly nutrition summaries;
+- the ability to exclude a non-empty day from weekly calculations;
 - Ingredient list, search, details, and form;
 - built-in and private user-created Ingredients;
 - Recipe list, details, and form;
 - adding Ingredients to a Recipe;
+- ordered Cooking Steps with at least one step per Recipe;
 - Calendar and Daily Plan;
-- adding an Ingredient or Recipe to a day;
+- automatic or flexible Prepared Meal planning;
+- adding an Ingredient or Prepared Meal to a day;
 - basic Settings, including theme selection;
 - loading, empty, error, validation, and success states;
 - reusable buttons, inputs, cards, dialogs, and nutrition indicators.
@@ -133,6 +139,10 @@ The following capabilities remain future work:
 - advanced analytics;
 - detailed fat breakdown;
 - advanced measurement units and conversions;
+- Recipes inside other Recipes;
+- converting a Recipe into a derived Ingredient;
+- manually estimated calories for untracked days;
+- personal nutrition targets beyond calories;
 - social features.
 
 Built-in shared Ingredients are part of the current scope. User submission, validation, and publication workflows are not.

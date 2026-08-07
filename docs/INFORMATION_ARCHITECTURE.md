@@ -75,6 +75,8 @@ Icons must include text labels. The active destination must use more than color 
 
 Login and Register use a separate minimal layout without the authenticated application shell.
 
+After Register, the user completes Onboarding and confirms a calorie target before entering Dashboard. A returning user with incomplete Onboarding resumes it after Login.
+
 ## Dashboard
 
 Dashboard is an overview and entry point. It must not duplicate the complete Planner editor.
@@ -114,7 +116,7 @@ Add Food opens the Planner workflow for today rather than creating a separate Da
 Show:
 
 - all seven days of the current week;
-- which days contain data;
+- which days are included, excluded, or empty;
 - a compact nutrition result;
 - how many days are included;
 - an action to open detailed weekly information in Planner.
@@ -144,8 +146,11 @@ Show:
 - optional Daily Plan name;
 - optional description;
 - compact nutrition summary;
+- `Include this day in weekly summary` for a non-empty day;
 - planned food items;
 - Add Food action.
+
+The weekly-summary setting is enabled by default. Empty days are excluded automatically. A manually excluded day remains visible with all its data but does not affect weekly totals or averages.
 
 ### Daily Plan Items
 
@@ -186,7 +191,9 @@ The flow shows a nutrition preview before the item is added.
 
 Planner provides the detailed weekly view, including:
 
-- nutrition totals by day;
+- included, excluded, and empty day states;
+- nutrition totals by included day;
+- totals and averages calculated from included non-empty days only;
 - partial-week results;
 - planned and empty days;
 - navigation between dates.
@@ -279,7 +286,9 @@ Recipe screens include:
 
 List items show the name, optional description, calories, primary macronutrients, servings, and Ingredient count.
 
-Recipe details show Ingredients and quantities, total nutrition, nutrition per serving, and the Prepare Recipe action.
+Recipe creation and editing contain Details, Ingredients, and Cooking Steps. A Recipe contains Ingredients only and must have at least one non-empty ordered Cooking Step. Recipes inside other Recipes remain outside the current scope.
+
+Recipe details show Ingredients and quantities, ordered Cooking Steps, total nutrition, nutrition per serving, and the Prepare Recipe action.
 
 Prepared Meals do not become a third Library tab. A Prepared Meal is created from Recipe details and then managed through Planner.
 
@@ -297,9 +306,15 @@ The current scope includes:
 
 - email;
 - account status;
+- onboarding profile data when the calculated-target path was used;
+- activity level and selected goal when available;
+- current daily calorie target;
+- actions to recalculate or manually change the calorie target;
 - Logout action.
 
-Profile photos, public usernames, biographies, email changes, and account deletion are outside the current scope.
+Changing profile data must not silently replace the saved calorie target. The user reviews and confirms any recalculated target.
+
+Profile photos, public usernames, biographies, email changes, and account deletion remain outside the current scope.
 
 ### Appearance
 
@@ -323,6 +338,8 @@ Login contains:
 
 Password recovery remains outside the current scope.
 
+Successful Login returns a fully onboarded user to the originally requested protected page or Dashboard. A user with incomplete Onboarding returns to Onboarding.
+
 ## Register
 
 Register contains:
@@ -337,13 +354,32 @@ Register contains:
 
 Password confirmation is a client-side validation field and does not have to be sent to the API.
 
+Successful Register creates the account and opens Onboarding rather than Dashboard.
+
+## Onboarding
+
+Onboarding is completed after the user saves a daily calorie target.
+
+The first choice is:
+
+```text
+Calculate for Me | Set Manually
+```
+
+The calculated path collects date of birth, the sex required by the selected formula, height in centimeters, weight in kilograms, activity level, and goal. The result is an estimated calorie target that the user may accept or replace with a custom value.
+
+The manual path collects only a daily calorie target in kcal. Other profile data may be completed later in Account.
+
+The exact calculation formula and safe validation limits require an evidence-based technical review before implementation. The result must be presented as an estimate rather than medical advice.
+
 ## Complete Structure
 
 ```text
 MealBuilder
 |-- Authentication
 |   |-- Login
-|   `-- Register
+|   |-- Register
+|   `-- Onboarding
 |-- Dashboard
 |   |-- Today's Nutrition
 |   |-- Today's Plan Preview
@@ -362,12 +398,16 @@ MealBuilder
 |       |-- List
 |       |-- Details
 |       |-- Create or Edit
+|       |   |-- Details
+|       |   |-- Ingredients
+|       |   `-- Cooking Steps
 |       `-- Prepare Recipe
 `-- Account
     |-- Account Information
+    |-- Calorie Target
     `-- Appearance
 ```
 
 ## Completion Criteria
 
-Information Architecture is complete when every screen in the current design scope has one clear location, Dashboard and Planner do not duplicate responsibilities, Ingredients and Recipes remain easy to find within Library, and the Prepared Meal workflow supports both automatic and flexible planning without exposing internal technical terminology to the user.
+Information Architecture is complete when every screen in the current design scope has one clear location, Onboarding establishes the calorie target used by Dashboard, Dashboard and Planner do not duplicate responsibilities, Ingredients and Recipes remain easy to find within Library, and the Prepared Meal workflow supports both automatic and flexible planning without exposing internal technical terminology to the user.

@@ -20,19 +20,21 @@ In the future, I also want to track vitamins and other micronutrients, but stori
 
 ## 2. Solution Idea: How the Project Solves the Problem
 
-Create a system that stores ingredients, recipes, and menus in one place.
+Create a system that stores ingredients, recipes, prepared meals, and daily plans in one place.
 
 The user will be able to add ingredients with nutrition values: calories, protein, fat, carbohydrates, sugars, fiber, and salt. In the current React migration scope, values are stored per 100 g.
 
-Based on saved ingredients, the user will be able to create recipes. A recipe can include ingredients, and the user can add them, remove them, or change their quantities. A finished recipe can also be reused as part of another recipe, for example as a sauce, filling, or prepared component.
+Based on saved ingredients, the user will be able to create recipes with ordered cooking steps. A recipe can include ingredients, and the user can add them, remove them, or change their quantities. Nested recipes are not part of the current REST API and React scope.
 
-The system will automatically recalculate total recipe values after each change: when an ingredient quantity changes, a new ingredient is added, an ingredient is removed, or another finished recipe is used as part of a dish.
+The system will automatically recalculate total recipe values after each ingredient change.
 
-For recipes, the user will be able to specify the number of portions or the number of days the dish lasts. The system will calculate values for the whole recipe, for one portion, or for one day.
+For recipes, the user will be able to specify the number of portions. The system will calculate values for the whole recipe and for one portion.
 
-The user will also be able to create menus from several recipes or individual products. The system will show total menu values for a day or for a selected period.
+The user will be able to create a Prepared Meal snapshot from a Recipe. Portions are planned automatically by default, but they may remain available and be allocated, adjusted, or moved manually.
 
-The main idea is to save ingredient or finished recipe data once, then reuse it in recipes and menus without manual recalculation.
+Daily Plans can contain individual Ingredients or Prepared Meal portions. The system will show daily and weekly nutrition values, compare daily calories with the user's saved target, and exclude empty or manually disabled days from weekly calculations.
+
+The main idea is to save Ingredient and Recipe data once, then reuse it through Recipes, Prepared Meals, and Daily Plans without manual recalculation.
 
 ## 3. Main Entities: What Objects Exist in the System
 
@@ -109,7 +111,8 @@ A dish, preparation, or reusable recipe that can be cooked and used again. For e
 Responsibility:
 - store basic recipe information
 - group ingredients into a reusable dish or preparation
-- provide a base for future recipe calculations, portions, and menus
+- store ordered cooking steps
+- provide a base for nutrition calculations, portions, and prepared meals
 
 Main data:
 - name
@@ -118,12 +121,14 @@ Main data:
 
 Relationships:
 - has many `RecipeIngredient` records
-- can be used in menus in the future
-- can be used as a component of another recipe through `RecipeComponent`
+- has many `RecipeStep` records
+- can be used to create many prepared meals
 
 Notes:
-- recipe nutrition values are calculated from its ingredients and components
-- an empty recipe can exist as a draft
+- recipe nutrition values are calculated from its ingredients
+- the current REST API and React scope does not support a recipe inside another recipe
+- the completed Razor Pages prototype may retain its legacy `RecipeComponent` implementation as a reference
+- a recipe must contain at least one non-empty cooking step
 - servings must be greater than 0 when portion calculations are used
 
 ### RecipeIngredient
@@ -146,41 +151,30 @@ Relationships:
 
 Notes:
 - `grams` must be greater than 0
-- all first-version recipe calculations use grams
+- all current REST API and React recipe calculations use grams
 - unit support, piece-based products, and milliliters can be added later
 
-### RecipeComponent
+### RecipeStep
 
-A connection between one recipe and another finished recipe.
-
-It is needed when a finished recipe is used as part of another recipe. For example, a sauce can be created as a separate recipe and then added to a burger, salad, or another dish.
+One ordered cooking instruction inside a `Recipe`.
 
 Responsibility:
-- connect a parent recipe with another finished recipe
-- store how much of the finished recipe is used
-- allow finished recipes to be included in another recipe's nutrition calculations
+- connect one cooking instruction to one recipe
+- preserve the order in which instructions should be followed
 
 Main data:
-- parent recipe id
-- component recipe id
-- grams
+- recipe id
+- sort order
+- instruction
 
 Relationships:
-- one parent `Recipe` can have many `RecipeComponent` records
-- one component `Recipe` can be used in many `RecipeComponent` records
-- the same component `Recipe` can be added only once inside the same parent `Recipe`
+- belongs to one `Recipe`
 
 Notes:
-- `parent recipe` is the recipe that contains the component
-- `component recipe` is the finished recipe used as part of another recipe
-- `grams` must be greater than 0
-- a recipe must not directly contain itself
-- a recipe must not indirectly contain itself through other recipes
-- duplicate components should be prevented by a unique database index on `ParentRecipeId` and `ComponentRecipeId`
-- the UI should not show the current recipe or already added component recipes in the add-component dropdown
-- server-side validation should protect the same rules even if the UI is bypassed
-- component recipe nutrition values should be included in parent recipe total values
-- in the first UI version, recipe ingredients and recipe components will be shown as two separate tables
+- every recipe must contain at least one step
+- an instruction cannot be empty or contain only whitespace
+- step ordering must remain deterministic after add, move, or remove operations
+- cooking time, temperature, images, and timers are outside the current scope
 
 ### DailyPlan
 
@@ -198,6 +192,7 @@ Main data:
 - name
 - date
 - description
+- include in weekly summary
 
 Relationships:
 - has many `DailyPlanItem` records
@@ -208,6 +203,8 @@ Notes:
 - an empty date can be viewed from Calendar without immediately saving a record
 - a daily plan is created only after the user adds an item or saves changes
 - nutrition totals are calculated from daily plan items and are not stored directly
+- a non-empty daily plan is included in weekly calculations by default
+- the user may exclude a non-empty daily plan from weekly calculations without deleting its data
 
 ### DailyPlanItem
 
@@ -251,15 +248,16 @@ For example, the user can create a `Burger` recipe, create a batch with 8 servin
 Responsibility:
 - represent a prepared copy of one recipe
 - preserve copied recipe contents and nutrition values as snapshot data
-- store the allocation start date, total servings, and planned days
+- store the prepared date, optional allocation start date, total servings, and optional planned days
 - track how many servings are allocated and how many remain
 
 Main data:
 - source recipe id
 - recipe name snapshot
 - cooked date
+- allocation start date when automatic planning is used
 - total servings
-- planned days
+- planned days when automatic planning is used
 - prepared batch snapshot items
 
 Relationships:
@@ -269,11 +267,14 @@ Relationships:
 
 Notes:
 - changing the source recipe does not silently change an existing batch snapshot
-- `CookedDate` currently acts as the allocation start date
-- servings are distributed across consecutive dates using `PlannedDays`
+- the prepared date and allocation start date are separate concepts in the new workflow
+- servings are distributed across consecutive dates only when automatic planning is enabled
 - used servings are calculated from daily plan items that reference the batch
 - remaining servings are calculated as total servings minus used servings
 - nutrition values are calculated from stored batch snapshot items
+- automatic portion planning is enabled by default but can be disabled
+- servings may remain unallocated and be assigned to dates later
+- allocated servings can be adjusted or moved between dates
 
 ## 4. Main Scenarios: What the User Can Do
 
@@ -301,25 +302,31 @@ The user can add ingredients to a recipe and specify their quantities.
 
 The user can change an ingredient quantity in a recipe or remove an ingredient from a recipe.
 
+The user can add, edit, reorder, and remove cooking steps.
+
+Every recipe must contain at least one non-empty cooking step.
+
 The system automatically recalculates recipe nutrition values after changes.
 
 The user can save a recipe and reuse it later.
 
-### Working With Recipe Components
+### Working With Prepared Meals
 
-The user can use a finished recipe as part of another recipe.
+The user can create a prepared snapshot from a finished recipe.
 
-For example, the user can create a sauce as a separate recipe, then add that sauce to a burger, salad, or another dish.
+Automatic portion planning is enabled by default. The user can disable it and keep all portions available for later allocation.
 
-### Working With Portions and Days
+The user can adjust allocated portions, move full or partial amounts to another date, or return portions to the available amount.
+
+### Working With Portions and Planning
 
 The user can specify how many portions a dish is split into.
 
 The user can see nutrition values for one portion.
 
-The user can specify how many days a dish lasts.
+When preparing a Recipe, the user can accept automatic planning across a selected number of days or keep the portions available.
 
-The user can see nutrition values for one day.
+Daily nutrition values are calculated from the portions and Ingredients allocated to that date.
 
 ### Working With Daily Plans
 
@@ -333,13 +340,15 @@ The user can see total calories, protein, fat, carbohydrates, sugars, fiber, and
 
 The user can change planned quantities or remove items from the daily plan.
 
+The user can exclude a non-empty day from weekly calculations without deleting its data.
+
 ### Searching and Reusing Data
 
 The user can search saved ingredients or recipes.
 
 The user can reuse the same ingredients in different recipes.
 
-The user can reuse finished recipes in menus or in other recipes.
+The user can reuse finished recipes by creating prepared meals.
 
 ## 5. Business Rules: What Must Always Be True
 
@@ -389,11 +398,9 @@ The main formula for calculating a nutrition value for a specific product weight
 
 For example, if 100 g of chicken contains 23 g of protein and the recipe uses 250 g of chicken, the calculation is: protein = 23 * 250 / 100 = 57.5 g.
 
-Total recipe nutrition values are the sum of all ingredient and component values.
+Total recipe nutrition values are the sum of all ingredient values.
 
-If a recipe uses another finished recipe, that recipe's values are included as part of the total recipe values.
-
-The system should not change base ingredient values while calculating recipes or menus.
+The system should not change base ingredient values while calculating recipes or daily plans.
 
 ### Recipes
 
@@ -401,29 +408,23 @@ Each recipe must have a name.
 
 A recipe can contain many ingredients.
 
-A recipe can contain another finished recipe as a component.
+A recipe must contain at least one ordered cooking step.
 
-The quantity of each ingredient or component in a recipe must be greater than 0.
+Each cooking-step instruction must contain non-whitespace text.
 
-An empty recipe can exist as a draft, but its nutrition values are 0 until ingredients or components are added.
+The quantity of each ingredient in a recipe must be greater than 0.
 
-### Recipe Component Rules
+The current REST API and React scope does not support nested recipes or `RecipeComponent` operations.
 
-A finished recipe can be used as part of another recipe.
-
-A recipe must not directly or indirectly contain itself to avoid endless calculations.
-
-For example, `Sauce` can be part of `Burger`, but `Burger` cannot be part of `Sauce` if `Sauce` is already used in `Burger`.
-
-### Portion and Day Rules
+### Portion and Planning Rules
 
 The number of portions must be greater than 0.
 
-The number of days must be greater than 0.
+The number of planned days must be greater than 0 when automatic portion planning is enabled.
 
 Values for one portion are calculated as total recipe values divided by the number of portions.
 
-Values for one day are calculated as total recipe values divided by the number of days.
+Daily values for a prepared meal are calculated from the portions allocated to that date.
 
 ### Daily Plans
 
@@ -440,6 +441,18 @@ A prepared batch item cannot use more servings than remain available in that bat
 Total daily plan values are the sum of all daily plan item values.
 
 Opening an empty calendar date must not create a database record until the user saves a change or adds an item.
+
+### Weekly Summary Rules
+
+A non-empty daily plan is included in weekly calculations by default.
+
+The user can exclude a non-empty daily plan without deleting or changing its daily data.
+
+Empty and manually excluded days do not contribute to weekly totals or averages.
+
+The weekly average for each nutrition value is the included-day total divided by the number of included non-empty days.
+
+The weekly summary must show how many of the seven days are included.
 
 ## 6. Implementation Plan: In What Order the Project Will Be Built
 
@@ -1086,9 +1099,10 @@ Complete the Recipe workflow through Domain, persistence, REST API, automated te
 
 #### Milestone 16.1: Recipe Domain
 
-- [ ] Review Recipe, RecipeIngredient, and RecipeComponent rules before migration
-- [ ] Add Recipe, RecipeIngredient, and RecipeComponent models to `MealBuilder.Domain`
-- [ ] Add recipe content ordering and relationship rules
+- [ ] Review Recipe, RecipeIngredient, and RecipeStep rules before migration
+- [ ] Add Recipe, RecipeIngredient, and RecipeStep models to `MealBuilder.Domain`
+- [ ] Keep nested Recipes and `RecipeComponent` outside the current REST API and React scope
+- [ ] Add Ingredient and Cooking Step ordering rules
 - [ ] Add recipe nutrition calculations
 - [ ] Add Recipe business validation rules
 
@@ -1103,26 +1117,76 @@ Complete the Recipe workflow through Domain, persistence, REST API, automated te
 - [ ] Add Recipe request, response, and nutrition contracts
 - [ ] Add Recipe CRUD endpoints
 - [ ] Add RecipeIngredient operations
-- [ ] Add RecipeComponent operations
+- [ ] Add ordered RecipeStep operations
 - [ ] Support creating and updating a complete recipe in one request
 - [ ] Enforce validation, dependency, and ownership rules
 
 #### Milestone 16.4: Recipe API Tests
 
 - [ ] Test Recipe CRUD and complete recipe requests
-- [ ] Test ingredient and recipe component operations
-- [ ] Test ordering and nutrition calculations
+- [ ] Test Ingredient and Cooking Step operations
+- [ ] Test Cooking Step ordering and nutrition calculations
+- [ ] Test the minimum-one-step rule
 - [ ] Test validation and ownership isolation
 
 #### Milestone 16.5: Recipe React Frontend
 
 - [ ] Add Recipe frontend types and API functions
 - [ ] Implement the full single-flow Recipe form
-- [ ] Support ingredients, recipe components, ordering, and nutrition summaries
+- [ ] Add Details, Ingredients, and Cooking Steps sections
+- [ ] Support Ingredient and Cooking Step ordering and live nutrition summaries
 - [ ] Implement Recipe list, details, edit, and delete workflows
 - [ ] Confirm the complete Recipe workflow works end to end
 
-### Milestone 17: Meal Planning Vertical Slice
+### Milestone 17: User Profile and Calorie Target
+
+### Goal
+
+Complete post-registration onboarding, user nutrition profile data, and a confirmed daily calorie target through persistence, REST API, automated tests, and React.
+
+### Required Sub-milestones
+
+#### Milestone 17.1: Profile and Calculation Rules
+
+- [ ] Review the profile storage model and privacy requirements before migration
+- [ ] Define required and optional data for calculated and manual target setup
+- [ ] Select and document an evidence-based calorie calculation formula
+- [ ] Define safe input validation limits and describe calculated results as estimates
+- [ ] Require a confirmed daily calorie target before onboarding is complete
+- [ ] Prevent profile changes from silently replacing the saved calorie target
+
+#### Milestone 17.2: Profile Persistence
+
+- [ ] Add the chosen user profile, calorie target, and onboarding status persistence model
+- [ ] Add Entity Framework Core configuration
+- [ ] Create and apply the profile and calorie-target migration
+
+#### Milestone 17.3: Profile API
+
+- [ ] Add profile, target calculation, and saved-target contracts
+- [ ] Add endpoints to read and update the current user's profile and calorie target
+- [ ] Add a calculation-preview endpoint that does not silently save a target
+- [ ] Return onboarding completion state with the authenticated user response
+- [ ] Enforce authentication, validation, and ownership rules
+
+#### Milestone 17.4: Profile API Tests
+
+- [ ] Test calculated and manual target setup
+- [ ] Test incomplete onboarding behavior
+- [ ] Test calculation and input validation boundaries
+- [ ] Test that profile changes do not silently change the saved target
+- [ ] Test authentication and ownership isolation
+
+#### Milestone 17.5: Profile React Frontend
+
+- [ ] Add the calculated and manual onboarding paths after Register
+- [ ] Resume incomplete Onboarding after Login
+- [ ] Add profile and calorie-target management to Account
+- [ ] Allow the user to review and confirm a recalculated target
+- [ ] Show the saved calorie target in Dashboard nutrition progress
+- [ ] Confirm onboarding and target workflows work end to end
+
+### Milestone 18: Meal Planning Vertical Slice
 
 ### Goal
 
@@ -1130,43 +1194,57 @@ Complete prepared batches, daily plans, and the calendar through Domain, persist
 
 ### Required Sub-milestones
 
-#### Milestone 17.1: Meal Planning Domain
+#### Milestone 18.1: Meal Planning Domain
 
 - [ ] Review PreparedRecipeBatch and DailyPlan rules before migration
 - [ ] Add PreparedRecipeBatch and snapshot models to `MealBuilder.Domain`
 - [ ] Add DailyPlan and DailyPlanItem models to `MealBuilder.Domain`
-- [ ] Add allocation, nutrition, and date rules
+- [ ] Exclude the legacy direct Recipe relationship from the new `DailyPlanItem` model
+- [ ] Add allocated and unallocated portion rules
+- [ ] Support automatic planning by default and optional flexible planning
+- [ ] Support full and partial moves between dates
+- [ ] Add daily-plan weekly-summary inclusion rules
+- [ ] Add allocation, nutrition, and date validation rules
 
-#### Milestone 17.2: Meal Planning Persistence
+#### Milestone 18.2: Meal Planning Persistence
 
 - [ ] Add Meal Planning Entity Framework Core configurations
 - [ ] Add Meal Planning data to `AppDbContext`
 - [ ] Create and apply the Meal Planning migration
 
-#### Milestone 17.3: Meal Planning API
+#### Milestone 18.3: Meal Planning API
 
 - [ ] Add PreparedRecipeBatch contracts and endpoints
 - [ ] Add batch snapshot item operations
 - [ ] Add DailyPlan and DailyPlanItem contracts and endpoints
+- [ ] Create a Prepared Meal and its optional automatic allocations atomically
+- [ ] Add full and partial move operations that preserve the original item on failure
+- [ ] Return portions to the available amount after reduction or removal
 - [ ] Add weekly Calendar and nutrition endpoints
+- [ ] Exclude empty and manually disabled days from weekly totals and averages
 - [ ] Enforce allocation, validation, and ownership rules
 
-#### Milestone 17.4: Meal Planning API Tests
+#### Milestone 18.4: Meal Planning API Tests
 
 - [ ] Test prepared batch snapshot operations
-- [ ] Test daily plan item and allocation operations
-- [ ] Test calendar and nutrition calculations
+- [ ] Test automatic and flexible allocation operations
+- [ ] Test adjust, move, remove, and insufficient-portion behavior
+- [ ] Test atomic failure behavior for preparation and move operations
+- [ ] Test daily-plan inclusion and weekly nutrition calculations
 - [ ] Test validation and ownership isolation
 
-#### Milestone 17.5: Meal Planning React Frontend
+#### Milestone 18.5: Meal Planning React Frontend
 
 - [ ] Add Meal Planning frontend types and API functions
-- [ ] Implement Prepared Recipe Batch workflows
+- [ ] Implement the user-facing Prepared Meal and Available Portions workflows
+- [ ] Enable automatic planning by default with an option to keep portions available
 - [ ] Implement Daily Plan workflows
-- [ ] Implement the weekly calendar and nutrition summaries
+- [ ] Implement change amount, full or partial move, remove, and Undo interactions
+- [ ] Implement Dashboard daily and weekly previews
+- [ ] Implement the weekly Planner and included-day nutrition summaries
 - [ ] Confirm the complete Meal Planning workflow works end to end
 
-### Milestone 18: Final Transition
+### Milestone 19: Final Transition
 
 ### Goal
 
@@ -1174,22 +1252,22 @@ Verify the new application, retire the completed Razor Pages prototype, and docu
 
 ### Required Sub-milestones
 
-#### Milestone 18.1: Final Application Verification
+#### Milestone 19.1: Final Application Verification
 
 - [ ] Run all backend automated tests
 - [ ] Verify authentication and ownership behavior end to end
-- [ ] Verify Ingredient, Recipe, Prepared Batch, Daily Plan, and Calendar workflows
+- [ ] Verify Onboarding, calorie target, Ingredient, Recipe, Prepared Meal, Daily Plan, and Calendar workflows
 - [ ] Verify responsive desktop and mobile layouts
 - [ ] Confirm that the frontend and backend production builds succeed
 
-#### Milestone 18.2: Razor Pages Prototype Retirement
+#### Milestone 19.2: Razor Pages Prototype Retirement
 
 - [ ] Confirm that the React application covers all required prototype workflows
 - [ ] Confirm that no required code or data remains only in `MealBuilder.Web`
 - [ ] Remove the `MealBuilder.Web` project from the solution and repository after explicit confirmation
 - [ ] Make `MealBuilder.Api` the primary backend host
 
-#### Milestone 18.3: Final Documentation
+#### Milestone 19.3: Final Documentation
 
 - [ ] Update the README and project setup instructions
 - [ ] Document the final architecture and project responsibilities
@@ -1299,9 +1377,6 @@ This section contains ideas that may be useful for the project in the future, bu
   - Avoid comparing string values such as `Ingredient` and `Recipe` directly in Razor Pages.
   - Use an enum or shared constants when the flow becomes more complex.
 
-- [ ] Add structured recipe instructions
-  - Support multiple instruction blocks or ordered steps.
-
 - [ ] Add recipe storage instructions
   - For example, how to store the prepared food.
 
@@ -1315,11 +1390,12 @@ This section contains ideas that may be useful for the project in the future, bu
 - [ ] Add recipe type
   - For example, meal, sauce, preparation, component, or snack.
 
-- [ ] Add recipe component snapshots
-  - Preserve component recipe values so later edits do not silently change recipes that already use the component.
-
-- [ ] Support serving-based recipe components
-  - Allow adding another recipe as a component by servings instead of grams.
+- [ ] Create a private Ingredient from a Recipe
+  - Require a final prepared weight before calculating values per 100 g.
+  - Create a recipe-derived Ingredient snapshot rather than a live nested Recipe relationship.
+  - Preserve the source Recipe id and the source values used for conversion.
+  - Do not silently update the derived Ingredient after the source Recipe changes.
+  - Let the user explicitly refresh or recreate the derived Ingredient.
 
 - [ ] Add recipe scaling
   - Allow scaling recipes up or down without changing the original recipe.
@@ -1328,24 +1404,18 @@ This section contains ideas that may be useful for the project in the future, bu
   - In the future, some ingredients may need custom scaling behavior instead of simple multiplication.
 
 - [ ] Add editable final recipe weight
-  - By default, the system can estimate recipe weight from all ingredients and components.
+  - By default, the system can estimate recipe weight from all ingredients.
   - The default estimate does not account for trimming, peeling, evaporation, or other preparation and cooking weight changes.
   - Allow users to override the estimated weight with their own final recipe weight.
-  - Use the final recipe weight for more accurate per-gram recipe component calculations.
+  - Use the final recipe weight when creating a recipe-derived Ingredient with values per 100 g.
 
 - [ ] Add advanced recipe validation
   - Prevent the same ingredient from being added more than once inside the same recipe.
-  - Prevent indirect recipe component cycles.
 
 ### Menu Planning Improvements
 
 - [ ] Add advanced prepared batch snapshot history
   - Preserve deeper source details, edit history, and recipe version references if the basic prepared batch snapshot model is not enough.
-
-- [ ] Remove direct `Recipe` support from `DailyPlanItem`
-  - A daily plan should contain only prepared recipe batches and individual ingredients.
-  - A recipe must be converted into a prepared batch before it can be allocated to daily plans.
-  - Check existing data before removing the recipe relationship and enum value.
 
 - [ ] Allow selecting specific meal dates for prepared batches
   - Open a calendar when creating a prepared batch.
@@ -1372,9 +1442,9 @@ This section contains ideas that may be useful for the project in the future, bu
 
 - [ ] Add automatic validation before publication
   - Require a valid name and nutrition values.
-  - Require a published recipe to contain at least one ingredient or recipe component.
+  - Require a published recipe to contain at least one ingredient and one non-empty cooking step.
   - Require valid quantities, servings, and nutrition calculations.
-  - Require every public recipe dependency to be published and immutable.
+  - Require every public ingredient dependency to be published and immutable.
 
 - [ ] Add safe unpublishing rules
   - Allow an owner to unpublish content only when it is not used by other published content.
@@ -1382,10 +1452,10 @@ This section contains ideas that may be useful for the project in the future, bu
   - Decide whether unused content should return to `Private` or use a separate publication state.
 
 - [ ] Allow users to save private copies of published recipes
-  - Copy recipe core fields, ingredient rows, component rows, quantities, and positions.
+  - Copy recipe core fields, ingredient rows, cooking steps, quantities, and positions.
   - Assign the copied recipe to the current user.
   - Ensure later edits to the private copy do not change the published recipe.
-  - Decide when referenced ingredients and recipe components should remain shared or receive private copies.
+  - Decide when referenced ingredients should remain shared or receive private copies.
 
 - [ ] Add reactive administrator controls for public content
   - Allow administrators to inspect public content and its dependencies.
@@ -1464,4 +1534,4 @@ This section contains ideas that may be useful for the project in the future, bu
   - Test `MenuCalculationService`.
   - Test prepared batch nutrition calculations.
   - Test daily menu totals.
-  - Test edge cases such as empty recipes, zero values, recipe components, and prepared batch servings.
+  - Test edge cases such as zero values, missing cooking steps, and prepared batch servings.
