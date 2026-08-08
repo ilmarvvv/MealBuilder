@@ -1035,14 +1035,14 @@ Complete the Ingredient workflow through Domain, persistence, REST API, automate
 
 #### Milestone 15.1: Ingredient Domain
 
-- [ ] Review the Ingredient fields and business rules before migration
-- [ ] Add the Ingredient model to `MealBuilder.Domain`
-- [ ] Add calories, protein, fat, carbohydrates, sugars, fiber, and salt per 100 g
-- [ ] Make nutrition values non-nullable with a default value of 0
-- [ ] Allow duplicate Ingredient names
-- [ ] Distinguish built-in Ingredients from user-created Ingredients
-- [ ] Keep all current Ingredient quantities grams-only
-- [ ] Add Ingredient business validation rules
+- [x] Review the Ingredient fields and business rules before migration
+- [x] Add the Ingredient model to `MealBuilder.Domain`
+- [x] Add calories, protein, fat, carbohydrates, sugars, fiber, and salt per 100 g
+- [x] Make nutrition values non-nullable with a default value of 0
+- [x] Allow duplicate Ingredient names
+- [x] Distinguish built-in Ingredients from user-created Ingredients
+- [x] Keep all current Ingredient quantities grams-only
+- [x] Add Ingredient business validation rules
 
 #### Milestone 15.2: Ingredient Persistence
 
