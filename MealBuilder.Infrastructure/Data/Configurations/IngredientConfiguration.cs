@@ -2,6 +2,7 @@
 using MealBuilder.Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using MealBuilder.Infrastructure.Data.Seeding;
 
 namespace MealBuilder.Infrastructure.Data.Configurations;
 
@@ -89,6 +90,8 @@ public sealed class IngredientConfiguration
         builder.HasIndex(ingredient => ingredient.Name);
 
         builder.HasIndex(ingredient => ingredient.OwnerId);
+
+        builder.HasData(IngredientSeedData.Ingredients);
 
         builder.HasOne<ApplicationUser>()
             .WithMany()

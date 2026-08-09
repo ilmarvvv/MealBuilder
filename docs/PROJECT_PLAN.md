@@ -1046,11 +1046,11 @@ Complete the Ingredient workflow through Domain, persistence, REST API, automate
 
 #### Milestone 15.2: Ingredient Persistence
 
-- [ ] Add Ingredient Entity Framework Core configuration
-- [ ] Add Ingredients to `AppDbContext`
-- [ ] Configure built-in Ingredient source metadata and user-created Ingredient ownership
-- [ ] Preserve BLS source code and version for every seeded Ingredient
-- [ ] Seed 20 read-only Ingredients from BLS 4.0
+- [x] Add Ingredient Entity Framework Core configuration
+- [x] Add Ingredients to `AppDbContext`
+- [x] Configure built-in Ingredient source metadata and user-created Ingredient ownership
+- [x] Preserve BLS source code and version for every seeded Ingredient
+- [x] Seed 20 read-only Ingredients from BLS 4.0
   1. Chicken breast
   2. Ground beef
   3. Salmon
@@ -1071,9 +1071,9 @@ Complete the Ingredient workflow through Domain, persistence, REST API, automate
   18. Onion
   19. Apple
   20. Banana
-- [ ] Match the starter names to exact BLS records and import only records with all seven required nutrition values
-- [ ] Add BLS 4.0 attribution under its CC BY 4.0 license
-- [ ] Create and apply the Ingredient migration
+- [x] Match the starter names to exact BLS records and import only records with all seven required nutrition values
+- [x] Add BLS 4.0 attribution under its CC BY 4.0 license
+- [x] Create and apply the Ingredient migration
 
 #### Milestone 15.3: Ingredient API
 

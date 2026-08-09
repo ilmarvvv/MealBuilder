@@ -369,3 +369,6 @@ FodyWeavers.xsd
 
 # Local AI assistant instructions
 AGENTS.md
+
+# Local nutrition source datasets
+data/BLS_4_0_2025_DE/
