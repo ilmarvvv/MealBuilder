@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { Link, Outlet } from 'react-router'
+import { Link, NavLink, Outlet } from 'react-router'
 import { getApiErrorMessages } from '../api/getApiErrorMessages'
 import { useAuth } from '../auth/useAuth'
 import ErrorList from './ErrorList'
 import LoadingIndicator from './LoadingIndicator'
+import './AppLayout.css'
 
 export default function AppLayout() {
   const { user, isLoading, logout } = useAuth()
@@ -29,38 +30,91 @@ export default function AppLayout() {
   }
 
   return (
-    <>
-      <header>
-        <nav aria-label="Main navigation">
-          <Link to="/">MealBuilder</Link>
+    <div className="app-shell">
+      <header className="app-header">
+        <nav
+          className="app-navigation"
+          aria-label="Main navigation"
+        >
+          <Link className="app-brand" to="/">
+            <span className="app-brand__mark">MB</span>
+            <span>MealBuilder</span>
+          </Link>
 
-          {isLoading ? (
-            <LoadingIndicator message="Loading user..." />
-          ) : user ? (
-            <>
-              <span>{user.email}</span>
-              <button
-                type="button"
-                disabled={isLoggingOut}
-                onClick={handleLogout}
+          {user ? (
+            <div className="app-navigation__primary">
+              <NavLink
+                className="app-navigation__link"
+                to="/"
+                end
               >
-                {isLoggingOut ? 'Logging out...' : 'Logout'}
-              </button>
-            </>
+                Dashboard
+              </NavLink>
+
+              <span
+                className="app-navigation__link"
+                aria-disabled="true"
+              >
+                Planner
+              </span>
+
+              <NavLink
+                className="app-navigation__link"
+                to="/library/ingredients"
+              >
+                Library
+              </NavLink>
+            </div>
           ) : (
-            <>
-              <Link to="/login">Login</Link>
-              <Link to="/register">Register</Link>
-            </>
+            <div />
           )}
+
+          <div className="app-navigation__actions">
+            {isLoading ? (
+              <LoadingIndicator message="Loading user..." />
+            ) : user ? (
+              <>
+                <span className="app-navigation__user">
+                  {user.email}
+                </span>
+
+                <button
+                  className="app-navigation__logout"
+                  type="button"
+                  disabled={isLoggingOut}
+                  onClick={handleLogout}
+                >
+                  {isLoggingOut ? 'Logging out...' : 'Logout'}
+                </button>
+              </>
+            ) : (
+              <>
+                <NavLink
+                  className="app-navigation__auth-link"
+                  to="/login"
+                >
+                  Login
+                </NavLink>
+
+                <NavLink
+                  className="app-navigation__auth-link app-navigation__auth-link--primary"
+                  to="/register"
+                >
+                  Register
+                </NavLink>
+              </>
+            )}
+          </div>
         </nav>
 
-        <ErrorList messages={errors} />
+        <div className="app-header__feedback">
+          <ErrorList messages={errors} />
+        </div>
       </header>
 
-      <main>
+      <main className="app-main">
         <Outlet />
       </main>
-    </>
+    </div>
   )
 }

@@ -1096,7 +1096,7 @@ Complete the Ingredient workflow through Domain, persistence, REST API, automate
 
 #### Milestone 15.5: Ingredient React Frontend
 
-- [ ] Add Ingredient frontend types and API functions
+- [x] Add Ingredient frontend types and API functions
 - [ ] Implement Ingredient list, details, create, edit, and delete workflows in the shared Library layout
 - [ ] Distinguish built-in Ingredients from personal Ingredients in the UI
 - [ ] Show edit and delete actions only for the current user's Ingredients

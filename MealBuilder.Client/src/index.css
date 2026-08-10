@@ -1,29 +1,213 @@
 :root {
   font-family:
-    Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  color: #1f2937;
-  background: #f9fafb;
+    Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    sans-serif;
+  color-scheme: light;
+
+  --color-background: #f6f5f2;
+  --color-surface: #ffffff;
+  --color-surface-muted: #efede8;
+  --color-text: #20201e;
+  --color-text-muted: #6d6963;
+  --color-border: #ddd9d1;
+
+  --color-accent: #f47b20;
+  --color-accent-hover: #d96512;
+  --color-accent-soft: #fff0e4;
+  --color-on-accent: #211208;
+
+  --color-success: #188357;
+  --color-danger: #bd3d3d;
+  --color-focus: #f47b20;
+
+  --shadow-small: 0 4px 14px rgb(32 32 30 / 8%);
+  --shadow-medium: 0 12px 32px rgb(32 32 30 / 10%);
+
+  --radius-small: 0.5rem;
+  --radius-medium: 0.875rem;
+  --radius-large: 1.25rem;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+
+  color: var(--color-text);
+  background: var(--color-background);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-background: #171715;
+  --color-surface: #222220;
+  --color-surface-muted: #2d2c29;
+  --color-text: #f7f5f1;
+  --color-text-muted: #b8b3ab;
+  --color-border: #46433e;
+
+  --color-accent: #ff8a33;
+  --color-accent-hover: #ff9f59;
+  --color-accent-soft: #3b281b;
+  --color-on-accent: #211208;
+
+  --color-success: #65d19a;
+  --color-danger: #ff8585;
+  --color-focus: #ff8a33;
+
+  --shadow-small: 0 4px 14px rgb(0 0 0 / 24%);
+  --shadow-medium: 0 12px 32px rgb(0 0 0 / 32%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+
+    --color-background: #171715;
+    --color-surface: #222220;
+    --color-surface-muted: #2d2c29;
+    --color-text: #f7f5f1;
+    --color-text-muted: #b8b3ab;
+    --color-border: #46433e;
+
+    --color-accent: #ff8a33;
+    --color-accent-hover: #ff9f59;
+    --color-accent-soft: #3b281b;
+    --color-on-accent: #211208;
+
+    --color-success: #65d19a;
+    --color-danger: #ff8585;
+    --color-focus: #ff8a33;
+
+    --shadow-small: 0 4px 14px rgb(0 0 0 / 24%);
+    --shadow-medium: 0 12px 32px rgb(0 0 0 / 32%);
+  }
+}
+
 * {
   box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  min-height: 100%;
+  background: var(--color-background);
 }
 
 body {
   min-width: 320px;
   min-height: 100vh;
   margin: 0;
+  color: var(--color-text);
+  background: var(--color-background);
+  line-height: 1.5;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+main {
+  width: min(100% - 2rem, 75rem);
+  margin-inline: auto;
+  padding-block: var(--space-6) var(--space-7);
+}
+
+h1,
+h2,
+h3 {
+  margin-block: 0;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+
+h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+h2 {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+h3 {
+  font-size: 1.125rem;
+}
+
+p {
+  margin-block: var(--space-3);
 }
 
 button,
-input {
+input,
+select,
+textarea {
   font: inherit;
 }
 
+button {
+  min-height: 2.75rem;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-small);
+  color: var(--color-on-accent);
+  background: var(--color-accent);
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+button:not(:disabled):hover {
+  background: var(--color-accent-hover);
+  transform: translateY(-1px);
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+input,
+select,
+textarea {
+  width: min(100%, 32rem);
+  min-height: 2.75rem;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-small);
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+
+textarea {
+  min-height: 7rem;
+  resize: vertical;
+}
+
 a {
-  color: inherit;
+  color: var(--color-accent-hover);
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+}
+
+a:hover {
+  color: var(--color-accent);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+::selection {
+  color: var(--color-text);
+  background: var(--color-accent-soft);
 }

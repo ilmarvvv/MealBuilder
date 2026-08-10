@@ -1,6 +1,8 @@
-import { Route, Routes } from 'react-router'
+import { Navigate, Route, Routes } from 'react-router'
 import AppLayout from './components/AppLayout'
+import LibraryLayout from './components/LibraryLayout'
 import HomePage from './pages/HomePage'
+import IngredientListPage from './pages/IngredientListPage'
 import LoginPage from './pages/LoginPage'
 import NotFoundPage from './pages/NotFoundPage'
 import RegisterPage from './pages/RegisterPage'
@@ -12,6 +14,18 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+
+        <Route path="/library" element={<LibraryLayout />}>
+          <Route
+            index
+            element={<Navigate to="ingredients" replace />}
+          />
+          <Route
+            path="ingredients"
+            element={<IngredientListPage />}
+          />
+        </Route>
+
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
