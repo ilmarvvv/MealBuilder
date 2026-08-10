@@ -1077,22 +1077,22 @@ Complete the Ingredient workflow through Domain, persistence, REST API, automate
 
 #### Milestone 15.3: Ingredient API
 
-- [ ] Add Ingredient request and response contracts
-- [ ] Return built-in Ingredients and the current user's Ingredients from list and details endpoints
-- [ ] Add create, update, and delete endpoints for user-created Ingredients
-- [ ] Prevent regular users from changing built-in Ingredients
-- [ ] Return appropriate validation errors and HTTP status codes
-- [ ] Enforce authentication and ownership in every endpoint
+- [x] Add Ingredient request and response contracts
+- [x] Return built-in Ingredients and the current user's Ingredients from list and details endpoints
+- [x] Add create, update, and delete endpoints for user-created Ingredients
+- [x] Prevent regular users from changing built-in Ingredients
+- [x] Return appropriate validation errors and HTTP status codes
+- [x] Enforce authentication and ownership in every endpoint
 
 #### Milestone 15.4: Ingredient API Tests
 
-- [ ] Test successful Ingredient CRUD operations
-- [ ] Test default nutrition values and duplicate Ingredient names
-- [ ] Test that authenticated users can read built-in Ingredients
-- [ ] Test that regular users cannot update or delete built-in Ingredients
-- [ ] Test Ingredient validation errors
-- [ ] Test unauthenticated access
-- [ ] Test ownership isolation between two users
+- [x] Test successful Ingredient CRUD operations
+- [x] Test default nutrition values and duplicate Ingredient names
+- [x] Test that authenticated users can read built-in Ingredients
+- [x] Test that regular users cannot update or delete built-in Ingredients
+- [x] Test Ingredient validation errors
+- [x] Test unauthenticated access
+- [x] Test ownership isolation between two users
 
 #### Milestone 15.5: Ingredient React Frontend
 

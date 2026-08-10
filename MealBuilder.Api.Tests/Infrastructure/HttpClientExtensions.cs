@@ -10,8 +10,9 @@ public static class HttpClientExtensions
         string requestUri,
         TRequest requestBody)
     {
-        return SendPostWithCsrfAsync(
+        return SendWithCsrfAsync(
             client,
+            HttpMethod.Post,
             requestUri,
             JsonContent.Create(requestBody));
     }
@@ -20,14 +21,39 @@ public static class HttpClientExtensions
         this HttpClient client,
         string requestUri)
     {
-        return SendPostWithCsrfAsync(
+        return SendWithCsrfAsync(
             client,
+            HttpMethod.Post,
             requestUri,
             content: null);
     }
 
-    private static async Task<HttpResponseMessage> SendPostWithCsrfAsync(
+    public static Task<HttpResponseMessage> PutWithCsrfAsync<TRequest>(
+        this HttpClient client,
+        string requestUri,
+        TRequest requestBody)
+    {
+        return SendWithCsrfAsync(
+            client,
+            HttpMethod.Put,
+            requestUri,
+            JsonContent.Create(requestBody));
+    }
+
+    public static Task<HttpResponseMessage> DeleteWithCsrfAsync(
+        this HttpClient client,
+        string requestUri)
+    {
+        return SendWithCsrfAsync(
+            client,
+            HttpMethod.Delete,
+            requestUri,
+            content: null);
+    }
+
+    private static async Task<HttpResponseMessage> SendWithCsrfAsync(
         HttpClient client,
+        HttpMethod method,
         string requestUri,
         HttpContent? content)
     {
@@ -42,7 +68,7 @@ public static class HttpClientExtensions
         }
 
         using var request = new HttpRequestMessage(
-            HttpMethod.Post,
+            method,
             requestUri)
         {
             Content = content
