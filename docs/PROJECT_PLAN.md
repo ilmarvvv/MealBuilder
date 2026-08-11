@@ -1122,9 +1122,9 @@ Complete the Recipe workflow through Domain, persistence, REST API, automated te
 
 #### Milestone 16.2: Recipe Persistence
 
-- [ ] Add Recipe Entity Framework Core configurations
-- [ ] Add Recipe data to `AppDbContext`
-- [ ] Create and apply the Recipe migration
+- [x] Add Recipe Entity Framework Core configurations
+- [x] Add Recipe data to `AppDbContext`
+- [x] Create and apply the Recipe migration
 
 #### Milestone 16.3: Recipe API
 
