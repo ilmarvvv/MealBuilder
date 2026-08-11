@@ -1097,11 +1097,11 @@ Complete the Ingredient workflow through Domain, persistence, REST API, automate
 #### Milestone 15.5: Ingredient React Frontend
 
 - [x] Add Ingredient frontend types and API functions
-- [ ] Implement Ingredient list, details, create, edit, and delete workflows in the shared Library layout
-- [ ] Distinguish built-in Ingredients from personal Ingredients in the UI
-- [ ] Show edit and delete actions only for the current user's Ingredients
-- [ ] Add loading, validation, empty, and error states
-- [ ] Confirm the complete Ingredient workflow works end to end
+- [x] Implement Ingredient list, details, create, edit, and delete workflows in the shared Library layout
+- [x] Distinguish built-in Ingredients from personal Ingredients in the UI
+- [x] Show edit and delete actions only for the current user's Ingredients
+- [x] Add loading, validation, empty, and error states
+- [x] Confirm the complete Ingredient workflow works end to end
 
 ### Milestone 16: Recipes Vertical Slice
 
