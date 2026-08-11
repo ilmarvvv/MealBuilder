@@ -1113,12 +1113,12 @@ Complete the Recipe workflow through Domain, persistence, REST API, automated te
 
 #### Milestone 16.1: Recipe Domain
 
-- [ ] Review Recipe, RecipeIngredient, and RecipeStep rules before migration
-- [ ] Add Recipe, RecipeIngredient, and RecipeStep models to `MealBuilder.Domain`
-- [ ] Keep nested Recipes and `RecipeComponent` outside the current REST API and React scope
-- [ ] Add Ingredient and Cooking Step ordering rules
-- [ ] Add recipe nutrition calculations
-- [ ] Add Recipe business validation rules
+- [x] Review Recipe, RecipeIngredient, and RecipeStep rules before migration
+- [x] Add Recipe, RecipeIngredient, and RecipeStep models to `MealBuilder.Domain`
+- [x] Keep nested Recipes and `RecipeComponent` outside the current REST API and React scope
+- [x] Add Ingredient and Cooking Step ordering rules
+- [x] Add recipe nutrition calculations
+- [x] Add Recipe business validation rules
 
 #### Milestone 16.2: Recipe Persistence
 
