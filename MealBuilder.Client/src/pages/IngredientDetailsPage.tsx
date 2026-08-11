@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router'
+import { Link, useNavigate, useParams } from 'react-router'
 import { getApiErrorMessages } from '../api/getApiErrorMessages'
 import { ingredientApi } from '../api/ingredientApi'
 import type { Ingredient } from '../api/ingredientApi'
@@ -13,12 +13,17 @@ const nutritionNumberFormatter = new Intl.NumberFormat('en', {
 
 export default function IngredientDetailsPage() {
   const { ingredientId } = useParams()
+  const navigate = useNavigate()
   const parsedIngredientId = Number(ingredientId)
 
   const [ingredient, setIngredient] =
     useState<Ingredient | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [errors, setErrors] = useState<string[]>([])
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
+  useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [deleteErrors, setDeleteErrors] = useState<string[]>([])
 
   useEffect(() => {
     let isActive = true
@@ -66,6 +71,32 @@ export default function IngredientDetailsPage() {
     }
   }, [parsedIngredientId])
 
+  async function handleDelete() {
+  if (!ingredient || ingredient.isBuiltIn) {
+    return
+  }
+
+  setIsDeleting(true)
+  setDeleteErrors([])
+
+  try {
+    await ingredientApi.remove(ingredient.id)
+
+    navigate('/library/ingredients', {
+      replace: true,
+    })
+  } catch (error) {
+     setDeleteErrors(
+       getApiErrorMessages(
+         error,
+         'Unable to delete the Ingredient.',
+       ),
+     )
+   } finally {
+     setIsDeleting(false)
+   }
+ }
+
   if (isLoading) {
     return <LoadingIndicator message="Loading Ingredient..." />
   }
@@ -105,16 +136,74 @@ export default function IngredientDetailsPage() {
           <p>Nutrition values per 100 g</p>
         </div>
         {!ingredient.isBuiltIn && (
-        <div className="ingredient-details__actions">
-            <Link
-            className="ingredient-details__edit"
-            to={`/library/ingredients/${ingredient.id}/edit`}
-            >
-            Edit Ingredient
-            </Link>
-        </div>
-        )}
-      </header>
+  <div className="ingredient-details__actions">
+    <Link
+      className="ingredient-details__edit"
+      to={`/library/ingredients/${ingredient.id}/edit`}
+    >
+      Edit Ingredient
+    </Link>
+
+    <button
+      className="ingredient-details__delete"
+      type="button"
+      aria-expanded={isDeleteConfirmationOpen}
+      aria-controls="delete-ingredient-confirmation"
+      onClick={() => {
+        setDeleteErrors([])
+        setIsDeleteConfirmationOpen(true)
+      }}
+    >
+      Delete
+    </button>
+  </div>
+)}
+</header>
+
+{isDeleteConfirmationOpen && !ingredient.isBuiltIn && (
+  <section
+    id="delete-ingredient-confirmation"
+    className="ingredient-delete-confirmation"
+    role="region"
+    aria-labelledby="delete-ingredient-heading"
+  >
+    <div>
+      <h3 id="delete-ingredient-heading">
+        Delete Ingredient?
+      </h3>
+
+      <p>
+        This will permanently delete {ingredient.name}.
+      </p>
+    </div>
+
+    <ErrorList messages={deleteErrors} />
+
+    <div className="ingredient-delete-confirmation__actions">
+      <button
+        className="ingredient-delete-confirmation__cancel"
+        type="button"
+        disabled={isDeleting}
+        onClick={() =>
+          setIsDeleteConfirmationOpen(false)
+        }
+      >
+        Cancel
+      </button>
+
+      <button
+        className="ingredient-delete-confirmation__confirm"
+        type="button"
+        disabled={isDeleting}
+        onClick={handleDelete}
+      >
+        {isDeleting
+          ? 'Deleting...'
+          : 'Delete permanently'}
+      </button>
+    </div>
+  </section>
+)}
 
       <section
         className="ingredient-details__nutrition"
