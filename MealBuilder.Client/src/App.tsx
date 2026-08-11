@@ -7,6 +7,7 @@ import IngredientListPage from './pages/IngredientListPage'
 import LoginPage from './pages/LoginPage'
 import NotFoundPage from './pages/NotFoundPage'
 import RegisterPage from './pages/RegisterPage'
+import CreateIngredientPage from './pages/CreateIngredientPage'
 
 function App() {
   return (
@@ -24,6 +25,10 @@ function App() {
           <Route
             path="ingredients"
             element={<IngredientListPage />}
+          />
+          <Route
+            path="ingredients/new"
+            element={<CreateIngredientPage />}
           />
           <Route
             path="ingredients/:ingredientId"

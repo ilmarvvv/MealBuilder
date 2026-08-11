@@ -86,6 +86,12 @@ export default function IngredientListPage() {
             Nutrition values are shown per 100 g.
           </p>
         </div>
+        <Link
+            className="ingredient-list__add"
+            to="/library/ingredients/new"
+            >
+            + Add Ingredient
+        </Link>
       </header>
 
       <div className="ingredient-list__controls">

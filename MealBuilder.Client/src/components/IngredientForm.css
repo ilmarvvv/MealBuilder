@@ -1,0 +1,136 @@
+.ingredient-form {
+  display: grid;
+  gap: var(--space-5);
+  width: min(100%, 58rem);
+  margin-inline: auto;
+}
+
+.ingredient-form__section {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-large);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-small);
+}
+
+.ingredient-form__section header p {
+  margin-bottom: 0;
+  color: var(--color-text-muted);
+}
+
+.ingredient-form__field {
+  display: grid;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  font-weight: 750;
+}
+
+.ingredient-form__field > input {
+  width: 100%;
+  max-width: none;
+  color: var(--color-text);
+  background: var(--color-background);
+}
+
+.ingredient-form__nutrition-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, 14rem), 1fr)
+  );
+  gap: var(--space-4);
+}
+
+.ingredient-form__number-input {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-background);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.ingredient-form__number-input:focus-within {
+  border-color: var(--color-focus);
+  box-shadow: 0 0 0 3px
+    color-mix(
+      in srgb,
+      var(--color-focus) 24%,
+      transparent
+    );
+}
+
+.ingredient-form__number-input input {
+  width: 100%;
+  max-width: none;
+  border: 0;
+  border-radius: 0;
+  color: var(--color-text);
+  background: transparent;
+}
+
+.ingredient-form__number-input input:focus-visible {
+  outline: none;
+}
+
+.ingredient-form__number-input > span {
+  padding-inline: var(--space-3);
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+  font-weight: 800;
+}
+
+.ingredient-form__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.ingredient-form__cancel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-small);
+  color: var(--color-text);
+  background: var(--color-surface);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.ingredient-form__cancel:hover {
+  color: var(--color-text);
+  background: var(--color-surface-muted);
+}
+
+@media (max-width: 35rem) {
+  .ingredient-form__section {
+    padding: var(--space-4);
+    border-radius: var(--radius-medium);
+  }
+
+  .ingredient-form__nutrition-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ingredient-form__actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .ingredient-form__actions > * {
+    width: 100%;
+  }
+}
