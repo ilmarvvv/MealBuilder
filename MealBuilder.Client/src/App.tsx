@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router'
 import AppLayout from './components/AppLayout'
 import LibraryLayout from './components/LibraryLayout'
 import HomePage from './pages/HomePage'
+import IngredientDetailsPage from './pages/IngredientDetailsPage'
 import IngredientListPage from './pages/IngredientListPage'
 import LoginPage from './pages/LoginPage'
 import NotFoundPage from './pages/NotFoundPage'
@@ -23,6 +24,10 @@ function App() {
           <Route
             path="ingredients"
             element={<IngredientListPage />}
+          />
+          <Route
+            path="ingredients/:ingredientId"
+            element={<IngredientDetailsPage />}
           />
         </Route>
 

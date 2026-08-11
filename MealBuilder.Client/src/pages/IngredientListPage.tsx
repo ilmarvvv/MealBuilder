@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router'
 import { getApiErrorMessages } from '../api/getApiErrorMessages'
 import { ingredientApi } from '../api/ingredientApi'
 import type { Ingredient } from '../api/ingredientApi'
@@ -157,7 +158,11 @@ export default function IngredientListPage() {
             <ul className="ingredient-grid">
               {visibleIngredients.map((ingredient) => (
                 <li key={ingredient.id}>
-                  <article className="ingredient-card">
+                    <Link
+                        className="ingredient-card__link"
+                        to={`/library/ingredients/${ingredient.id}`}
+                    >
+                        <article className="ingredient-card">
                     <header className="ingredient-card__header">
                       <h3>{ingredient.name}</h3>
 
@@ -209,6 +214,7 @@ export default function IngredientListPage() {
                       </div>
                     </dl>
                   </article>
+                  </Link>
                 </li>
               ))}
             </ul>
