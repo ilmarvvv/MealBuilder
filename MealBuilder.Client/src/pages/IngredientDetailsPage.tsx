@@ -104,6 +104,16 @@ export default function IngredientDetailsPage() {
 
           <p>Nutrition values per 100 g</p>
         </div>
+        {!ingredient.isBuiltIn && (
+        <div className="ingredient-details__actions">
+            <Link
+            className="ingredient-details__edit"
+            to={`/library/ingredients/${ingredient.id}/edit`}
+            >
+            Edit Ingredient
+            </Link>
+        </div>
+        )}
       </header>
 
       <section

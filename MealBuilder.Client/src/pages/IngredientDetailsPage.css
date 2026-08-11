@@ -38,6 +38,10 @@
       transparent 60%
     ),
     var(--color-surface);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-4);
 }
 
 .ingredient-details__header h2 {
@@ -59,6 +63,30 @@
   background: var(--color-surface-muted);
   font-size: 0.75rem;
   font-weight: 800;
+}
+
+.ingredient-details__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.ingredient-details__edit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-small);
+  color: var(--color-on-accent);
+  background: var(--color-accent);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.ingredient-details__edit:hover {
+  color: var(--color-on-accent);
+  background: var(--color-accent-hover);
 }
 
 .ingredient-details__nutrition {
@@ -157,5 +185,13 @@
 
   .ingredient-details__calories > span:first-child {
     grid-column: 1 / -1;
+  }
+  .ingredient-details__header {
+  align-items: stretch;
+  flex-direction: column;
+  }
+
+  .ingredient-details__edit {
+  width: 100%;
   }
 }

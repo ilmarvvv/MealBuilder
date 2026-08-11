@@ -8,6 +8,7 @@ import LoginPage from './pages/LoginPage'
 import NotFoundPage from './pages/NotFoundPage'
 import RegisterPage from './pages/RegisterPage'
 import CreateIngredientPage from './pages/CreateIngredientPage'
+import EditIngredientPage from './pages/EditIngredientPage'
 
 function App() {
   return (
@@ -29,6 +30,10 @@ function App() {
           <Route
             path="ingredients/new"
             element={<CreateIngredientPage />}
+          />
+          <Route
+            path="ingredients/:ingredientId/edit"
+            element={<EditIngredientPage />}
           />
           <Route
             path="ingredients/:ingredientId"
