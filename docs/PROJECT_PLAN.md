@@ -1128,12 +1128,12 @@ Complete the Recipe workflow through Domain, persistence, REST API, automated te
 
 #### Milestone 16.3: Recipe API
 
-- [ ] Add Recipe request, response, and nutrition contracts
-- [ ] Add Recipe CRUD endpoints
-- [ ] Add RecipeIngredient operations
-- [ ] Add ordered RecipeStep operations
-- [ ] Support creating and updating a complete recipe in one request
-- [ ] Enforce validation, dependency, and ownership rules
+- [x] Add Recipe request, response, and nutrition contracts
+- [x] Add Recipe CRUD endpoints
+- [x] Add RecipeIngredient operations
+- [x] Add ordered RecipeStep operations
+- [x] Support creating and updating a complete recipe in one request
+- [x] Enforce validation, dependency, and ownership rules
 
 #### Milestone 16.4: Recipe API Tests
 

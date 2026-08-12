@@ -181,6 +181,22 @@ public sealed class IngredientsController(
             return Forbid();
         }
 
+        var isUsedByRecipe = await dbContext.RecipeIngredients
+            .AsNoTracking()
+            .AnyAsync(
+        recipeIngredient =>
+            recipeIngredient.IngredientId == ingredient.Id,
+        cancellationToken);
+
+        if (isUsedByRecipe)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status409Conflict,
+                title: "Ingredient is in use.",
+                detail:
+                    "An ingredient used by a recipe cannot be deleted.");
+        }
+
         dbContext.Ingredients.Remove(ingredient);
 
         await dbContext.SaveChangesAsync(cancellationToken);
