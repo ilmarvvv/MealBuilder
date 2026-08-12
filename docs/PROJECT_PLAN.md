@@ -1137,11 +1137,11 @@ Complete the Recipe workflow through Domain, persistence, REST API, automated te
 
 #### Milestone 16.4: Recipe API Tests
 
-- [ ] Test Recipe CRUD and complete recipe requests
-- [ ] Test Ingredient and Cooking Step operations
-- [ ] Test Cooking Step ordering and nutrition calculations
-- [ ] Test the minimum-one-step rule
-- [ ] Test validation and ownership isolation
+- [x] Test Recipe CRUD and complete recipe requests
+- [x] Test Ingredient and Cooking Step operations
+- [x] Test Cooking Step ordering and nutrition calculations
+- [x] Test the minimum-one-step rule
+- [x] Test validation and ownership isolation
 
 #### Milestone 16.5: Recipe React Frontend
 
