@@ -1145,13 +1145,13 @@ Complete the Recipe workflow through Domain, persistence, REST API, automated te
 
 #### Milestone 16.5: Recipe React Frontend
 
-- [ ] Add Recipe frontend types and API functions
-- [ ] Implement the full single-flow Recipe form
-- [ ] Add Details, Ingredients, and Cooking Steps sections
-- [ ] Support Ingredient and Cooking Step ordering and live nutrition summaries
-- [ ] Implement Recipe list, details, edit, and delete workflows
-- [ ] Integrate Recipe results into the shared Library search and type filters
-- [ ] Confirm the complete Recipe workflow works end to end
+- [x] Add Recipe frontend types and API functions
+- [x] Implement the full single-flow Recipe form
+- [x] Add Details, Ingredients, and Cooking Steps sections
+- [x] Support Ingredient and Cooking Step ordering and live nutrition summaries
+- [x] Implement Recipe list, details, edit, and delete workflows
+- [x] Integrate Recipe results into the shared Library search and type filters
+- [x] Confirm the complete Recipe workflow works end to end
 
 ### Milestone 17: User Profile and Calorie Target
 
