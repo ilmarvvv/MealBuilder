@@ -28,12 +28,12 @@ export default function LibraryLayout() {
             Ingredients
           </NavLink>
 
-          <span
+          <NavLink
             className="library-tabs__item"
-            aria-disabled="true"
+            to="/library/recipes"
           >
             Recipes
-          </span>
+          </NavLink>
         </nav>
       </header>
 

@@ -9,6 +9,7 @@ import NotFoundPage from './pages/NotFoundPage'
 import RegisterPage from './pages/RegisterPage'
 import CreateIngredientPage from './pages/CreateIngredientPage'
 import EditIngredientPage from './pages/EditIngredientPage'
+import RecipeListPage from './pages/RecipeListPage'
 
 function App() {
   return (
@@ -26,6 +27,10 @@ function App() {
           <Route
             path="ingredients"
             element={<IngredientListPage />}
+          />
+          <Route
+            path="recipes"
+            element={<RecipeListPage />}
           />
           <Route
             path="ingredients/new"
