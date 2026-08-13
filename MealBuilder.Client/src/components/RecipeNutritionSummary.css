@@ -1,0 +1,125 @@
+.recipe-nutrition-summary {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: color-mix(
+    in srgb,
+    var(--color-surface) 94%,
+    var(--color-accent) 6%
+  );
+  box-shadow: var(--shadow-small);
+}
+
+.recipe-nutrition-summary > header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.recipe-nutrition-summary > header > p {
+  max-width: 24rem;
+  margin: 0;
+  color: var(--color-text-muted);
+  text-align: right;
+}
+
+.recipe-nutrition-summary__eyebrow {
+  margin: 0 0 var(--space-1);
+  color: var(--color-accent);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.recipe-nutrition-summary__panels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.recipe-nutrition-panel {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-background);
+}
+
+.recipe-nutrition-panel h4 {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.recipe-nutrition-panel__calories {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.recipe-nutrition-panel__calories strong {
+  color: var(--color-text);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  line-height: 1;
+}
+
+.recipe-nutrition-panel__calories span {
+  color: var(--color-text-muted);
+  font-weight: 700;
+}
+
+.recipe-nutrition-panel__values {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  border-top: 1px solid var(--color-border);
+  border-left: 1px solid var(--color-border);
+}
+
+.recipe-nutrition-panel__values div {
+  min-width: 0;
+  padding: var(--space-3);
+  border-right: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.recipe-nutrition-panel__values dt {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}
+
+.recipe-nutrition-panel__values dd {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text);
+  font-weight: 800;
+}
+
+@media (max-width: 55rem) {
+  .recipe-nutrition-summary__panels {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 35rem) {
+  .recipe-nutrition-summary {
+    padding: var(--space-4);
+  }
+
+  .recipe-nutrition-summary > header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .recipe-nutrition-summary > header > p {
+    text-align: left;
+  }
+
+  .recipe-nutrition-panel__values {
+    grid-template-columns: 1fr;
+  }
+}

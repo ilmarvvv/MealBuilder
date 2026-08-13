@@ -1,0 +1,25 @@
+.recipe-form-page {
+  display: grid;
+  gap: var(--space-5);
+  width: min(100%, 72rem);
+  margin-inline: auto;
+}
+
+.recipe-form-page__header {
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.recipe-form-page__header > p:last-child {
+  margin-bottom: 0;
+  color: var(--color-text-muted);
+}
+
+.recipe-form-page__eyebrow {
+  margin: 0 0 var(--space-2);
+  color: var(--color-accent);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
