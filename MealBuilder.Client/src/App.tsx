@@ -11,6 +11,7 @@ import CreateIngredientPage from './pages/CreateIngredientPage'
 import EditIngredientPage from './pages/EditIngredientPage'
 import RecipeListPage from './pages/RecipeListPage'
 import CreateRecipePage from './pages/CreateRecipePage'
+import RecipeDetailsPage from './pages/RecipeDetailsPage'
 
 function App() {
   return (
@@ -40,6 +41,10 @@ function App() {
           <Route
             path="recipes/new"
             element={<CreateRecipePage />}
+          />
+          <Route
+            path="recipes/:recipeId"
+            element={<RecipeDetailsPage />}
           />
           <Route
             path="ingredients/:ingredientId/edit"
