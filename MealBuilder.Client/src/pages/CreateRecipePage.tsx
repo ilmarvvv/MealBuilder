@@ -29,12 +29,7 @@ export default function CreateRecipePage() {
         }
       } catch (error) {
         if (isActive) {
-          setErrors(
-            getApiErrorMessages(
-              error,
-              'Unable to load Ingredients.',
-            ),
-          )
+          setErrors(getApiErrorMessages(error, 'Unable to load Ingredients.'))
         }
       } finally {
         if (isActive) {
@@ -55,15 +50,11 @@ export default function CreateRecipePage() {
     setErrors([])
 
     try {
-      await recipeApi.create(input)
-      navigate('/library/recipes', { replace: true })
+      const createdRecipe = await recipeApi.create(input)
+
+      navigate(`/library/recipes/${createdRecipe.id}`, { replace: true })
     } catch (error) {
-      setErrors(
-        getApiErrorMessages(
-          error,
-          'Unable to create the Recipe.',
-        ),
-      )
+      setErrors(getApiErrorMessages(error, 'Unable to create the Recipe.'))
     } finally {
       setIsSubmitting(false)
     }
@@ -76,15 +67,13 @@ export default function CreateRecipePage() {
   return (
     <section className="recipe-form-page">
       <header className="recipe-form-page__header">
-        <p className="recipe-form-page__eyebrow">
-          Personal Recipe
-        </p>
+        <p className="recipe-form-page__eyebrow">Personal Recipe</p>
 
         <h2>Add Recipe</h2>
 
         <p>
-          Combine Ingredients, add Cooking Steps, and review
-          the calculated nutrition values.
+          Combine Ingredients, add Cooking Steps, and review the calculated
+          nutrition values.
         </p>
       </header>
 
