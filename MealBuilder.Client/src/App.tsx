@@ -12,6 +12,7 @@ import EditIngredientPage from './pages/EditIngredientPage'
 import RecipeListPage from './pages/RecipeListPage'
 import CreateRecipePage from './pages/CreateRecipePage'
 import RecipeDetailsPage from './pages/RecipeDetailsPage'
+import EditRecipePage from './pages/EditRecipePage'
 
 function App() {
   return (
@@ -41,6 +42,10 @@ function App() {
           <Route
             path="recipes/new"
             element={<CreateRecipePage />}
+          />
+          <Route
+            path="recipes/:recipeId/edit"
+            element={<EditRecipePage />}
           />
           <Route
             path="recipes/:recipeId"

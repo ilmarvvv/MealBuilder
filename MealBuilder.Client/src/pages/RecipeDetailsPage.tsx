@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router'
+import { Link, useNavigate, useParams } from 'react-router'
 import { getApiErrorMessages } from '../api/getApiErrorMessages'
 import { recipeApi } from '../api/recipeApi'
 import type { Recipe } from '../api/recipeApi'
@@ -15,10 +15,17 @@ const numberFormatter = new Intl.NumberFormat('en', {
 export default function RecipeDetailsPage() {
   const { recipeId } = useParams()
   const parsedRecipeId = Number(recipeId)
+  const navigate = useNavigate()
 
   const [recipe, setRecipe] = useState<Recipe | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [errors, setErrors] = useState<string[]>([])
+  const [
+  isDeleteConfirmationOpen,
+  setIsDeleteConfirmationOpen,
+  ] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [deleteErrors, setDeleteErrors] = useState<string[]>([])
 
   useEffect(() => {
     let isActive = true
@@ -67,6 +74,32 @@ export default function RecipeDetailsPage() {
     }
   }, [parsedRecipeId])
 
+async function handleDelete() {
+  if (!recipe) {
+    return
+  }
+
+  setIsDeleting(true)
+  setDeleteErrors([])
+
+  try {
+    await recipeApi.remove(recipe.id)
+
+    navigate('/library/recipes', {
+      replace: true,
+    })
+  } catch (error) {
+    setDeleteErrors(
+      getApiErrorMessages(
+        error,
+        'Unable to delete the Recipe.',
+      ),
+    )
+  } finally {
+    setIsDeleting(false)
+  }
+}
+
   if (isLoading) {
     return <LoadingIndicator message="Loading Recipe..." />
   }
@@ -105,11 +138,78 @@ export default function RecipeDetailsPage() {
           </p>
         </div>
 
-        <span className="recipe-details__servings">
-          {recipe.servings}{' '}
-          {recipe.servings === 1 ? 'serving' : 'servings'}
-        </span>
+        <div className="recipe-details__actions">
+            <span className="recipe-details__servings">
+                {recipe.servings}{' '}
+                {recipe.servings === 1 ? 'serving' : 'servings'}
+            </span>
+
+            <Link
+                className="recipe-details__edit"
+                to={`/library/recipes/${recipe.id}/edit`}
+            >
+                Edit Recipe
+            </Link>
+            <button
+                className="recipe-details__delete"
+                type="button"
+                aria-expanded={isDeleteConfirmationOpen}
+                aria-controls="delete-recipe-confirmation"
+                onClick={() => {
+                    setDeleteErrors([])
+                    setIsDeleteConfirmationOpen(true)
+                }}
+                >
+                    Delete
+            </button>
+        </div>
       </header>
+
+{isDeleteConfirmationOpen && (
+  <section
+    id="delete-recipe-confirmation"
+    className="recipe-delete-confirmation"
+    role="region"
+    aria-labelledby="delete-recipe-heading"
+  >
+    <div>
+      <h3 id="delete-recipe-heading">
+        Delete Recipe?
+      </h3>
+
+      <p>
+        This will permanently delete {recipe.name}.
+      </p>
+    </div>
+
+    <ErrorList messages={deleteErrors} />
+
+    <div className="recipe-delete-confirmation__actions">
+      <button
+        className="recipe-delete-confirmation__cancel"
+        type="button"
+        disabled={isDeleting}
+        onClick={() => {
+          setDeleteErrors([])
+          setIsDeleteConfirmationOpen(false)
+        }}
+      >
+        Cancel
+      </button>
+
+      <button
+        className="recipe-delete-confirmation__confirm"
+        type="button"
+        disabled={isDeleting}
+        onClick={handleDelete}
+      >
+        {isDeleting
+          ? 'Deleting...'
+          : 'Delete permanently'}
+      </button>
+    </div>
+  </section>
+)}
 
       <RecipeNutritionSummary
         total={recipe.totalNutrition}
