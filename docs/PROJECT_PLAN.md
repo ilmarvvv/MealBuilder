@@ -1163,32 +1163,17 @@ Complete post-registration onboarding, user nutrition profile data, and a confir
 
 #### Milestone 17.1: Profile and Calculation Rules
 
-- [x] Review the profile storage model and privacy requirements before migration
-  - Store one private `UserNutritionProfile` per user, separate from `ApplicationUser`.
-  - Allow only the current user to access the profile, do not accept `UserId` from the client, and do not persist calculation previews.
-- [x] Define required and optional data for calculated and manual target setup
-  - Require `UserId` and `DailyCalorieTarget` in the saved profile.
-  - Keep `BirthDate`, `SexForCalculation`, `HeightCm`, `WeightKg`, `ActivityLevel`, and `WeightGoal` optional in persistence so manual setup can save only a target.
-  - Require all calculation inputs when the calculated setup path is used.
-- [x] Limit the initial guided setup to adults aged 18 and over with metric age, height, and weight inputs
-  - Support ages from 18 through 100, heights from 100 through 250 cm, and weights from 30 through 400 kg.
-- [x] Define the initial activity-level and lose, maintain, or gain goal options
-  - Use `LowActive` (1.4), `ModeratelyActive` (1.6), `Active` (1.8), and `VeryActive` (2.0).
-  - Adjust maintenance calories by -10% for `LoseWeight`, 0% for `MaintainWeight`, and +10% for `GainWeight`.
-- [x] Keep first-version user targets calories-only
-  - Do not add saved targets for protein, fat, carbohydrates, sugars, fiber, or salt.
-- [x] Select and document an evidence-based calorie calculation formula
-  - Use the simplified Mifflin-St Jeor formula: `10 * weightKg + 6.25 * heightCm - 5 * age + 5` for male calculation and `10 * weightKg + 6.25 * heightCm - 5 * age - 161` for female calculation.
-  - Calculate maintenance calories as resting energy expenditure multiplied by the selected EFSA physical activity level, then apply the selected weight-goal adjustment and round to the nearest whole kcal.
-  - Sources: [Mifflin-St Jeor study](https://ajcn.nutrition.org/article/S0002-9165%2823%2916698-6/pdf) and [EFSA Dietary Reference Values for energy](https://www.efsa.europa.eu/sites/default/files/assets/DRV_Summary_tables_jan_17.pdf).
-- [x] Define safe input validation limits and describe calculated results as estimates
-  - Accept saved targets from 1,000 through 10,000 kcal and reject out-of-range calculated results instead of silently clamping them.
-  - Present calculated results as estimates rather than medical advice.
-  - Minimum-target reference: [NIDDK Body Weight Planner](https://www.niddk.nih.gov/bwp).
-- [x] Require a confirmed daily calorie target before onboarding is complete
-  - Treat the existence of a saved profile with a confirmed target as completed onboarding instead of persisting a separate completion flag.
-- [x] Prevent profile changes from silently replacing the saved calorie target
-  - Recalculation produces a preview, and the saved target changes only after explicit confirmation.
+- [x] Use one private `UserNutritionProfile` per user; keep it separate from `ApplicationUser`, current-user-only, and never persist calculation previews
+- [x] Require `UserId` and `DailyCalorieTarget`; keep calculation fields optional for manual setup but require all of them for calculated setup
+- [x] Support metric inputs for ages 18-100, heights 100-250 cm, and weights 30-400 kg
+- [x] Use EFSA activity levels `LowActive` (1.4), `ModeratelyActive` (1.6), `Active` (1.8), and `VeryActive` (2.0)
+- [x] Apply goal factors of 0.90 for `LoseWeight`, 1.00 for `MaintainWeight`, and 1.10 for `GainWeight`
+- [x] Keep first-version saved targets calories-only
+- [x] Use the simplified Mifflin-St Jeor formula and calculate `Target = round(RMR * ActivityFactor * GoalFactor)`
+  - `Male RMR = 10 * weightKg + 6.25 * heightCm - 5 * age + 5`; `Female RMR = 10 * weightKg + 6.25 * heightCm - 5 * age - 161`
+- [x] Accept targets from 1,000-10,000 kcal, reject out-of-range results without clamping, and label calculated targets as estimates rather than medical advice
+- [x] Complete onboarding only after a target is confirmed; derive completion from the saved profile instead of storing another flag
+- [x] Keep the saved target unchanged when profile data changes; replace it only after an explicit recalculation confirmation
 
 #### Milestone 17.2: Profile Persistence
 
