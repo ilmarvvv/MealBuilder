@@ -1,20 +1,25 @@
 ﻿using MealBuilder.Api.Contracts.Authentication;
+using MealBuilder.Infrastructure.Data;
 using MealBuilder.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace MealBuilder.Api.Controllers;
 
 [ApiController]
 [Route("api/auth")]
 public sealed class AuthController(
+    AppDbContext dbContext,
     UserManager<ApplicationUser> userManager,
     SignInManager<ApplicationUser> signInManager) : ControllerBase
 {
     [AllowAnonymous]
     [HttpPost("register")]
-    public async Task<ActionResult<AuthUserResponse>> Register(RegisterRequest request)
+    public async Task<ActionResult<AuthUserResponse>> Register(
+        RegisterRequest request,
+        CancellationToken cancellationToken)
     {
         var user = new ApplicationUser
         {
@@ -22,28 +27,39 @@ public sealed class AuthController(
             Email = request.Email
         };
 
-        var result = await userManager.CreateAsync(user, request.Password);
+        var result = await userManager.CreateAsync(
+            user,
+            request.Password);
 
         if (!result.Succeeded)
         {
             foreach (var error in result.Errors)
             {
-                ModelState.AddModelError(error.Code, error.Description);
+                ModelState.AddModelError(
+                    error.Code,
+                    error.Description);
             }
 
             return ValidationProblem(ModelState);
         }
 
-        await signInManager.SignInAsync(user, isPersistent: false);
+        await signInManager.SignInAsync(
+            user,
+            isPersistent: false);
 
-        return Ok(new AuthUserResponse(user.Id, user.Email!));
+        return Ok(await CreateResponseAsync(
+            user,
+            cancellationToken));
     }
 
     [AllowAnonymous]
     [HttpPost("login")]
-    public async Task<ActionResult<AuthUserResponse>> Login(LoginRequest request)
+    public async Task<ActionResult<AuthUserResponse>> Login(
+        LoginRequest request,
+        CancellationToken cancellationToken)
     {
-        var user = await userManager.FindByEmailAsync(request.Email);
+        var user = await userManager.FindByEmailAsync(
+            request.Email);
 
         if (user is null)
         {
@@ -65,12 +81,15 @@ public sealed class AuthController(
                 title: "Invalid email or password.");
         }
 
-        return Ok(new AuthUserResponse(user.Id, user.Email!));
+        return Ok(await CreateResponseAsync(
+            user,
+            cancellationToken));
     }
 
     [Authorize]
     [HttpGet("me")]
-    public async Task<ActionResult<AuthUserResponse>> GetCurrentUser()
+    public async Task<ActionResult<AuthUserResponse>> GetCurrentUser(
+        CancellationToken cancellationToken)
     {
         var user = await userManager.GetUserAsync(User);
 
@@ -79,7 +98,9 @@ public sealed class AuthController(
             return Unauthorized();
         }
 
-        return Ok(new AuthUserResponse(user.Id, user.Email!));
+        return Ok(await CreateResponseAsync(
+            user,
+            cancellationToken));
     }
 
     [Authorize]
@@ -89,5 +110,21 @@ public sealed class AuthController(
         await signInManager.SignOutAsync();
 
         return NoContent();
+    }
+
+    private async Task<AuthUserResponse> CreateResponseAsync(
+        ApplicationUser user,
+        CancellationToken cancellationToken)
+    {
+        var isOnboardingComplete =
+            await dbContext.UserNutritionProfiles
+                .AnyAsync(
+                    profile => profile.UserId == user.Id,
+                    cancellationToken);
+
+        return new AuthUserResponse(
+            user.Id,
+            user.Email!,
+            isOnboardingComplete);
     }
 }
