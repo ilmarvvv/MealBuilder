@@ -1,5 +1,6 @@
 ﻿using MealBuilder.Domain.Ingredients;
 using MealBuilder.Domain.Recipes;
+using MealBuilder.Domain.Profiles;
 using MealBuilder.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,9 @@ namespace MealBuilder.Infrastructure.Data
             Set<RecipeIngredient>();
 
         public DbSet<RecipeStep> RecipeSteps => Set<RecipeStep>();
+
+        public DbSet<UserNutritionProfile> UserNutritionProfiles =>
+            Set<UserNutritionProfile>();
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
