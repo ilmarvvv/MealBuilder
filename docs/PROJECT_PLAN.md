@@ -1177,9 +1177,9 @@ Complete post-registration onboarding, user nutrition profile data, and a confir
 
 #### Milestone 17.2: Profile Persistence
 
-- [ ] Add the chosen user profile, calorie target, and onboarding status persistence model
-- [ ] Add Entity Framework Core configuration
-- [ ] Create and apply the profile and calorie-target migration
+- [x] Add the chosen user profile, calorie target, and onboarding status persistence model
+- [x] Add Entity Framework Core configuration
+- [x] Create and apply the profile and calorie-target migration
 
 #### Milestone 17.3: Profile API
 
