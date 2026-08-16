@@ -206,6 +206,63 @@ public sealed class ProfileTests(
         Assert.True(updatedProfile.HasCalculationInputs);
     }
 
+    [Fact]
+    public async Task SaveDailyCalorieTarget_AfterCalculation_ReplacesSavedTarget()
+    {
+        using var client = factory.CreateHttpsClient();
+
+        await RegisterUserAsync(client);
+
+        const int initialTarget = 2200;
+
+        var initialTargetResponse = await client.PutWithCsrfAsync(
+            "/api/profile/calorie-target",
+            new DailyCalorieTargetRequest(initialTarget));
+
+        initialTargetResponse.EnsureSuccessStatusCode();
+
+        var calculationResponse = await client.PostWithCsrfAsync(
+            "/api/profile/calorie-target/calculate",
+            CreateValidCalculationRequest());
+
+        calculationResponse.EnsureSuccessStatusCode();
+
+        var estimate = await calculationResponse.Content
+            .ReadFromJsonAsync<CalorieTargetEstimateResponse>();
+
+        Assert.NotNull(estimate);
+
+        var profileBeforeConfirmation = await client
+            .GetFromJsonAsync<UserNutritionProfileResponse>(
+                "/api/profile");
+
+        Assert.NotNull(profileBeforeConfirmation);
+        Assert.Equal(
+            initialTarget,
+            profileBeforeConfirmation.DailyCalorieTarget);
+
+        var confirmationResponse = await client.PutWithCsrfAsync(
+            "/api/profile/calorie-target",
+            new DailyCalorieTargetRequest(
+                estimate.RecommendedDailyCalorieTarget));
+
+        confirmationResponse.EnsureSuccessStatusCode();
+
+        var profileAfterConfirmation =
+            await confirmationResponse.Content
+                .ReadFromJsonAsync<UserNutritionProfileResponse>();
+
+        Assert.NotNull(profileAfterConfirmation);
+        Assert.Equal(
+            estimate.RecommendedDailyCalorieTarget,
+            profileAfterConfirmation.DailyCalorieTarget);
+        Assert.NotEqual(
+            initialTarget,
+            profileAfterConfirmation.DailyCalorieTarget);
+    }
+
+
+
     private static CalorieTargetCalculationRequest
     CreateValidCalculationRequest()
     {
