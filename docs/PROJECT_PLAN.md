@@ -1183,19 +1183,19 @@ Complete post-registration onboarding, user nutrition profile data, and a confir
 
 #### Milestone 17.3: Profile API
 
-- [ ] Add profile, target calculation, and saved-target contracts
-- [ ] Add endpoints to read and update the current user's profile and calorie target
-- [ ] Add a calculation-preview endpoint that does not silently save a target
-- [ ] Return onboarding completion state with the authenticated user response
-- [ ] Enforce authentication, validation, and ownership rules
+- [x] Add profile, target calculation, and saved-target contracts
+- [x] Add endpoints to read and update the current user's profile and calorie target
+- [x] Add a calculation-preview endpoint that does not silently save a target
+- [x] Return onboarding completion state with the authenticated user response
+- [x] Enforce authentication, validation, and ownership rules
 
 #### Milestone 17.4: Profile API Tests
 
-- [ ] Test calculated and manual target setup
-- [ ] Test incomplete onboarding behavior
-- [ ] Test calculation and input validation boundaries
-- [ ] Test that profile changes do not silently change the saved target
-- [ ] Test authentication and ownership isolation
+- [x] Test calculated and manual target setup
+- [x] Test incomplete onboarding behavior
+- [x] Test calculation and input validation boundaries
+- [x] Test that profile changes do not silently change the saved target
+- [x] Test authentication and ownership isolation
 
 #### Milestone 17.5: Profile React Frontend
 
