@@ -44,6 +44,9 @@ export default function CalculatedTargetSetup({
   const [dailyCalorieTarget, setDailyCalorieTarget] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
+  const goalAdjustment = estimate
+    ? estimate.recommendedDailyCalorieTarget - estimate.maintenanceCalories
+    : 0
 
   function createCalculationInput(): CalorieTargetCalculationInput {
     return {
@@ -249,6 +252,11 @@ export default function CalculatedTargetSetup({
               </select>
             </label>
 
+            <p className="onboarding-card__description">
+              Activity level describes your usual whole day, including work,
+              walking, exercise, and time spent sitting.
+            </p>
+
             <label className="onboarding-form__field" htmlFor="weight-goal">
               <span>Weight goal</span>
 
@@ -310,6 +318,13 @@ export default function CalculatedTargetSetup({
             <div>
               <span>Recommendation</span>
               <strong>{estimate.recommendedDailyCalorieTarget} kcal</strong>
+
+              {goalAdjustment !== 0 && (
+                <span>
+                  {Math.abs(goalAdjustment)} kcal{' '}
+                  {goalAdjustment < 0 ? 'below' : 'above'} maintenance
+                </span>
+              )}
             </div>
           </div>
 

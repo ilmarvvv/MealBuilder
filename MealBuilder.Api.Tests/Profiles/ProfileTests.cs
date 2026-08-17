@@ -105,6 +105,38 @@ public sealed class ProfileTests(
     }
 
     [Fact]
+    public async Task CalculateTarget_WithLoseWeightGoal_AppliesTwentyPercentDeficit()
+    {
+        using var client = factory.CreateHttpsClient();
+
+        await RegisterUserAsync(client);
+
+        var request = CreateValidCalculationRequest() with
+        {
+            WeightGoal = WeightGoal.LoseWeight
+        };
+
+        var response = await client.PostWithCsrfAsync(
+            "/api/profile/calorie-target/calculate",
+            request);
+
+        Assert.Equal(
+            HttpStatusCode.OK,
+            response.StatusCode);
+
+        var estimate = await response.Content
+            .ReadFromJsonAsync<CalorieTargetEstimateResponse>();
+
+        Assert.NotNull(estimate);
+        Assert.Equal(
+            2848,
+            estimate.MaintenanceCalories);
+        Assert.Equal(
+            2278,
+            estimate.RecommendedDailyCalorieTarget);
+    }
+
+    [Fact]
     public async Task SaveCalculatedProfile_WithValidRequest_CompletesOnboarding()
     {
         using var client = factory.CreateHttpsClient();

@@ -49,7 +49,7 @@ public static class CalorieTargetCalculator
 
         var goalFactor = weightGoal switch
         {
-            WeightGoal.LoseWeight => 0.9m,
+            WeightGoal.LoseWeight => 0.8m,
             WeightGoal.MaintainWeight => 1m,
             WeightGoal.GainWeight => 1.1m,
             _ => throw new ArgumentOutOfRangeException(

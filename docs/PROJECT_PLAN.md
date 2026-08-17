@@ -1167,7 +1167,7 @@ Complete post-registration onboarding, user nutrition profile data, and a confir
 - [x] Require `UserId` and `DailyCalorieTarget`; keep calculation fields optional for manual setup but require all of them for calculated setup
 - [x] Support metric inputs for ages 18-100, heights 100-250 cm, and weights 30-400 kg
 - [x] Use EFSA activity levels `LowActive` (1.4), `ModeratelyActive` (1.6), `Active` (1.8), and `VeryActive` (2.0)
-- [x] Apply goal factors of 0.90 for `LoseWeight`, 1.00 for `MaintainWeight`, and 1.10 for `GainWeight`
+- [x] Apply goal factors of 0.80 for `LoseWeight`, 1.00 for `MaintainWeight`, and 1.10 for `GainWeight`
 - [x] Keep first-version saved targets calories-only
 - [x] Use the simplified Mifflin-St Jeor formula and calculate `Target = round(RMR * ActivityFactor * GoalFactor)`
   - `Male RMR = 10 * weightKg + 6.25 * heightCm - 5 * age + 5`; `Female RMR = 10 * weightKg + 6.25 * heightCm - 5 * age - 161`
