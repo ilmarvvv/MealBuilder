@@ -15,6 +15,7 @@ import OnboardingPage from './pages/OnboardingPage'
 import RecipeDetailsPage from './pages/RecipeDetailsPage'
 import RecipeListPage from './pages/RecipeListPage'
 import RegisterPage from './pages/RegisterPage'
+import AccountPage from './pages/AccountPage'
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
 
         <Route element={<AuthenticatedRoute />}>
           <Route path="/" element={<HomePage />} />
+          <Route path="/account" element={<AccountPage />} />
 
           <Route path="/library" element={<LibraryLayout />}>
             <Route index element={<Navigate to="ingredients" replace />} />

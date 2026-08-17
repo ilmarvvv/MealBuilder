@@ -1199,12 +1199,12 @@ Complete post-registration onboarding, user nutrition profile data, and a confir
 
 #### Milestone 17.5: Profile React Frontend
 
-- [ ] Add the calculated and manual onboarding paths after Register
-- [ ] Implement the three-step guided flow: Body Information, Activity and Goal, and Daily Target
-- [ ] Resume incomplete Onboarding after Login
-- [ ] Add profile and calorie-target management to Account
+- [x] Add the calculated and manual onboarding paths after Register
+- [x] Implement the three-step guided flow: Body Information, Activity and Goal, and Daily Target
+- [x] Resume incomplete Onboarding after Login
+- [x] Add profile and calorie-target management to Account
 - [ ] Add System, Light, and Dark appearance selection
-- [ ] Allow the user to review and confirm a recalculated target
+- [x] Allow the user to review and confirm a recalculated target
 - [ ] Show the saved calorie target in Dashboard nutrition progress
 - [ ] Confirm onboarding and target workflows work end to end
 

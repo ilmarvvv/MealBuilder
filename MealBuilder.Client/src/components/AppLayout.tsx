@@ -61,7 +61,9 @@ export default function AppLayout() {
               <LoadingIndicator message="Loading user..." />
             ) : user ? (
               <>
-                <span className="app-navigation__user">{user.email}</span>
+                <NavLink className="app-navigation__auth-link" to="/account">
+                  Account
+                </NavLink>
 
                 <button
                   className="app-navigation__logout"

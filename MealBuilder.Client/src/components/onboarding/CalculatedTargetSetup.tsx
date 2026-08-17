@@ -11,34 +11,42 @@ import {
 import type {
   CalorieTargetCalculationInput,
   CalorieTargetEstimate,
+  NutritionProfile,
 } from '../../api/profileApi'
 import { useAuth } from '../../auth/useAuth'
 import ErrorList from '../ErrorList'
 
 type CalculatedTargetSetupProps = {
+  initialProfile?: NutritionProfile
   onBack: () => void
+  onSaved?: (profile: NutritionProfile) => void
 }
 
 type SetupStep = 1 | 2 | 3
 
 export default function CalculatedTargetSetup({
+  initialProfile,
   onBack,
+  onSaved,
 }: CalculatedTargetSetupProps) {
   const navigate = useNavigate()
   const { refreshUser } = useAuth()
-
   const [step, setStep] = useState<SetupStep>(1)
-  const [birthDate, setBirthDate] = useState('')
+  const [birthDate, setBirthDate] = useState(initialProfile?.birthDate ?? '')
   const [sexForCalculation, setSexForCalculation] = useState<CalculationSex>(
-    CalculationSex.Female,
+    initialProfile?.sexForCalculation ?? CalculationSex.Female,
   )
-  const [heightCm, setHeightCm] = useState('')
-  const [weightKg, setWeightKg] = useState('')
+  const [heightCm, setHeightCm] = useState(
+    initialProfile?.heightCm?.toString() ?? '',
+  )
+  const [weightKg, setWeightKg] = useState(
+    initialProfile?.weightKg?.toString() ?? '',
+  )
   const [activityLevel, setActivityLevel] = useState<ActivityLevel>(
-    ActivityLevel.ModeratelyActive,
+    initialProfile?.activityLevel ?? ActivityLevel.ModeratelyActive,
   )
   const [weightGoal, setWeightGoal] = useState<WeightGoal>(
-    WeightGoal.MaintainWeight,
+    initialProfile?.weightGoal ?? WeightGoal.MaintainWeight,
   )
   const [estimate, setEstimate] = useState<CalorieTargetEstimate | null>(null)
   const [dailyCalorieTarget, setDailyCalorieTarget] = useState('')
@@ -95,10 +103,15 @@ export default function CalculatedTargetSetup({
     setErrors([])
 
     try {
-      await profileApi.saveCalculated({
+      const savedProfile = await profileApi.saveCalculated({
         dailyCalorieTarget: Number(dailyCalorieTarget),
         calculationInputs: createCalculationInput(),
       })
+
+      if (onSaved) {
+        onSaved(savedProfile)
+        return
+      }
 
       await refreshUser()
       navigate('/', { replace: true })
