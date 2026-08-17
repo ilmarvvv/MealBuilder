@@ -1,0 +1,206 @@
+.onboarding-page {
+  width: min(100%, 52rem);
+  margin-inline: auto;
+  display: grid;
+  gap: var(--space-6);
+}
+
+.onboarding-page__header {
+  max-width: 42rem;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.onboarding-page__header p {
+  color: var(--color-text-muted);
+}
+
+.onboarding-page__eyebrow,
+.onboarding-card__eyebrow {
+  margin: 0 0 var(--space-2);
+  color: var(--color-accent);
+  font-size: 0.875rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.onboarding-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.onboarding-choice {
+  min-height: 13rem;
+  padding: var(--space-5);
+  border-color: var(--color-border);
+  color: var(--color-text);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-small);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  text-align: left;
+}
+
+.onboarding-choice--recommended {
+  border-color: var(--color-accent);
+}
+
+.onboarding-choice:not(:disabled):hover {
+  border-color: var(--color-accent);
+  color: var(--color-text);
+  background: var(--color-accent-soft);
+}
+
+.onboarding-choice strong {
+  font-size: 1.25rem;
+}
+
+.onboarding-choice > span:last-child {
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.onboarding-choice__badge {
+  padding: var(--space-1) var(--space-2);
+  border-radius: 999px;
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.onboarding-card {
+  padding: clamp(var(--space-4), 4vw, var(--space-6));
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-large);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-medium);
+}
+
+.onboarding-card__description {
+  margin-bottom: var(--space-5);
+  color: var(--color-text-muted);
+}
+
+.onboarding-form {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.onboarding-form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.onboarding-form__field {
+  display: grid;
+  gap: var(--space-2);
+  font-weight: 700;
+}
+
+.onboarding-form__field input,
+.onboarding-form__field select {
+  width: 100%;
+}
+
+.onboarding-form__input-unit {
+  min-height: 2.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-surface);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.onboarding-form__input-unit:focus-within {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+.onboarding-form__input-unit input {
+  min-width: 0;
+  border: 0;
+  background: transparent;
+}
+
+.onboarding-form__input-unit input:focus-visible {
+  outline: 0;
+}
+
+.onboarding-form__input-unit > span {
+  padding-right: var(--space-3);
+  color: var(--color-text-muted);
+  font-weight: 700;
+}
+
+.onboarding-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.onboarding-actions .button-secondary {
+  border-color: var(--color-border);
+  color: var(--color-text);
+  background: var(--color-surface-muted);
+}
+
+.onboarding-actions .button-secondary:not(:disabled):hover {
+  color: var(--color-text);
+  background: var(--color-border);
+}
+
+.onboarding-estimate {
+  margin-block: var(--space-5);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.onboarding-estimate > div {
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: var(--color-surface-muted);
+  display: grid;
+  gap: var(--space-1);
+}
+
+.onboarding-estimate span {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.onboarding-estimate strong {
+  font-size: 1.125rem;
+}
+
+.onboarding-disclaimer {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+@media (max-width: 42rem) {
+  .onboarding-choice-grid,
+  .onboarding-form__grid,
+  .onboarding-estimate {
+    grid-template-columns: 1fr;
+  }
+
+  .onboarding-actions {
+    flex-direction: column-reverse;
+  }
+
+  .onboarding-actions button {
+    width: 100%;
+  }
+}

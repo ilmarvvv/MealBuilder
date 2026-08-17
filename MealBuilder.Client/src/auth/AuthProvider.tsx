@@ -41,6 +41,11 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     }
   }, [])
 
+  async function refreshUser() {
+    const currentUser = await authApi.getCurrentUser()
+    setUser(currentUser)
+  }
+
   async function register(credentials: AuthCredentials) {
     const registeredUser = await authApi.register(credentials)
     setUser(registeredUser)
@@ -59,6 +64,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   const value: AuthContextValue = {
     user,
     isLoading,
+    refreshUser,
     register,
     login,
     logout,

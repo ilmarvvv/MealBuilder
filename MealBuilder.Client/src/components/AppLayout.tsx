@@ -19,10 +19,7 @@ export default function AppLayout() {
       await logout()
     } catch (error) {
       setErrors(
-        getApiErrorMessages(
-          error,
-          'Unable to log out. Please try again.',
-        ),
+        getApiErrorMessages(error, 'Unable to log out. Please try again.'),
       )
     } finally {
       setIsLoggingOut(false)
@@ -32,29 +29,19 @@ export default function AppLayout() {
   return (
     <div className="app-shell">
       <header className="app-header">
-        <nav
-          className="app-navigation"
-          aria-label="Main navigation"
-        >
+        <nav className="app-navigation" aria-label="Main navigation">
           <Link className="app-brand" to="/">
             <span className="app-brand__mark">MB</span>
             <span>MealBuilder</span>
           </Link>
 
-          {user ? (
+          {user?.isOnboardingComplete ? (
             <div className="app-navigation__primary">
-              <NavLink
-                className="app-navigation__link"
-                to="/"
-                end
-              >
+              <NavLink className="app-navigation__link" to="/" end>
                 Dashboard
               </NavLink>
 
-              <span
-                className="app-navigation__link"
-                aria-disabled="true"
-              >
+              <span className="app-navigation__link" aria-disabled="true">
                 Planner
               </span>
 
@@ -74,9 +61,7 @@ export default function AppLayout() {
               <LoadingIndicator message="Loading user..." />
             ) : user ? (
               <>
-                <span className="app-navigation__user">
-                  {user.email}
-                </span>
+                <span className="app-navigation__user">{user.email}</span>
 
                 <button
                   className="app-navigation__logout"
@@ -89,10 +74,7 @@ export default function AppLayout() {
               </>
             ) : (
               <>
-                <NavLink
-                  className="app-navigation__auth-link"
-                  to="/login"
-                >
+                <NavLink className="app-navigation__auth-link" to="/login">
                   Login
                 </NavLink>
 
