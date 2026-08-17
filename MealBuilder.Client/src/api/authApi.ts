@@ -3,6 +3,7 @@ import { apiRequest } from './apiClient'
 export type AuthUser = {
   id: string
   email: string
+  isOnboardingComplete: boolean
 }
 
 export type AuthCredentials = {
