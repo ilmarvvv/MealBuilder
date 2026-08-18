@@ -1205,8 +1205,8 @@ Complete post-registration onboarding, user nutrition profile data, and a confir
 - [x] Add profile and calorie-target management to Account
 - [x] Add System, Light, and Dark appearance selection
 - [x] Allow the user to review and confirm a recalculated target
-- [ ] Show the saved calorie target in Dashboard nutrition progress
-- [ ] Confirm onboarding and target workflows work end to end
+- [x] Show the saved calorie target in Dashboard nutrition progress
+- [x] Confirm onboarding and target workflows work end to end
 
 ### Milestone 18: Meal Planning Vertical Slice
 
