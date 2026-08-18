@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document defines how the current MealBuilder experience is organized. It describes the main sections, their responsibilities, the relationships between screens, and the agreed user-facing Prepared Meal workflow.
+This document defines how the current MealBuilder experience is organized. It describes the main sections, their responsibilities, the relationships between screens, and the agreed Prepared Recipe workflow.
 
 It complements `DESIGN_BRIEF.md`. It does not define database schema or authorize implementation changes.
 
@@ -77,6 +77,8 @@ Login and Register use a separate minimal layout without the authenticated appli
 
 After Register, the user completes Onboarding and confirms a calorie target before entering Dashboard. A returning user with incomplete Onboarding resumes it after Login.
 
+Authenticated screens show only shared built-in Ingredients and the current user's private Recipes, Ingredients, Prepared Recipes, and Daily Plans. The UI never asks for or sends an owner id.
+
 ## Dashboard
 
 Dashboard is an overview and entry point. It must not duplicate the complete Planner editor.
@@ -100,7 +102,7 @@ Calories and the three primary macronutrients receive the strongest visual empha
 Show:
 
 - the number of planned items;
-- a short list of today's Ingredients or Prepared Meals;
+- a short list of today's Ingredients or Prepared Recipes;
 - grams or portions;
 - a compact nutrition summary.
 
@@ -136,15 +138,13 @@ Show:
 - next week;
 - seven selectable days.
 
-Selecting a date opens its existing or empty Daily Plan. Viewing an empty date does not create a stored Daily Plan. It is created only after the user adds an item or explicitly saves a change.
+Selecting a date opens its existing or empty Daily Plan. Viewing an empty date does not create a stored Daily Plan. Its first item creates the Daily Plan, and removing its final item removes the empty saved plan.
 
 ### Selected Day
 
 Show:
 
 - date;
-- optional Daily Plan name;
-- optional description;
 - compact nutrition summary;
 - `Include this day in weekly summary` for a non-empty day;
 - planned food items;
@@ -157,21 +157,26 @@ The weekly-summary setting is enabled by default. Empty days are excluded automa
 A Daily Plan may contain:
 
 - an individual Ingredient measured in grams;
-- portions from a Prepared Meal.
+- portions from a Prepared Recipe.
 
 Each item shows:
 
 - name;
 - item type;
+- optional planned time;
 - grams or portions;
 - nutrition contribution;
 - Change Amount action;
 - Move action;
 - Remove action.
 
-Move transfers the item to another date without requiring the user to remove and recreate it.
+Move transfers the full or partial amount to another date without requiring the user to remove and recreate the item. It preserves the original planned time. A destination item is combined only when both its food source and planned time match; items with different planned times remain separate.
 
-Reducing or removing Prepared Meal portions returns them to the available amount. Increasing the amount uses available portions. The system must not silently create portions when the available amount is insufficient.
+Items are ordered by planned time. Items without a time appear last, and fixed meal categories are not used.
+
+Reducing or removing Prepared Recipe portions returns them to the available amount. Increasing the amount uses available portions. The system must not silently create portions when the available amount is insufficient. Fractional portions use at most two decimal places.
+
+Removal is saved immediately and shows Undo for 5 seconds. Undo re-adds the item with its original amount and planned time. It may fail clearly if the source is no longer valid or enough Prepared Recipe portions are no longer available.
 
 ### Add Food
 
@@ -183,7 +188,9 @@ Ingredients | Available Portions
 
 For an Ingredient, the user selects a record and enters grams.
 
-For a Prepared Meal, the user selects an available preparation and enters portions.
+In the first version, direct Ingredient items use the current live Ingredient nutrition values. Historical Ingredient snapshots remain a future improvement.
+
+For a Prepared Recipe, the user selects an available preparation and enters portions.
 
 The flow shows a nutrition preview before the item is added.
 
@@ -200,12 +207,12 @@ Planner provides the detailed weekly view, including:
 
 Dashboard contains only the compact weekly preview.
 
-## Prepared Meal Workflow
+## Prepared Recipe Workflow
 
-`PreparedRecipeBatch` remains the internal technical term. The UI uses user-facing language:
+The Domain, API, and UI use the same `PreparedRecipe` / `Prepared Recipe` concept:
 
 - Prepare Recipe;
-- Prepared Meal;
+- Prepared Recipe;
 - Available Portions;
 - portions left.
 
@@ -218,7 +225,13 @@ When preparing a Recipe, the form asks for:
 - start date;
 - number of planned days.
 
+Prepared date may be in the past, today, or the future. It defines the earliest date on which portions may be allocated. Start date defaults to prepared date and cannot be earlier.
+
+The user may create and plan a future Prepared Recipe immediately, but Add Food and Move cannot place its portions on an earlier date.
+
 `Automatically plan portions` is enabled by default. The system previews the proposed distribution before the user confirms it.
+
+The distribution uses at most two decimal places and remains editable. When the division has a rounding remainder, it is assigned deterministically so the proposed allocations sum exactly to the total portions.
 
 ### Optional Flexible Planning
 
@@ -231,18 +244,15 @@ Automatic planning remains flexible after confirmation. The user can:
 - remove portions from a day;
 - leave portions without an assigned date.
 
-### Technical Follow-up
+The start date and planned days are creation inputs only. The resulting allocations are stored through Daily Plans and Daily Plan Items rather than duplicated on the Prepared Recipe.
 
-Before implementation, the project plan and domain rules must be reviewed for:
+The user may review the copied Recipe contents before confirmation. After creation, the Prepared Recipe snapshot is immutable; allocation amounts and dates remain editable.
 
-- allocated and unallocated portions;
-- optional automatic planning;
-- movement between dates;
-- fractional portion support;
-- the role of `PlannedDays`;
-- protection against allocating more portions than are available.
+### Delete Prepared Recipe
 
-This review may require behavior or database changes and must be handled separately from this UX decision.
+Deleting a Prepared Recipe permanently removes its snapshot ingredients and every Daily Plan Item that references it. Daily Plans that still contain other items remain; plans left empty by the cascade are removed.
+
+Before deletion, the interface shows the Prepared Recipe name, the number of affected planned items and dates, and a warning that affected daily and weekly nutrition totals will change. `Cancel` is the safe action and `Delete` confirms the atomic operation. The source Recipe is not deleted.
 
 ## Library
 
@@ -290,7 +300,7 @@ Recipe creation and editing contain Details, Ingredients, and Cooking Steps. A R
 
 Recipe details show Ingredients and quantities, ordered Cooking Steps, total nutrition, nutrition per serving, and the Prepare Recipe action.
 
-Prepared Meals do not become a third Library tab. A Prepared Meal is created from Recipe details and then managed through Planner.
+Prepared Recipes do not become a third Library tab. A Prepared Recipe is created from Recipe details and then managed through Planner.
 
 ```text
 Library -> Recipe Details -> Prepare Recipe -> Planner
@@ -410,4 +420,4 @@ MealBuilder
 
 ## Completion Criteria
 
-Information Architecture is complete when every screen in the current design scope has one clear location, Onboarding establishes the calorie target used by Dashboard, Dashboard and Planner do not duplicate responsibilities, Ingredients and Recipes remain easy to find within Library, and the Prepared Meal workflow supports both automatic and flexible planning without exposing internal technical terminology to the user.
+Information Architecture is complete when every screen in the current design scope has one clear location, Onboarding establishes the calorie target used by Dashboard, Dashboard and Planner do not duplicate responsibilities, Ingredients and Recipes remain easy to find within Library, and the Prepared Recipe workflow supports both automatic and flexible planning.

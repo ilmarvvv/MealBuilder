@@ -30,11 +30,11 @@ The system will automatically recalculate total recipe values after each ingredi
 
 For recipes, the user will be able to specify the number of portions. The system will calculate values for the whole recipe and for one portion.
 
-The user will be able to create a Prepared Meal snapshot from a Recipe. Portions are planned automatically by default, but they may remain available and be allocated, adjusted, or moved manually.
+The user will be able to create a Prepared Recipe snapshot from a Recipe. Portions are planned automatically by default, but they may remain available and be allocated, adjusted, or moved manually.
 
-Daily Plans can contain individual Ingredients or Prepared Meal portions. The system will show daily and weekly nutrition values, compare daily calories with the user's saved target, and exclude empty or manually disabled days from weekly calculations.
+Daily Plans can contain individual Ingredients or Prepared Recipe portions. The system will show daily and weekly nutrition values, compare daily calories with the user's saved target, and exclude empty or manually disabled days from weekly calculations.
 
-The main idea is to save Ingredient and Recipe data once, then reuse it through Recipes, Prepared Meals, and Daily Plans without manual recalculation.
+The main idea is to save Ingredient and Recipe data once, then reuse it through Recipes, Prepared Recipes, and Daily Plans without manual recalculation.
 
 ## 3. Main Entities: What Objects Exist in the System
 
@@ -180,7 +180,7 @@ Notes:
 
 A food plan for one specific date.
 
-It allows the user to plan prepared recipe batches and individual ingredients for a day and see the total nutrition values for that date.
+It allows the user to plan Prepared Recipes and individual Ingredients for a day and see the total nutrition values for that date.
 
 Responsibility:
 - represent one daily food plan
@@ -189,9 +189,8 @@ Responsibility:
 - support calendar, weekly, and future monthly views
 
 Main data:
-- name
+- owner id
 - date
-- description
 - include in weekly summary
 
 Relationships:
@@ -199,9 +198,10 @@ Relationships:
 
 Notes:
 - one `DailyPlan` represents one specific date
-- the same date can have only one saved daily plan
+- the same owner and date can have only one saved daily plan
 - an empty date can be viewed from Calendar without immediately saving a record
-- a daily plan is created only after the user adds an item or saves changes
+- a daily plan is created only after the user adds its first item
+- removing the last item also removes the empty saved daily plan
 - nutrition totals are calculated from daily plan items and are not stored directly
 - a non-empty daily plan is included in weekly calculations by default
 - the user may exclude a non-empty daily plan from weekly calculations without deleting its data
@@ -210,7 +210,7 @@ Notes:
 
 A single planned food item inside a `DailyPlan`.
 
-In the current UI, it represents either an individual ingredient measured in grams or servings from a prepared recipe batch.
+In the current UI, it represents either an individual Ingredient measured in grams or portions from a Prepared Recipe.
 
 Responsibility:
 - connect a daily plan with one planned food item
@@ -221,60 +221,115 @@ Main data:
 - daily plan id
 - item type
 - ingredient id
-- prepared recipe batch id
-- servings count
+- prepared recipe id
+- portions
 - grams
+- planned time
 
 Relationships:
 - belongs to one `DailyPlan`
 - can reference one `Ingredient`
-- can reference one `PreparedRecipeBatch`
-- can temporarily reference one legacy `Recipe`
+- can reference one `PreparedRecipe`
 
 Notes:
 - `ItemType` determines which relationship and quantity field are used
+- `ItemType` supports `Ingredient` and `PreparedRecipe`
 - ingredient items use `IngredientId` and `Grams`
-- prepared batch items use `PreparedRecipeBatchId` and `ServingsCount`
+- ingredient item nutrition is calculated from the current live Ingredient values in the first version
+- Prepared Recipe items use `PreparedRecipeId` and `Portions`
+- planned time is optional; items are ordered by planned time with items without a time last
+- item id provides deterministic ordering when planned times are equal
+- fixed meal categories are outside the current scope
 - the quantity must be greater than 0
 - one item must reference only the entity required by its item type
-- direct recipe items are no longer created by the UI and their legacy support should be removed later
+- an Ingredient item may reference a built-in Ingredient or an Ingredient owned by the Daily Plan owner
+- a Prepared Recipe item must reference a Prepared Recipe owned by the Daily Plan owner
 
-### PreparedRecipeBatch
+### PreparedRecipe
 
-An editable snapshot of a recipe that represents one prepared or planned batch.
+An immutable snapshot of a Recipe that represents one prepared set of portions.
 
-For example, the user can create a `Burger` recipe, create a batch with 8 servings, adjust its copied contents, and allocate those servings across consecutive daily plans.
+For example, the user can create a `Burger` Recipe, review its copied contents, create a Prepared Recipe with 8 portions, and allocate those portions across consecutive Daily Plans.
 
 Responsibility:
-- represent a prepared copy of one recipe
+- represent a prepared copy of one Recipe
 - preserve copied recipe contents and nutrition values as snapshot data
-- store the prepared date, optional allocation start date, total servings, and optional planned days
-- track how many servings are allocated and how many remain
+- store the prepared date and total portions
+- track how many portions are allocated and how many remain
 
 Main data:
+- owner id
 - source recipe id
 - recipe name snapshot
-- cooked date
-- allocation start date when automatic planning is used
-- total servings
-- planned days when automatic planning is used
-- prepared batch snapshot items
+- prepared date
+- total portions
+- Prepared Recipe snapshot ingredients
 
 Relationships:
 - references one source `Recipe`
-- has many `PreparedRecipeBatchItem` snapshot records
+- has many `PreparedRecipeIngredient` snapshot records
 - can be referenced by many `DailyPlanItem` records
 
 Notes:
-- changing the source recipe does not silently change an existing batch snapshot
-- the prepared date and allocation start date are separate concepts in the new workflow
-- servings are distributed across consecutive dates only when automatic planning is enabled
-- used servings are calculated from daily plan items that reference the batch
-- remaining servings are calculated as total servings minus used servings
-- nutrition values are calculated from stored batch snapshot items
+- changing the source Recipe does not silently change an existing Prepared Recipe snapshot
+- the snapshot becomes immutable after the user confirms creation
+- prepared date may be in the past, today, or the future and defines the earliest date on which portions may be allocated
+- automatic planning start date and planned days are creation inputs, not stored Prepared Recipe fields
+- automatic planning start date defaults to prepared date and cannot be earlier
+- the user may create and allocate a future Prepared Recipe immediately, but no allocation may target a date before its prepared date
+- portions are distributed across consecutive dates only when automatic planning is enabled
+- automatic planning distributes portions as evenly as possible with at most two decimal places
+- any rounding remainder is assigned deterministically so allocations sum exactly to total portions
+- the proposed allocation remains editable before confirmation
+- allocated portions are calculated from Daily Plan Items that reference the Prepared Recipe
+- available portions are calculated as total portions minus allocated portions
+- total and allocated portions use decimals with at most two decimal places
+- nutrition values are calculated from stored Prepared Recipe snapshot ingredients
 - automatic portion planning is enabled by default but can be disabled
-- servings may remain unallocated and be assigned to dates later
-- allocated servings can be adjusted or moved between dates
+- portions may remain unallocated and be assigned to dates later
+- allocated portions can be adjusted or moved between dates
+- deleting a Prepared Recipe permanently deletes its snapshot ingredients and all Daily Plan Items that reference it
+- the deletion requires a warning that shows how many planned items and dates will be affected
+- the deletion is atomic, removes any Daily Plan left empty by the cascade, and recalculates affected daily and weekly totals
+- deleting a Prepared Recipe does not delete its source Recipe
+
+### Ownership and Authorization Rules
+
+`PreparedRecipe` and `DailyPlan` records are private and belong to the current authenticated user.
+
+The server derives `OwnerId` from the authenticated user and does not accept it from client requests.
+
+A Prepared Recipe can be created only from a Recipe owned by the current user.
+
+A Daily Plan Item may reference a built-in Ingredient, an Ingredient owned by the current user, or a Prepared Recipe owned by the current user.
+
+Requests using another user's private entity id return `404 Not Found` without revealing that the entity exists.
+
+Prepared Recipe cascade deletion can remove only snapshot and planning records owned by the same current user.
+
+### PreparedRecipeIngredient
+
+An immutable ingredient-level snapshot inside one `PreparedRecipe`.
+
+Main data:
+- prepared recipe id
+- ingredient name snapshot
+- grams
+- position
+- calories
+- protein
+- fat
+- carbohydrates
+- sugars
+- fiber
+- salt
+
+Notes:
+- nutrition values represent the contribution for the stored grams, not values per 100 g
+- the source `IngredientId` is used during creation but is not stored on the snapshot
+- changing or deleting the source Ingredient does not change an existing Prepared Recipe
+- Prepared Recipe totals are calculated by summing its snapshot ingredients
+- per-portion values are calculated as Prepared Recipe totals divided by total portions
 
 ## 4. Main Scenarios: What the User Can Do
 
@@ -310,7 +365,7 @@ The system automatically recalculates recipe nutrition values after changes.
 
 The user can save a recipe and reuse it later.
 
-### Working With Prepared Meals
+### Working With Prepared Recipes
 
 The user can create a prepared snapshot from a finished recipe.
 
@@ -332,13 +387,15 @@ Daily nutrition values are calculated from the portions and Ingredients allocate
 
 The user can open any date from Calendar and see an existing or empty daily plan.
 
-The user can add prepared recipe batch servings or individual ingredients to the selected day.
+The user can add Prepared Recipe portions or individual Ingredients to the selected day.
 
 The system creates a saved daily plan only after the user adds an item or saves changes.
 
 The user can see total calories, protein, fat, carbohydrates, sugars, fiber, and salt for the day.
 
 The user can change planned quantities or remove items from the daily plan.
+
+Full and partial moves preserve the source item's planned time. A destination item is combined only when both its food source and planned time match. Items with different planned times remain separate. The move is atomic, and the source Daily Plan is removed if a full move leaves it empty.
 
 The user can exclude a non-empty day from weekly calculations without deleting its data.
 
@@ -430,17 +487,21 @@ Daily values for a prepared meal are calculated from the portions allocated to t
 
 One saved `DailyPlan` can exist for each date.
 
-A daily plan can contain individual ingredients or prepared recipe batches.
+A Daily Plan can contain individual Ingredients or Prepared Recipes.
 
-Direct recipes must be converted into prepared batches before they are added through the current UI.
+Direct Recipes must be converted into Prepared Recipes before they are added through the current UI.
 
 The quantity of each daily plan item must be greater than 0.
 
-A prepared batch item cannot use more servings than remain available in that batch.
+A Prepared Recipe item cannot use more portions than remain available in that Prepared Recipe.
+
+Moving Prepared Recipe portions between dates does not change the total allocated or available portions.
+
+Removing a Daily Plan Item is persisted immediately. The client offers Undo for 5 seconds by re-adding the removed item with its original amount and planned time. Restoring Prepared Recipe portions succeeds only when enough portions remain available; otherwise the system returns a clear error. If removal deleted an empty Daily Plan, a successful Undo recreates that plan with the restored item.
 
 Total daily plan values are the sum of all daily plan item values.
 
-Opening an empty calendar date must not create a database record until the user saves a change or adds an item.
+Opening an empty calendar date must not create a database record. The first item creates its Daily Plan, and removing the final item removes the empty saved plan.
 
 ### Weekly Summary Rules
 
@@ -1212,18 +1273,18 @@ Complete post-registration onboarding, user nutrition profile data, and a confir
 
 ### Goal
 
-Complete prepared batches, daily plans, and the calendar through Domain, persistence, REST API, automated tests, and React.
+Complete Prepared Recipes, Daily Plans, and the Calendar through Domain, persistence, REST API, automated tests, and React.
 
 ### Required Sub-milestones
 
 #### Milestone 18.1: Meal Planning Domain
 
-- [ ] Review PreparedRecipeBatch and DailyPlan rules before migration
-- [ ] Add PreparedRecipeBatch and snapshot models to `MealBuilder.Domain`
+- [x] Review PreparedRecipe and DailyPlan rules before migration
+- [ ] Add PreparedRecipe and snapshot models to `MealBuilder.Domain`
 - [ ] Add DailyPlan and DailyPlanItem models to `MealBuilder.Domain`
 - [ ] Exclude the legacy direct Recipe relationship from the new `DailyPlanItem` model
 - [ ] Add allocated and unallocated portion rules
-- [ ] Keep the prepared amount available by default and support optional portion planning
+- [ ] Keep unallocated portions available by default and support optional portion planning
 - [ ] Support full and partial moves between dates
 - [ ] Add daily-plan weekly-summary inclusion rules
 - [ ] Add allocation, nutrition, and date validation rules
@@ -1236,10 +1297,11 @@ Complete prepared batches, daily plans, and the calendar through Domain, persist
 
 #### Milestone 18.3: Meal Planning API
 
-- [ ] Add PreparedRecipeBatch contracts and endpoints
-- [ ] Add batch snapshot item operations
+- [ ] Add PreparedRecipe contracts and endpoints
+- [ ] Add Prepared Recipe creation, snapshot, and availability contracts and endpoints
 - [ ] Add DailyPlan and DailyPlanItem contracts and endpoints
-- [ ] Create a prepared recipe batch and any optional planned allocations atomically
+- [ ] Create a Prepared Recipe and any optional planned allocations atomically
+- [ ] Delete a Prepared Recipe, its snapshot ingredients, and its allocations atomically, removing Daily Plans left empty
 - [ ] Add full and partial move operations that preserve the original item on failure
 - [ ] Return portions to the available amount after reduction or removal
 - [ ] Add weekly Calendar and nutrition endpoints
@@ -1248,8 +1310,9 @@ Complete prepared batches, daily plans, and the calendar through Domain, persist
 
 #### Milestone 18.4: Meal Planning API Tests
 
-- [ ] Test prepared batch snapshot operations
+- [ ] Test Prepared Recipe snapshot operations
 - [ ] Test available-amount and optional planned-allocation operations
+- [ ] Test Prepared Recipe cascade deletion, empty Daily Plan cleanup, and recalculated totals
 - [ ] Test adjust, move, remove, and insufficient-portion behavior
 - [ ] Test atomic failure behavior for preparation and move operations
 - [ ] Test daily-plan inclusion and weekly nutrition calculations
@@ -1258,10 +1321,11 @@ Complete prepared batches, daily plans, and the calendar through Domain, persist
 #### Milestone 18.5: Meal Planning React Frontend
 
 - [ ] Add Meal Planning frontend types and API functions
-- [ ] Implement the user-facing Cooked Recipe and Available Amount workflows
-- [ ] Keep the cooked amount available by default and provide an optional Plan Portions flow
+- [ ] Implement the user-facing Prepared Recipe and Available Portions workflows
+- [ ] Keep unallocated portions available by default and provide an optional Plan Portions flow
+- [ ] Add a Prepared Recipe deletion warning with affected item and date counts
 - [ ] Implement the time-sorted Daily Plan without fixed meal sections, placing items without a time last
-- [ ] Implement the two-step Add Food modal with combined Ingredient and Recipe search
+- [ ] Implement the two-step Add Food modal with Ingredient and Prepared Recipe search
 - [ ] Implement change amount, full or partial move, remove, and Undo interactions
 - [ ] Implement Dashboard daily and weekly previews
 - [ ] Implement the weekly Planner and included-day nutrition summaries with one active calorie-target line
@@ -1279,7 +1343,7 @@ Verify the new application, retire the completed Razor Pages prototype, and docu
 
 - [ ] Run all backend automated tests
 - [ ] Verify authentication and ownership behavior end to end
-- [ ] Verify Onboarding, calorie target, Ingredient, Recipe, Prepared Meal, Daily Plan, and Calendar workflows
+- [ ] Verify Onboarding, calorie target, Ingredient, Recipe, Prepared Recipe, Daily Plan, and Calendar workflows
 - [ ] Verify responsive desktop and mobile layouts
 - [ ] Confirm that the frontend and backend production builds succeed
 
@@ -1441,6 +1505,11 @@ This section contains ideas that may be useful for the project in the future, bu
   - Prevent the same ingredient from being added more than once inside the same recipe.
 
 ### Menu Planning Improvements
+
+- [ ] Preserve direct Ingredient Daily Plan history with snapshots
+  - Copy the Ingredient name and nutrition values when it is added to a Daily Plan.
+  - Keep historical Daily Plan and weekly nutrition totals stable after the source Ingredient changes.
+  - Decide whether to store snapshot values directly on `DailyPlanItem` or in a separate snapshot entity.
 
 - [ ] Add advanced prepared batch snapshot history
   - Preserve deeper source details, edit history, and recipe version references if the basic prepared batch snapshot model is not enough.

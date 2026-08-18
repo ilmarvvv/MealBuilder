@@ -14,7 +14,10 @@ It does not define the final visual layout or authorize source-code, database, o
 - Ask before discarding a form only when unsaved changes exist.
 - Do not create partial records when a multi-record operation fails.
 - Reuse the same workflow when an action is opened from different entry points.
-- Keep internal terms such as `PreparedRecipeBatch` out of user-facing text.
+- Use `PreparedRecipe` in code and `Prepared Recipe` in user-facing text.
+- Derive ownership from the authenticated user; never accept `OwnerId` from client input.
+- Treat another user's private entity id as `404 Not Found` without revealing that it exists.
+- Allow Daily Plans to use only built-in Ingredients and private Ingredients or Prepared Recipes owned by the current user.
 
 ## Flow 1: Authentication and Onboarding
 
@@ -116,7 +119,11 @@ Add Food
   -> Update Daily Plan and Nutrition Totals
 ```
 
-Quantity must be greater than zero. Adding the first item to an empty date creates its Daily Plan. Merely viewing an empty date does not create a record.
+Quantity must be greater than zero. Adding the first item to an empty date creates its Daily Plan. Merely viewing an empty date does not create a record, and removing the final item removes the empty saved plan.
+
+Direct Ingredient items use current live Ingredient nutrition values in the first version. Preserving historical values with an Ingredient snapshot remains a future improvement.
+
+Planned time is optional. Daily Plan Items are ordered by planned time, items without a time appear last, and fixed meal categories are outside the current scope.
 
 After success, the interface offers `Add Another` for fast repeated entry.
 
@@ -241,9 +248,13 @@ The form provides:
 - start date, defaulting to prepared date;
 - number of days, defaulting to one.
 
+Prepared date may be in the past, today, or the future. It defines the earliest allowed allocation date. Start date cannot be earlier than prepared date.
+
+The user may create and allocate a future Prepared Recipe immediately. Add Food and Move reject any destination date before its prepared date.
+
 ### Automatic Planning
 
-The system previews the proposed portion distribution before confirmation. When portions do not divide evenly, whole portions are distributed as evenly as possible, and the preview remains editable.
+The system previews the proposed portion distribution before confirmation. Portions are distributed as evenly as possible with at most two decimal places. Any rounding remainder is assigned deterministically so the allocations sum exactly to the total portions, and the preview remains editable.
 
 ### Flexible Planning
 
@@ -251,11 +262,28 @@ The user may disable automatic planning. All portions then remain available and 
 
 ### Result
 
-Confirmation creates a Prepared Meal snapshot. Later Recipe changes do not silently change it.
+Confirmation creates a Prepared Recipe snapshot. Later Recipe changes do not silently change it.
 
-Allocated portions appear in the selected Daily Plans. Unallocated portions remain available. If any part of the operation fails, the system must not leave a partially created Prepared Meal or partial allocations.
+The copied contents may be reviewed before confirmation. After creation, the Prepared Recipe snapshot is immutable; only its portion allocations may be adjusted, moved, or removed.
 
-`PreparedRecipeBatch` remains the internal technical term. The UI uses `Prepared Meal`, `Available Portions`, and `portions left`.
+Start date and number of planned days are creation inputs only. The resulting allocations are stored through Daily Plans and Daily Plan Items.
+
+Allocated portions appear in the selected Daily Plans. Unallocated portions remain available. If any part of the operation fails, the system must not leave a partially created Prepared Recipe or partial allocations.
+
+The Domain, API, and UI use the same `PreparedRecipe` / `Prepared Recipe` concept. The UI also uses `Available Portions` and `portions left`.
+
+### Delete Prepared Recipe
+
+```text
+Prepared Recipe
+  -> Delete
+  -> Review Permanent Deletion Warning
+  -> Cancel or Confirm Delete
+```
+
+The warning shows the Prepared Recipe name, the number of affected Daily Plan Items and dates, and explains that affected daily and weekly nutrition totals will change.
+
+Confirmation permanently deletes the Prepared Recipe, its snapshot ingredients, and all Daily Plan Items that reference it. Daily Plans left empty by the cascade are removed, while plans with other items remain. The source Recipe remains unchanged. The complete deletion is atomic.
 
 ## Flow 5: Adjust, Move, or Remove Food
 
@@ -265,7 +293,7 @@ The current scope uses one editable amount rather than separate Planned and Eate
 
 Ingredient amounts are changed in grams.
 
-Prepared Meal amounts are changed in portions:
+Prepared Recipe amounts are changed in portions. Fractional portions use at most two decimal places:
 
 - increasing an amount consumes available portions;
 - decreasing an amount returns portions to the available amount;
@@ -280,15 +308,17 @@ Move
   -> Confirm
 ```
 
-Moving a Prepared Meal allocation changes its date without changing the available amount. When the same source item already exists on the destination date, amounts are combined while meal categories remain outside the scope.
+Moving a Prepared Recipe allocation changes its date without changing the total allocated or available portions. Full and partial moves preserve the original planned time. When the same source item with the same planned time already exists on the destination date, amounts are combined. Items with different planned times remain separate.
 
-Move must behave as one complete operation. A failure leaves the original item unchanged.
+Move must behave as one complete operation. A failure leaves the original item unchanged. If a full move leaves the source Daily Plan empty, that empty plan is removed.
 
 ### Remove
 
-Removing an Ingredient deletes its Daily Plan Item. Removing Prepared Meal portions returns them to the available amount.
+Removing an Ingredient deletes its Daily Plan Item. Removing Prepared Recipe portions returns them to the available amount.
 
-The interface provides a short Undo action instead of interrupting every removal with a confirmation dialog.
+Removal is persisted immediately. The interface keeps the removed item details and provides Undo for 5 seconds instead of interrupting every removal with a confirmation dialog.
+
+Undo re-adds the item with its original amount and planned time. Restoring Prepared Recipe portions requires enough available portions at that moment; otherwise Undo fails with a clear message. If removal deleted an empty Daily Plan, successful Undo recreates the plan with the restored item.
 
 Every successful adjustment updates the selected Daily Plan, daily nutrition, available portions, Dashboard preview, and weekly summary.
 
