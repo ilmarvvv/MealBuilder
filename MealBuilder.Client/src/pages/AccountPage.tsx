@@ -6,6 +6,7 @@ import ErrorList from '../components/ErrorList'
 import LoadingIndicator from '../components/LoadingIndicator'
 import DailyCalorieTargetSettings from '../components/profile/DailyCalorieTargetSettings'
 import CalculatedTargetSetup from '../components/onboarding/CalculatedTargetSetup'
+import AppearanceSettings from '../components/profile/AppearanceSettings'
 import './AccountPage.css'
 
 export default function AccountPage() {
@@ -67,6 +68,8 @@ export default function AccountPage() {
             profile={profile}
             onProfileChanged={setProfile}
           />
+
+          <AppearanceSettings />
 
           <section className="account-page__section">
             <header>
