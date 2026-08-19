@@ -1298,9 +1298,9 @@ Complete Prepared Recipes, Daily Plans, and the Calendar through Domain, persist
 
 #### Milestone 18.2: Meal Planning Persistence
 
-- [ ] Add Meal Planning Entity Framework Core configurations
-- [ ] Configure the optional Prepared Recipe source relationship with `DeleteBehavior.SetNull`
-- [ ] Add Meal Planning data to `AppDbContext`
+- [x] Add Meal Planning Entity Framework Core configurations
+- [x] Configure the optional Prepared Recipe source relationship with `DeleteBehavior.SetNull`
+- [x] Add Meal Planning data to `AppDbContext`
 - [ ] Create and apply the Meal Planning migration
 
 #### Milestone 18.3: Meal Planning API

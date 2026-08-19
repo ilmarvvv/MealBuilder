@@ -1,4 +1,5 @@
 ﻿using MealBuilder.Domain.Ingredients;
+using MealBuilder.Domain.MealPlanning;
 using MealBuilder.Domain.Recipes;
 using MealBuilder.Domain.Profiles;
 using MealBuilder.Infrastructure.Identity;
@@ -22,6 +23,19 @@ namespace MealBuilder.Infrastructure.Data
             Set<RecipeIngredient>();
 
         public DbSet<RecipeStep> RecipeSteps => Set<RecipeStep>();
+
+        public DbSet<PreparedRecipe> PreparedRecipes =>
+            Set<PreparedRecipe>();
+
+        public DbSet<PreparedRecipeIngredient>
+            PreparedRecipeIngredients =>
+                Set<PreparedRecipeIngredient>();
+
+        public DbSet<DailyPlan> DailyPlans =>
+            Set<DailyPlan>();
+
+        public DbSet<DailyPlanItem> DailyPlanItems =>
+            Set<DailyPlanItem>();
 
         public DbSet<UserNutritionProfile> UserNutritionProfiles =>
             Set<UserNutritionProfile>();
