@@ -300,6 +300,8 @@ Recipe creation and editing contain Details, Ingredients, and Cooking Steps. A R
 
 Recipe details show Ingredients and quantities, ordered Cooking Steps, total nutrition, nutrition per serving, and the Prepare Recipe action.
 
+Deleting a Recipe does not delete Prepared Recipes already created from it. Their snapshots, allocations, and nutrition totals remain unchanged, while their source link is removed.
+
 Prepared Recipes do not become a third Library tab. A Prepared Recipe is created from Recipe details and then managed through Planner.
 
 ```text

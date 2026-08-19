@@ -259,19 +259,21 @@ Responsibility:
 
 Main data:
 - owner id
-- source recipe id
+- nullable source recipe id
 - recipe name snapshot
 - prepared date
 - total portions
 - Prepared Recipe snapshot ingredients
 
 Relationships:
-- references one source `Recipe`
+- optionally references its source `Recipe` after creation
 - has many `PreparedRecipeIngredient` snapshot records
 - can be referenced by many `DailyPlanItem` records
 
 Notes:
 - changing the source Recipe does not silently change an existing Prepared Recipe snapshot
+- a source Recipe is required when the Prepared Recipe is created and must belong to the same owner
+- deleting the source Recipe sets `SourceRecipeId` to null without changing the Prepared Recipe snapshot, allocations, or nutrition totals
 - the snapshot becomes immutable after the user confirms creation
 - prepared date may be in the past, today, or the future and defines the earliest date on which portions may be allocated
 - automatic planning start date and planned days are creation inputs, not stored Prepared Recipe fields
@@ -1280,7 +1282,7 @@ Complete Prepared Recipes, Daily Plans, and the Calendar through Domain, persist
 #### Milestone 18.1: Meal Planning Domain
 
 - [x] Review PreparedRecipe and DailyPlan rules before migration
-- [ ] Add PreparedRecipe and snapshot models to `MealBuilder.Domain`
+- [x] Add PreparedRecipe and snapshot models to `MealBuilder.Domain`
 - [ ] Add DailyPlan and DailyPlanItem models to `MealBuilder.Domain`
 - [ ] Exclude the legacy direct Recipe relationship from the new `DailyPlanItem` model
 - [ ] Add allocated and unallocated portion rules
@@ -1292,6 +1294,7 @@ Complete Prepared Recipes, Daily Plans, and the Calendar through Domain, persist
 #### Milestone 18.2: Meal Planning Persistence
 
 - [ ] Add Meal Planning Entity Framework Core configurations
+- [ ] Configure the optional Prepared Recipe source relationship with `DeleteBehavior.SetNull`
 - [ ] Add Meal Planning data to `AppDbContext`
 - [ ] Create and apply the Meal Planning migration
 
@@ -1311,6 +1314,7 @@ Complete Prepared Recipes, Daily Plans, and the Calendar through Domain, persist
 #### Milestone 18.4: Meal Planning API Tests
 
 - [ ] Test Prepared Recipe snapshot operations
+- [ ] Test that deleting a source Recipe preserves its Prepared Recipes and sets `SourceRecipeId` to null
 - [ ] Test available-amount and optional planned-allocation operations
 - [ ] Test Prepared Recipe cascade deletion, empty Daily Plan cleanup, and recalculated totals
 - [ ] Test adjust, move, remove, and insufficient-portion behavior
@@ -1322,6 +1326,7 @@ Complete Prepared Recipes, Daily Plans, and the Calendar through Domain, persist
 
 - [ ] Add Meal Planning frontend types and API functions
 - [ ] Implement the user-facing Prepared Recipe and Available Portions workflows
+- [ ] Show `Original recipe deleted` when a Prepared Recipe no longer has its source Recipe
 - [ ] Keep unallocated portions available by default and provide an optional Plan Portions flow
 - [ ] Add a Prepared Recipe deletion warning with affected item and date counts
 - [ ] Implement the time-sorted Daily Plan without fixed meal sections, placing items without a time last

@@ -224,6 +224,8 @@ Recipe Details provides:
 
 The Recipe remains private. Public submission and moderation remain future work.
 
+When deleting a Recipe that has existing Prepared Recipes, the confirmation explains that those Prepared Recipes will remain unchanged but lose their link to the original Recipe. After deletion, they show `Original recipe deleted`; their snapshots, allocations, and nutrition totals remain available.
+
 ## Flow 4: Prepare a Recipe
 
 The user starts from Recipe Details:
