@@ -1285,7 +1285,7 @@ Complete Prepared Recipes, Daily Plans, and the Calendar through Domain, persist
 - [x] Add PreparedRecipe and snapshot models to `MealBuilder.Domain`
 - [x] Add DailyPlan and DailyPlanItem models to `MealBuilder.Domain`
 - [x] Exclude the legacy direct Recipe relationship from the new `DailyPlanItem` model
-- [ ] Add allocated and unallocated portion rules
+- [x] Add allocated and unallocated portion rules
 - [ ] Keep unallocated portions available by default and support optional portion planning
 - [ ] Support full and partial moves between dates
 - [ ] Add daily-plan weekly-summary inclusion rules
