@@ -125,6 +125,8 @@ Direct Ingredient items use current live Ingredient nutrition values in the firs
 
 Planned time is optional. Daily Plan Items are ordered by planned time, items without a time appear last, and fixed meal categories are outside the current scope.
 
+Adding the same item type and food source with the same planned time increases the existing item amount instead of creating a duplicate. A different planned time creates a separate item, while two items without a planned time are combined.
+
 After success, the interface offers `Add Another` for fast repeated entry.
 
 ### Create a Personal Ingredient

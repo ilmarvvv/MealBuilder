@@ -192,6 +192,8 @@ In the first version, direct Ingredient items use the current live Ingredient nu
 
 For a Prepared Recipe, the user selects an available preparation and enters portions.
 
+Adding the same food source with the same planned time increases the existing item amount. A different planned time creates a separate item. Two items without a planned time are treated as having the same time for this rule.
+
 The flow shows a nutrition preview before the item is added.
 
 ### Weekly Details

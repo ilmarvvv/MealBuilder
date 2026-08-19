@@ -244,6 +244,8 @@ Notes:
 - one item must reference only the entity required by its item type
 - an Ingredient item may reference a built-in Ingredient or an Ingredient owned by the Daily Plan owner
 - a Prepared Recipe item must reference a Prepared Recipe owned by the Daily Plan owner
+- adding the same item type and food source with the same planned time increases the existing item amount instead of creating a duplicate
+- the same food source with a different planned time remains a separate item
 
 ### PreparedRecipe
 
@@ -1289,7 +1291,7 @@ Complete Prepared Recipes, Daily Plans, and the Calendar through Domain, persist
 - [x] Exclude the legacy direct Recipe relationship from the new `DailyPlanItem` model
 - [x] Add allocated and unallocated portion rules
 - [x] Keep unallocated portions available by default and support optional portion planning
-- [ ] Support full and partial moves between dates
+- [x] Support full and partial moves between dates
 - [x] Add daily-plan weekly-summary inclusion rules
 - [ ] Add allocation, nutrition, and date validation rules
 

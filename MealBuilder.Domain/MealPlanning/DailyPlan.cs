@@ -53,14 +53,30 @@ public sealed class DailyPlan
 
         EnsureIngredientCanBeUsed(ingredient);
 
-        var item = DailyPlanItem.CreateIngredient(
+        var newItem = DailyPlanItem.CreateIngredient(
             ingredient,
             grams,
             plannedTime);
 
-        _items.Add(item);
+        var existingItem = _items.SingleOrDefault(item =>
+            item.ItemType == DailyPlanItemType.Ingredient &&
+            item.IngredientId == ingredient.Id &&
+            item.PlannedTime == plannedTime);
 
-        return item;
+        if (existingItem is null)
+        {
+            _items.Add(newItem);
+
+            return newItem;
+        }
+
+        var existingGrams = existingItem.Grams
+            ?? throw new InvalidOperationException(
+                "An Ingredient item must contain grams.");
+
+        existingItem.ChangeGrams(existingGrams + grams);
+
+        return existingItem;
     }
 
     public DailyPlanItem AddPreparedRecipe(
@@ -72,14 +88,34 @@ public sealed class DailyPlan
 
         EnsurePreparedRecipeCanBeUsed(preparedRecipe);
 
-        var item = DailyPlanItem.CreatePreparedRecipe(
+        var newItem = DailyPlanItem.CreatePreparedRecipe(
             preparedRecipe,
             portions,
             plannedTime);
 
-        _items.Add(item);
+        var existingItem = _items.SingleOrDefault(item =>
+            item.ItemType ==
+                DailyPlanItemType.PreparedRecipe &&
+            ReferencesPreparedRecipe(
+                item,
+                preparedRecipe) &&
+            item.PlannedTime == plannedTime);
 
-        return item;
+        if (existingItem is null)
+        {
+            _items.Add(newItem);
+
+            return newItem;
+        }
+
+        var existingPortions = existingItem.Portions
+            ?? throw new InvalidOperationException(
+                "A Prepared Recipe item must contain portions.");
+
+        existingItem.ChangePortions(
+            existingPortions + portions);
+
+        return existingItem;
     }
 
     public void ChangeIngredientAmount(
@@ -128,6 +164,21 @@ public sealed class DailyPlan
             throw new InvalidOperationException(
                 "A daily plan must contain at least one item.");
         }
+    }
+
+    private static bool ReferencesPreparedRecipe(
+    DailyPlanItem item,
+    PreparedRecipe preparedRecipe)
+    {
+        if (preparedRecipe.Id > 0)
+        {
+            return item.PreparedRecipeId ==
+                preparedRecipe.Id;
+        }
+
+        return ReferenceEquals(
+            item.PreparedRecipe,
+            preparedRecipe);
     }
 
     private DailyPlanItem FindItem(int itemId)
