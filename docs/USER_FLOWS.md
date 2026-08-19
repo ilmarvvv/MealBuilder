@@ -248,7 +248,7 @@ The form provides:
 - total portions, defaulting to Recipe servings;
 - `Automatically Plan Portions`, enabled by default;
 - start date, defaulting to prepared date;
-- number of days, defaulting to one.
+- number of days, defaulting to one and limited to 365.
 
 Prepared date may be in the past, today, or the future. It defines the earliest allowed allocation date. Start date cannot be earlier than prepared date.
 
@@ -257,6 +257,8 @@ The user may create and allocate a future Prepared Recipe immediately. Add Food 
 ### Automatic Planning
 
 The system previews the proposed portion distribution before confirmation. Portions are distributed as evenly as possible with at most two decimal places. Any rounding remainder is assigned deterministically so the allocations sum exactly to the total portions, and the preview remains editable.
+
+Every generated day must receive at least 0.01 portion. Automatic planning is rejected when the selected number of days would create a zero-portion allocation.
 
 ### Flexible Planning
 

@@ -479,7 +479,9 @@ The current REST API and React scope does not support nested recipes or `RecipeC
 
 The number of portions must be greater than 0.
 
-The number of planned days must be greater than 0 when automatic portion planning is enabled.
+The number of planned days must be between 1 and 365 when automatic portion planning is enabled.
+
+Automatic distribution must assign at least 0.01 portion to every generated day. The request is invalid when the selected number of days would produce a zero-portion allocation.
 
 Values for one portion are calculated as total recipe values divided by the number of portions.
 
@@ -1286,9 +1288,9 @@ Complete Prepared Recipes, Daily Plans, and the Calendar through Domain, persist
 - [x] Add DailyPlan and DailyPlanItem models to `MealBuilder.Domain`
 - [x] Exclude the legacy direct Recipe relationship from the new `DailyPlanItem` model
 - [x] Add allocated and unallocated portion rules
-- [ ] Keep unallocated portions available by default and support optional portion planning
+- [x] Keep unallocated portions available by default and support optional portion planning
 - [ ] Support full and partial moves between dates
-- [ ] Add daily-plan weekly-summary inclusion rules
+- [x] Add daily-plan weekly-summary inclusion rules
 - [ ] Add allocation, nutrition, and date validation rules
 
 #### Milestone 18.2: Meal Planning Persistence
