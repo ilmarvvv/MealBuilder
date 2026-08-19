@@ -30,7 +30,32 @@ public readonly record struct RecipeNutrition(
             Salt + nutrition.Salt);
     }
 
+    public RecipeNutrition MultiplyBy(decimal multiplier)
+    {
+        if (multiplier < 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(multiplier),
+                multiplier,
+                "Multiplier cannot be negative.");
+        }
+
+        return new RecipeNutrition(
+            Calories * multiplier,
+            Protein * multiplier,
+            Fat * multiplier,
+            Carbohydrates * multiplier,
+            Sugars * multiplier,
+            Fiber * multiplier,
+            Salt * multiplier);
+    }
+
     public RecipeNutrition DivideBy(int divisor)
+    {
+        return DivideBy((decimal)divisor);
+    }
+
+    public RecipeNutrition DivideBy(decimal divisor)
     {
         if (divisor <= 0)
         {

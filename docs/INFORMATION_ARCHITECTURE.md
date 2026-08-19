@@ -194,6 +194,8 @@ For a Prepared Recipe, the user selects an available preparation and enters port
 
 Adding the same food source with the same planned time increases the existing item amount. A different planned time creates a separate item. Two items without a planned time are treated as having the same time for this rule.
 
+Changing planned time to match another item with the same food source combines their amounts into one item.
+
 The flow shows a nutrition preview before the item is added.
 
 ### Weekly Details

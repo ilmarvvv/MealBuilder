@@ -134,12 +134,71 @@ public sealed class DailyPlan
         item.ChangePortions(portions);
     }
 
-    public void ChangePlannedTime(
+    public DailyPlanItem ChangePlannedTime(
         int itemId,
         TimeOnly? plannedTime)
     {
         var item = FindItem(itemId);
-        item.ChangePlannedTime(plannedTime);
+
+        if (item.PlannedTime == plannedTime)
+        {
+            return item;
+        }
+
+        var matchingItem = _items.SingleOrDefault(candidate =>
+            !ReferenceEquals(candidate, item) &&
+            candidate.PlannedTime == plannedTime &&
+            HasSameFoodSource(candidate, item));
+
+        if (matchingItem is null)
+        {
+            item.ChangePlannedTime(plannedTime);
+
+            return item;
+        }
+
+        switch (item.ItemType)
+        {
+            case DailyPlanItemType.Ingredient:
+                {
+                    var matchingGrams = matchingItem.Grams
+                        ?? throw new InvalidOperationException(
+                            "An Ingredient item must contain grams.");
+
+                    var itemGrams = item.Grams
+                        ?? throw new InvalidOperationException(
+                            "An Ingredient item must contain grams.");
+
+                    matchingItem.ChangeGrams(
+                        matchingGrams + itemGrams);
+
+                    break;
+                }
+
+            case DailyPlanItemType.PreparedRecipe:
+                {
+                    var matchingPortions = matchingItem.Portions
+                        ?? throw new InvalidOperationException(
+                            "A Prepared Recipe item must contain portions.");
+
+                    var itemPortions = item.Portions
+                        ?? throw new InvalidOperationException(
+                            "A Prepared Recipe item must contain portions.");
+
+                    matchingItem.ChangePortions(
+                        matchingPortions + itemPortions);
+
+                    break;
+                }
+
+            default:
+                throw new InvalidOperationException(
+                    "The daily plan item type is not supported.");
+        }
+
+        _items.Remove(item);
+
+        return matchingItem;
     }
 
     public DailyPlanItem RemoveItem(int itemId)
@@ -167,8 +226,8 @@ public sealed class DailyPlan
     }
 
     private static bool ReferencesPreparedRecipe(
-    DailyPlanItem item,
-    PreparedRecipe preparedRecipe)
+        DailyPlanItem item,
+        PreparedRecipe preparedRecipe)
     {
         if (preparedRecipe.Id > 0)
         {
@@ -179,6 +238,46 @@ public sealed class DailyPlan
         return ReferenceEquals(
             item.PreparedRecipe,
             preparedRecipe);
+    }
+
+    private static bool HasSameFoodSource(
+        DailyPlanItem firstItem,
+        DailyPlanItem secondItem)
+    {
+        if (firstItem.ItemType != secondItem.ItemType)
+        {
+            return false;
+        }
+
+        return firstItem.ItemType switch
+        {
+            DailyPlanItemType.Ingredient =>
+                firstItem.IngredientId ==
+                secondItem.IngredientId,
+
+            DailyPlanItemType.PreparedRecipe =>
+                ReferencesSamePreparedRecipe(
+                    firstItem,
+                    secondItem),
+
+            _ => false
+        };
+    }
+
+    private static bool ReferencesSamePreparedRecipe(
+        DailyPlanItem firstItem,
+        DailyPlanItem secondItem)
+    {
+        if (firstItem.PreparedRecipeId.HasValue ||
+            secondItem.PreparedRecipeId.HasValue)
+        {
+            return firstItem.PreparedRecipeId ==
+                secondItem.PreparedRecipeId;
+        }
+
+        return ReferenceEquals(
+            firstItem.PreparedRecipe,
+            secondItem.PreparedRecipe);
     }
 
     private DailyPlanItem FindItem(int itemId)

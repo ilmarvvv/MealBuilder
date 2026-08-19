@@ -246,6 +246,7 @@ Notes:
 - a Prepared Recipe item must reference a Prepared Recipe owned by the Daily Plan owner
 - adding the same item type and food source with the same planned time increases the existing item amount instead of creating a duplicate
 - the same food source with a different planned time remains a separate item
+- changing planned time to match another item with the same type and food source combines their amounts and removes the duplicate
 
 ### PreparedRecipe
 
@@ -1293,7 +1294,7 @@ Complete Prepared Recipes, Daily Plans, and the Calendar through Domain, persist
 - [x] Keep unallocated portions available by default and support optional portion planning
 - [x] Support full and partial moves between dates
 - [x] Add daily-plan weekly-summary inclusion rules
-- [ ] Add allocation, nutrition, and date validation rules
+- [x] Add allocation, nutrition, and date validation rules
 
 #### Milestone 18.2: Meal Planning Persistence
 

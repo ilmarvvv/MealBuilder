@@ -127,6 +127,8 @@ Planned time is optional. Daily Plan Items are ordered by planned time, items wi
 
 Adding the same item type and food source with the same planned time increases the existing item amount instead of creating a duplicate. A different planned time creates a separate item, while two items without a planned time are combined.
 
+Changing an item's planned time to match another item with the same type and food source combines their amounts and removes the duplicate. Daily nutrition and Prepared Recipe allocated portions remain unchanged.
+
 After success, the interface offers `Add Another` for fast repeated entry.
 
 ### Create a Personal Ingredient
