@@ -68,9 +68,11 @@ public static class DailyPlanNutritionCalculator
             .ToList();
     }
 
-    private static RecipeNutrition CalculateItem(
+    public static RecipeNutrition CalculateItem(
         DailyPlanItem item)
     {
+        ArgumentNullException.ThrowIfNull(item);
+
         return item.ItemType switch
         {
             DailyPlanItemType.Ingredient =>
