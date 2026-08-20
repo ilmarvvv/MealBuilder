@@ -1307,11 +1307,11 @@ Complete Prepared Recipes, Daily Plans, and the Calendar through Domain, persist
 
 - [x] Add PreparedRecipe contracts and endpoints
 - [x] Add Prepared Recipe creation, snapshot, and availability contracts and endpoints
-- [ ] Add DailyPlan and DailyPlanItem contracts and endpoints
+- [x] Add DailyPlan and DailyPlanItem contracts and endpoints
 - [ ] Create a Prepared Recipe and any optional planned allocations atomically
 - [x] Delete a Prepared Recipe, its snapshot ingredients, and its allocations atomically, removing Daily Plans left empty
 - [ ] Add full and partial move operations that preserve the original item on failure
-- [ ] Return portions to the available amount after reduction or removal
+- [x] Return portions to the available amount after reduction or removal
 - [ ] Add weekly Calendar and nutrition endpoints
 - [ ] Exclude empty and manually disabled days from weekly totals and averages
 - [ ] Enforce allocation, validation, and ownership rules

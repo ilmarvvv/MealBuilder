@@ -138,9 +138,9 @@ public sealed class DailyPlansController(
     [HttpPost("{date}/prepared-recipes")]
     public async Task<ActionResult<DailyPlanResponse>>
         AddPreparedRecipe(
-        DateOnly date,
-        AddDailyPlanPreparedRecipeRequest request,
-        CancellationToken cancellationToken)
+            DateOnly date,
+            AddDailyPlanPreparedRecipeRequest request,
+            CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
 
@@ -234,6 +234,51 @@ public sealed class DailyPlansController(
 
             return ValidationProblem(ModelState);
         }
+    }
+
+    [HttpPut("{dailyPlanId:int}/weekly-summary")]
+    public async Task<ActionResult<DailyPlanResponse>>
+        SetWeeklySummaryInclusion(
+            int dailyPlanId,
+            DailyPlanInclusionRequest request,
+            CancellationToken cancellationToken)
+    {
+        var userId = userManager.GetUserId(User);
+
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        var dailyPlan = await dbContext.DailyPlans
+            .Where(dailyPlan =>
+                dailyPlan.Id == dailyPlanId &&
+                dailyPlan.OwnerId == userId)
+            .Include(dailyPlan => dailyPlan.Items)
+                .ThenInclude(item => item.Ingredient)
+            .Include(dailyPlan => dailyPlan.Items)
+                .ThenInclude(item => item.PreparedRecipe)
+                    .ThenInclude(preparedRecipe =>
+                        preparedRecipe!.Ingredients)
+            .AsSplitQuery()
+            .SingleOrDefaultAsync(cancellationToken);
+
+        if (dailyPlan is null)
+        {
+            return NotFound();
+        }
+
+        dailyPlan.SetWeeklySummaryInclusion(
+            request.IncludeInWeeklySummary);
+
+        dailyPlan.EnsureCanBeSaved();
+
+        await dbContext.SaveChangesAsync(
+            cancellationToken);
+
+        return Ok(
+            DailyPlanResponseMapper.ToResponse(
+                dailyPlan));
     }
 
     private async Task<decimal> GetAllocatedPortionsAsync(
