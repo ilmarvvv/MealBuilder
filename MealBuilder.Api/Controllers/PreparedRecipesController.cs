@@ -170,6 +170,115 @@ public sealed class PreparedRecipesController(
                     allocatedPortions));
     }
 
+    [HttpGet("{id:int}/deletion-impact")]
+    public async Task<
+        ActionResult<PreparedRecipeDeletionImpactResponse>>
+        GetDeletionImpact(
+            int id,
+            CancellationToken cancellationToken)
+    {
+        var userId = userManager.GetUserId(User);
+
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        var preparedRecipe = await dbContext.PreparedRecipes
+            .AsNoTracking()
+            .SingleOrDefaultAsync(
+                preparedRecipe =>
+                    preparedRecipe.Id == id &&
+                    preparedRecipe.OwnerId == userId,
+                cancellationToken);
+
+        if (preparedRecipe is null)
+        {
+            return NotFound();
+        }
+
+        var affectedItems = dbContext.DailyPlanItems
+            .AsNoTracking()
+            .Where(item =>
+                item.PreparedRecipeId == preparedRecipe.Id);
+
+        var affectedItemCount =
+            await affectedItems.CountAsync(
+                cancellationToken);
+
+        var affectedDateCount =
+            await affectedItems
+                .Select(item => item.DailyPlanId)
+                .Distinct()
+                .CountAsync(cancellationToken);
+
+        return Ok(
+            PreparedRecipeResponseMapper
+                .ToDeletionImpactResponse(
+                    preparedRecipe,
+                    affectedItemCount,
+                    affectedDateCount));
+    }
+
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(
+        int id,
+        CancellationToken cancellationToken)
+    {
+        var userId = userManager.GetUserId(User);
+
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        await using var transaction =
+            await dbContext.Database.BeginTransactionAsync(
+                cancellationToken);
+
+        var preparedRecipe = await dbContext.PreparedRecipes
+            .SingleOrDefaultAsync(
+                preparedRecipe =>
+                    preparedRecipe.Id == id &&
+                    preparedRecipe.OwnerId == userId,
+                cancellationToken);
+
+        if (preparedRecipe is null)
+        {
+            return NotFound();
+        }
+
+        var affectedDailyPlans = await dbContext.DailyPlans
+            .Where(dailyPlan =>
+                dailyPlan.OwnerId == userId &&
+                dailyPlan.Items.Any(item =>
+                    item.PreparedRecipeId ==
+                    preparedRecipe.Id))
+            .Include(dailyPlan => dailyPlan.Items)
+            .ToListAsync(cancellationToken);
+
+        var emptyDailyPlans = affectedDailyPlans
+            .Where(dailyPlan =>
+                dailyPlan.Items.All(item =>
+                    item.PreparedRecipeId ==
+                    preparedRecipe.Id))
+            .ToArray();
+
+        dbContext.DailyPlans.RemoveRange(
+            emptyDailyPlans);
+
+        dbContext.PreparedRecipes.Remove(
+            preparedRecipe);
+
+        await dbContext.SaveChangesAsync(
+            cancellationToken);
+
+        await transaction.CommitAsync(
+            cancellationToken);
+
+        return NoContent();
+    }
+
     [HttpPost]
     public async Task<ActionResult<PreparedRecipeResponse>> Create(
         CreatePreparedRecipeRequest request,
