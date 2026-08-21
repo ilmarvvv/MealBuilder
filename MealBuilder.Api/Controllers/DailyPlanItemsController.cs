@@ -239,6 +239,121 @@ public sealed class DailyPlanItemsController(
                 dailyPlan));
     }
 
+    [HttpPost("{itemId:int}/move")]
+    public async Task<ActionResult<MoveDailyPlanItemResponse>> Move(
+        int dailyPlanId,
+        int itemId,
+        MoveDailyPlanItemRequest request,
+        CancellationToken cancellationToken)
+    {
+        var userId = userManager.GetUserId(User);
+
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        await using var transaction =
+            await dbContext.Database.BeginTransactionAsync(
+                cancellationToken);
+
+        var sourcePlan = await LoadDailyPlanAsync(
+            dailyPlanId,
+            userId,
+            cancellationToken);
+
+        if (sourcePlan is null)
+        {
+            return NotFound();
+        }
+
+        var itemExists = sourcePlan.Items.Any(
+            item => item.Id == itemId);
+
+        if (!itemExists)
+        {
+            return NotFound();
+        }
+
+        var destinationPlan = await dbContext.DailyPlans
+            .Where(dailyPlan =>
+                dailyPlan.OwnerId == userId &&
+                dailyPlan.Date ==
+                    request.DestinationDate)
+            .Include(dailyPlan => dailyPlan.Items)
+                .ThenInclude(item => item.Ingredient)
+            .Include(dailyPlan => dailyPlan.Items)
+                .ThenInclude(item => item.PreparedRecipe)
+                    .ThenInclude(preparedRecipe =>
+                        preparedRecipe!.Ingredients)
+            .AsSplitQuery()
+            .SingleOrDefaultAsync(cancellationToken);
+
+        if (destinationPlan is null)
+        {
+            destinationPlan = DailyPlan.Create(
+                userId,
+                request.DestinationDate);
+
+            dbContext.DailyPlans.Add(
+                destinationPlan);
+        }
+
+        var sourceDate = sourcePlan.Date;
+
+        try
+        {
+            DailyPlanItemMover.Move(
+                sourcePlan,
+                destinationPlan,
+                itemId,
+                request.Amount);
+
+            destinationPlan.EnsureCanBeSaved();
+
+            if (sourcePlan.IsEmpty)
+            {
+                dbContext.DailyPlans.Remove(
+                    sourcePlan);
+            }
+            else
+            {
+                sourcePlan.EnsureCanBeSaved();
+            }
+
+            await dbContext.SaveChangesAsync(
+                cancellationToken);
+
+            await transaction.CommitAsync(
+                cancellationToken);
+
+            var sourceResponse = sourcePlan.IsEmpty
+                ? DailyPlanResponseMapper.ToEmptyResponse(
+                    sourceDate)
+                : DailyPlanResponseMapper.ToResponse(
+                    sourcePlan);
+
+            var destinationResponse =
+                DailyPlanResponseMapper.ToResponse(
+                    destinationPlan);
+
+            return Ok(
+                new MoveDailyPlanItemResponse(
+                    sourceResponse,
+                    destinationResponse));
+        }
+        catch (Exception exception)
+            when (exception is ArgumentException or
+                  InvalidOperationException)
+        {
+            ModelState.AddModelError(
+                nameof(request),
+                exception.Message);
+
+            return ValidationProblem(ModelState);
+        }
+    }
+
     private async Task<DailyPlan?> LoadDailyPlanAsync(
         int dailyPlanId,
         string userId,
