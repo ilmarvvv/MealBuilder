@@ -1319,10 +1319,10 @@ Complete Prepared Recipes, Daily Plans, and the Calendar through Domain, persist
 
 #### Milestone 18.4: Meal Planning API Tests
 
-- [ ] Test Prepared Recipe snapshot operations
-- [ ] Test that deleting a source Recipe preserves its Prepared Recipes and sets `SourceRecipeId` to null
-- [ ] Test available-amount and optional planned-allocation operations
-- [ ] Test Prepared Recipe cascade deletion, empty Daily Plan cleanup, and recalculated totals
+- [x] Test Prepared Recipe snapshot operations
+- [x] Test that deleting a source Recipe preserves its Prepared Recipes and sets `SourceRecipeId` to null
+- [x] Test available-amount and optional planned-allocation operations
+- [x] Test Prepared Recipe cascade deletion, empty Daily Plan cleanup, and recalculated totals
 - [ ] Test adjust, move, remove, and insufficient-portion behavior
 - [ ] Test atomic failure behavior for preparation and move operations
 - [ ] Test daily-plan inclusion and weekly nutrition calculations
