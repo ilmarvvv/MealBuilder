@@ -1312,9 +1312,10 @@ Complete Prepared Recipes, Daily Plans, and the Calendar through Domain, persist
 - [x] Delete a Prepared Recipe, its snapshot ingredients, and its allocations atomically, removing Daily Plans left empty
 - [x] Add full and partial move operations that preserve the original item on failure
 - [x] Return portions to the available amount after reduction or removal
-- [ ] Add weekly Calendar and nutrition endpoints
-- [ ] Exclude empty and manually disabled days from weekly totals and averages
-- [ ] Enforce allocation, validation, and ownership rules
+- [x] Add weekly Calendar and nutrition endpoints
+- [x] Exclude empty and manually disabled days from weekly totals and averages
+- [x] Enforce allocation, validation, and ownership rules
+- [ ] Organize Meal Planning API contracts into focused folders before API tests
 
 #### Milestone 18.4: Meal Planning API Tests
 

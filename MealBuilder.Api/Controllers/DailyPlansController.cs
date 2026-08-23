@@ -55,6 +55,61 @@ public sealed class DailyPlansController(
                 dailyPlan));
     }
 
+    [HttpGet("week/{startDate}")]
+    public async Task<ActionResult<WeeklySummaryResponse>> GetWeek(
+        DateOnly startDate,
+        CancellationToken cancellationToken)
+    {
+        var userId = userManager.GetUserId(User);
+
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        if (startDate.DayOfWeek != DayOfWeek.Monday)
+        {
+            ModelState.AddModelError(
+                nameof(startDate),
+                "The week start date must be a Monday.");
+
+            return ValidationProblem(ModelState);
+        }
+
+        if (startDate.DayNumber >
+            DateOnly.MaxValue.DayNumber - 6)
+        {
+            ModelState.AddModelError(
+                nameof(startDate),
+                "The requested week exceeds the supported calendar.");
+
+            return ValidationProblem(ModelState);
+        }
+
+        var endDate = startDate.AddDays(6);
+
+        var dailyPlans = await dbContext.DailyPlans
+            .AsNoTracking()
+            .Where(dailyPlan =>
+                dailyPlan.OwnerId == userId &&
+                dailyPlan.Date >= startDate &&
+                dailyPlan.Date <= endDate)
+            .Include(dailyPlan => dailyPlan.Items)
+                .ThenInclude(item => item.Ingredient)
+            .Include(dailyPlan => dailyPlan.Items)
+                .ThenInclude(item => item.PreparedRecipe)
+                    .ThenInclude(preparedRecipe =>
+                        preparedRecipe!.Ingredients)
+            .OrderBy(dailyPlan => dailyPlan.Date)
+            .AsSplitQuery()
+            .ToListAsync(cancellationToken);
+
+        return Ok(
+            WeeklySummaryResponseMapper.ToResponse(
+                startDate,
+                dailyPlans));
+    }
+
     [HttpPost("{date}/ingredients")]
     public async Task<ActionResult<DailyPlanResponse>> AddIngredient(
         DateOnly date,

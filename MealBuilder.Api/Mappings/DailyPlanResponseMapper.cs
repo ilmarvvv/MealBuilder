@@ -78,7 +78,7 @@ public static class DailyPlanResponseMapper
         };
     }
 
-    private static MealPlanningNutritionResponse
+    internal static MealPlanningNutritionResponse
         ToNutritionResponse(
             RecipeNutrition nutrition)
     {
