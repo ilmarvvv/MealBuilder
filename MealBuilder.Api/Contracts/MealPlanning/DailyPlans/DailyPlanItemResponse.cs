@@ -1,6 +1,6 @@
 ﻿using MealBuilder.Domain.MealPlanning;
 
-namespace MealBuilder.Api.Contracts.MealPlanning;
+namespace MealBuilder.Api.Contracts.MealPlanning.DailyPlans;
 
 public sealed record DailyPlanItemResponse(
     int Id,

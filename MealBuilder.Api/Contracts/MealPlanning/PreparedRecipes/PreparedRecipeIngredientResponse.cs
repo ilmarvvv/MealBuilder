@@ -1,4 +1,4 @@
-﻿namespace MealBuilder.Api.Contracts.MealPlanning;
+﻿namespace MealBuilder.Api.Contracts.MealPlanning.PreparedRecipes;
 
 public sealed record PreparedRecipeIngredientResponse(
     int Id,

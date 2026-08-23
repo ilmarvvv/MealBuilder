@@ -1,4 +1,4 @@
-﻿namespace MealBuilder.Api.Contracts.MealPlanning;
+﻿namespace MealBuilder.Api.Contracts.MealPlanning.Weekly;
 
 public sealed record WeeklySummaryResponse(
     DateOnly StartDate,

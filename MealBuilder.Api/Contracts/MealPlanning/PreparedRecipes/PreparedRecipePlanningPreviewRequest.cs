@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using MealBuilder.Domain.MealPlanning;
 
-namespace MealBuilder.Api.Contracts.MealPlanning;
+namespace MealBuilder.Api.Contracts.MealPlanning.PreparedRecipes;
 
 public sealed record PreparedRecipePlanningPreviewRequest(
     [Range(1, int.MaxValue)]

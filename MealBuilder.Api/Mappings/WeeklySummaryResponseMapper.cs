@@ -1,4 +1,4 @@
-﻿using MealBuilder.Api.Contracts.MealPlanning;
+﻿using MealBuilder.Api.Contracts.MealPlanning.Weekly;
 using MealBuilder.Domain.MealPlanning;
 using MealBuilder.Domain.Recipes;
 

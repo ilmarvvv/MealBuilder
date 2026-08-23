@@ -1,4 +1,5 @@
 ﻿using MealBuilder.Api.Contracts.MealPlanning;
+using MealBuilder.Api.Contracts.MealPlanning.PreparedRecipes;
 using MealBuilder.Domain.MealPlanning;
 using MealBuilder.Domain.Recipes;
 

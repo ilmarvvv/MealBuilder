@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MealBuilder.Api.Contracts.MealPlanning;
+namespace MealBuilder.Api.Contracts.MealPlanning.DailyPlans;
 
 public sealed record DailyPlanItemAmountRequest(
     [Range(

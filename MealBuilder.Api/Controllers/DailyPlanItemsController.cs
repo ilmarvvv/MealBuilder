@@ -1,4 +1,4 @@
-﻿using MealBuilder.Api.Contracts.MealPlanning;
+﻿using MealBuilder.Api.Contracts.MealPlanning.DailyPlans;
 using MealBuilder.Api.Mappings;
 using MealBuilder.Domain.MealPlanning;
 using MealBuilder.Infrastructure.Data;

@@ -1,4 +1,4 @@
-﻿namespace MealBuilder.Api.Contracts.MealPlanning;
+﻿namespace MealBuilder.Api.Contracts.MealPlanning.DailyPlans;
 
 public sealed record MoveDailyPlanItemResponse(
     DailyPlanResponse SourcePlan,

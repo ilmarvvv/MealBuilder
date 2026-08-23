@@ -1315,7 +1315,7 @@ Complete Prepared Recipes, Daily Plans, and the Calendar through Domain, persist
 - [x] Add weekly Calendar and nutrition endpoints
 - [x] Exclude empty and manually disabled days from weekly totals and averages
 - [x] Enforce allocation, validation, and ownership rules
-- [ ] Organize Meal Planning API contracts into focused folders before API tests
+- [x] Organize Meal Planning API contracts into focused folders before API tests
 
 #### Milestone 18.4: Meal Planning API Tests
 
