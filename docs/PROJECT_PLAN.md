@@ -1323,10 +1323,10 @@ Complete Prepared Recipes, Daily Plans, and the Calendar through Domain, persist
 - [x] Test that deleting a source Recipe preserves its Prepared Recipes and sets `SourceRecipeId` to null
 - [x] Test available-amount and optional planned-allocation operations
 - [x] Test Prepared Recipe cascade deletion, empty Daily Plan cleanup, and recalculated totals
-- [ ] Test adjust, move, remove, and insufficient-portion behavior
-- [ ] Test atomic failure behavior for preparation and move operations
-- [ ] Test daily-plan inclusion and weekly nutrition calculations
-- [ ] Test validation and ownership isolation
+- [x] Test adjust, move, remove, and insufficient-portion behavior
+- [x] Test atomic failure behavior for preparation and move operations
+- [x] Test daily-plan inclusion and weekly nutrition calculations
+- [x] Test validation and ownership isolation
 
 #### Milestone 18.5: Meal Planning React Frontend
 
