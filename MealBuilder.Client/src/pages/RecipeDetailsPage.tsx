@@ -20,10 +20,8 @@ export default function RecipeDetailsPage() {
   const [recipe, setRecipe] = useState<Recipe | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [errors, setErrors] = useState<string[]>([])
-  const [
-  isDeleteConfirmationOpen,
-  setIsDeleteConfirmationOpen,
-  ] = useState(false)
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
+    useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [deleteErrors, setDeleteErrors] = useState<string[]>([])
 
@@ -35,30 +33,21 @@ export default function RecipeDetailsPage() {
       setErrors([])
       setRecipe(null)
 
-      if (
-        !Number.isInteger(parsedRecipeId) ||
-        parsedRecipeId <= 0
-      ) {
+      if (!Number.isInteger(parsedRecipeId) || parsedRecipeId <= 0) {
         setErrors(['Recipe not found.'])
         setIsLoading(false)
         return
       }
 
       try {
-        const loadedRecipe =
-          await recipeApi.getById(parsedRecipeId)
+        const loadedRecipe = await recipeApi.getById(parsedRecipeId)
 
         if (isActive) {
           setRecipe(loadedRecipe)
         }
       } catch (error) {
         if (isActive) {
-          setErrors(
-            getApiErrorMessages(
-              error,
-              'Unable to load the Recipe.',
-            ),
-          )
+          setErrors(getApiErrorMessages(error, 'Unable to load the Recipe.'))
         }
       } finally {
         if (isActive) {
@@ -74,31 +63,28 @@ export default function RecipeDetailsPage() {
     }
   }, [parsedRecipeId])
 
-async function handleDelete() {
-  if (!recipe) {
-    return
+  async function handleDelete() {
+    if (!recipe) {
+      return
+    }
+
+    setIsDeleting(true)
+    setDeleteErrors([])
+
+    try {
+      await recipeApi.remove(recipe.id)
+
+      navigate('/library/recipes', {
+        replace: true,
+      })
+    } catch (error) {
+      setDeleteErrors(
+        getApiErrorMessages(error, 'Unable to delete the Recipe.'),
+      )
+    } finally {
+      setIsDeleting(false)
+    }
   }
-
-  setIsDeleting(true)
-  setDeleteErrors([])
-
-  try {
-    await recipeApi.remove(recipe.id)
-
-    navigate('/library/recipes', {
-      replace: true,
-    })
-  } catch (error) {
-    setDeleteErrors(
-      getApiErrorMessages(
-        error,
-        'Unable to delete the Recipe.',
-      ),
-    )
-  } finally {
-    setIsDeleting(false)
-  }
-}
 
   if (isLoading) {
     return <LoadingIndicator message="Loading Recipe..." />
@@ -107,9 +93,7 @@ async function handleDelete() {
   if (errors.length > 0 || !recipe) {
     return (
       <section className="recipe-details">
-        <Link to="/library/recipes">
-          &larr; Back to Recipes
-        </Link>
+        <Link to="/library/recipes">&larr; Back to Recipes</Link>
 
         <ErrorList messages={errors} />
       </section>
@@ -118,98 +102,91 @@ async function handleDelete() {
 
   return (
     <article className="recipe-details">
-      <Link
-        className="recipe-details__back"
-        to="/library/recipes"
-      >
+      <Link className="recipe-details__back" to="/library/recipes">
         &larr; Back to Recipes
       </Link>
 
       <header className="recipe-details__header">
         <div>
-          <p className="recipe-details__eyebrow">
-            Personal Recipe
-          </p>
+          <p className="recipe-details__eyebrow">Personal Recipe</p>
 
           <h2>{recipe.name}</h2>
 
-          <p>
-            {recipe.description ?? 'No description'}
-          </p>
+          <p>{recipe.description ?? 'No description'}</p>
         </div>
 
         <div className="recipe-details__actions">
-            <span className="recipe-details__servings">
-                {recipe.servings}{' '}
-                {recipe.servings === 1 ? 'serving' : 'servings'}
-            </span>
+          <span className="recipe-details__servings">
+            {recipe.servings} {recipe.servings === 1 ? 'serving' : 'servings'}
+          </span>
 
-            <Link
-                className="recipe-details__edit"
-                to={`/library/recipes/${recipe.id}/edit`}
-            >
-                Edit Recipe
-            </Link>
-            <button
-                className="recipe-details__delete"
-                type="button"
-                aria-expanded={isDeleteConfirmationOpen}
-                aria-controls="delete-recipe-confirmation"
-                onClick={() => {
-                    setDeleteErrors([])
-                    setIsDeleteConfirmationOpen(true)
-                }}
-                >
-                    Delete
-            </button>
+          <Link
+            className="recipe-details__prepare"
+            to={`/planner/prepare/${recipe.id}`}
+          >
+            Prepare Recipe
+          </Link>
+
+          <Link
+            className="recipe-details__edit"
+            to={`/library/recipes/${recipe.id}/edit`}
+          >
+            Edit Recipe
+          </Link>
+          <button
+            className="recipe-details__delete"
+            type="button"
+            aria-expanded={isDeleteConfirmationOpen}
+            aria-controls="delete-recipe-confirmation"
+            onClick={() => {
+              setDeleteErrors([])
+              setIsDeleteConfirmationOpen(true)
+            }}
+          >
+            Delete
+          </button>
         </div>
       </header>
 
-{isDeleteConfirmationOpen && (
-  <section
-    id="delete-recipe-confirmation"
-    className="recipe-delete-confirmation"
-    role="region"
-    aria-labelledby="delete-recipe-heading"
-  >
-    <div>
-      <h3 id="delete-recipe-heading">
-        Delete Recipe?
-      </h3>
+      {isDeleteConfirmationOpen && (
+        <section
+          id="delete-recipe-confirmation"
+          className="recipe-delete-confirmation"
+          role="region"
+          aria-labelledby="delete-recipe-heading"
+        >
+          <div>
+            <h3 id="delete-recipe-heading">Delete Recipe?</h3>
 
-      <p>
-        This will permanently delete {recipe.name}.
-      </p>
-    </div>
+            <p>This will permanently delete {recipe.name}.</p>
+          </div>
 
-    <ErrorList messages={deleteErrors} />
+          <ErrorList messages={deleteErrors} />
 
-    <div className="recipe-delete-confirmation__actions">
-      <button
-        className="recipe-delete-confirmation__cancel"
-        type="button"
-        disabled={isDeleting}
-        onClick={() => {
-          setDeleteErrors([])
-          setIsDeleteConfirmationOpen(false)
-        }}
-      >
-        Cancel
-      </button>
+          <div className="recipe-delete-confirmation__actions">
+            <button
+              className="recipe-delete-confirmation__cancel"
+              type="button"
+              disabled={isDeleting}
+              onClick={() => {
+                setDeleteErrors([])
+                setIsDeleteConfirmationOpen(false)
+              }}
+            >
+              Cancel
+            </button>
 
-      <button
-        className="recipe-delete-confirmation__confirm"
-        type="button"
-        disabled={isDeleting}
-        onClick={handleDelete}
-      >
-        {isDeleting
-          ? 'Deleting...'
-          : 'Delete permanently'}
-      </button>
-    </div>
-  </section>
-)}
+            <button
+              className="recipe-delete-confirmation__confirm"
+              type="button"
+              disabled={isDeleting}
+              onClick={handleDelete}
+            >
+              {isDeleting ? 'Deleting...' : 'Delete permanently'}
+            </button>
+          </div>
+        </section>
+      )}
 
       <RecipeNutritionSummary
         total={recipe.totalNutrition}
@@ -223,15 +200,11 @@ async function handleDelete() {
           <ol className="recipe-details__ingredients">
             {recipe.ingredients.map((ingredient) => (
               <li key={ingredient.ingredientId}>
-                <Link
-                  to={`/library/ingredients/${ingredient.ingredientId}`}
-                >
+                <Link to={`/library/ingredients/${ingredient.ingredientId}`}>
                   {ingredient.ingredientName}
                 </Link>
 
-                <strong>
-                  {numberFormatter.format(ingredient.grams)} g
-                </strong>
+                <strong>{numberFormatter.format(ingredient.grams)} g</strong>
               </li>
             ))}
           </ol>

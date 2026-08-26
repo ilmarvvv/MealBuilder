@@ -1,0 +1,236 @@
+.planner-page {
+  display: grid;
+  gap: var(--space-5);
+  width: min(100% - 2rem, 75rem);
+  margin-inline: auto;
+  padding-block: var(--space-6);
+}
+
+.planner-page__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-5);
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-large);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-accent-soft) 70%, transparent),
+      transparent 60%
+    ),
+    var(--color-surface);
+  box-shadow: var(--shadow-small);
+}
+
+.planner-page__header h1 {
+  margin-top: var(--space-2);
+  font-size: clamp(2rem, 5vw, 3rem);
+}
+
+.planner-page__header p:last-child {
+  max-width: 42rem;
+  margin-bottom: 0;
+  color: var(--color-text-muted);
+}
+
+.planner-page__eyebrow,
+.available-portions__eyebrow {
+  margin: 0;
+  color: var(--color-accent);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.available-portions {
+  display: grid;
+  gap: var(--space-5);
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-large);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-small);
+}
+
+.available-portions__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.available-portions__header h2 {
+  margin-top: var(--space-2);
+}
+
+.available-portions__header p:last-child {
+  margin-bottom: 0;
+  color: var(--color-text-muted);
+}
+
+.available-portions__count {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  min-width: 3rem;
+  min-height: 3rem;
+  padding: var(--space-2);
+  border: 1px solid
+    color-mix(in srgb, var(--color-accent) 50%, var(--color-border));
+  border-radius: 50%;
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+  font-size: 1.125rem;
+}
+
+.available-portions__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.available-portions__item {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: var(--color-surface-muted);
+}
+
+.available-portions__item h3 {
+  overflow-wrap: anywhere;
+}
+
+.available-portions__item > div:first-child p {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.available-portions__amount {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid
+    color-mix(in srgb, var(--color-accent) 40%, var(--color-border));
+  border-radius: var(--radius-small);
+  background: var(--color-accent-soft);
+}
+
+.available-portions__amount strong {
+  color: var(--color-accent);
+  font-size: 1.75rem;
+}
+
+.available-portions__amount span {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.available-portions__nutrition {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.available-portions__nutrition div {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.available-portions__nutrition dt {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}
+
+.available-portions__nutrition dd {
+  margin: 0;
+  color: var(--color-text);
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.available-portions__empty {
+  padding: var(--space-6);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-medium);
+  text-align: center;
+}
+
+.available-portions__empty p {
+  max-width: 34rem;
+  margin: var(--space-2) auto 0;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 40rem) {
+  .planner-page {
+    padding-block: var(--space-4);
+  }
+
+  .planner-page__header,
+  .available-portions {
+    padding: var(--space-4);
+    border-radius: var(--radius-medium);
+  }
+
+  .available-portions__header {
+    align-items: flex-start;
+  }
+
+  .available-portions__nutrition {
+    grid-template-columns: 1fr;
+  }
+}
+
+.available-portions__details {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-small);
+  color: var(--color-text);
+  background: var(--color-surface);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.available-portions__details:hover {
+  color: var(--color-on-accent);
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+}
+
+.available-portions__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.available-portions__controls button {
+  border-color: var(--color-border);
+  color: var(--color-text);
+  background: var(--color-surface-muted);
+}
+
+.available-portions__controls button:not(:disabled):hover {
+  color: var(--color-on-accent);
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+}

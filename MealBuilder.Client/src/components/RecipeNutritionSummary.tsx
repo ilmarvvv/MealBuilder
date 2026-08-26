@@ -4,6 +4,11 @@ import './RecipeNutritionSummary.css'
 type RecipeNutritionSummaryProps = {
   total: RecipeNutrition
   perServing: RecipeNutrition
+  eyebrow?: string
+  title?: string
+  description?: string
+  totalTitle?: string
+  perServingTitle?: string
 }
 
 type NutritionPanelProps = {
@@ -19,10 +24,7 @@ function formatNumber(value: number) {
   return numberFormatter.format(value)
 }
 
-function NutritionPanel({
-  title,
-  nutrition,
-}: NutritionPanelProps) {
+function NutritionPanel({ title, nutrition }: NutritionPanelProps) {
   return (
     <article className="recipe-nutrition-panel">
       <h4>{title}</h4>
@@ -68,6 +70,11 @@ function NutritionPanel({
 export default function RecipeNutritionSummary({
   total,
   perServing,
+  eyebrow = 'Live calculation',
+  title = 'Nutrition Summary',
+  description = 'Calculated from the selected Ingredients.',
+  totalTitle = 'Whole Recipe',
+  perServingTitle = 'Per Serving',
 }: RecipeNutritionSummaryProps) {
   return (
     <section
@@ -76,28 +83,18 @@ export default function RecipeNutritionSummary({
     >
       <header>
         <div>
-          <p className="recipe-nutrition-summary__eyebrow">
-            Live calculation
-          </p>
+          <p className="recipe-nutrition-summary__eyebrow">{eyebrow}</p>
 
-          <h3 id="recipe-nutrition-title">
-            Nutrition Summary
-          </h3>
+          <h3 id="recipe-nutrition-title">{title}</h3>
         </div>
 
-        <p>Calculated from the selected Ingredients.</p>
+        <p>{description}</p>
       </header>
 
       <div className="recipe-nutrition-summary__panels">
-        <NutritionPanel
-          title="Whole Recipe"
-          nutrition={total}
-        />
+        <NutritionPanel title={totalTitle} nutrition={total} />
 
-        <NutritionPanel
-          title="Per Serving"
-          nutrition={perServing}
-        />
+        <NutritionPanel title={perServingTitle} nutrition={perServing} />
       </div>
     </section>
   )

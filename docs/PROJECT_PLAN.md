@@ -1331,10 +1331,10 @@ Complete Prepared Recipes, Daily Plans, and the Calendar through Domain, persist
 #### Milestone 18.5: Meal Planning React Frontend
 
 - [x] Add Meal Planning frontend types and API functions
-- [ ] Implement the user-facing Prepared Recipe and Available Portions workflows
-- [ ] Show `Original recipe deleted` when a Prepared Recipe no longer has its source Recipe
-- [ ] Keep unallocated portions available by default and provide an optional Plan Portions flow
-- [ ] Add a Prepared Recipe deletion warning with affected item and date counts
+- [x] Implement the user-facing Prepared Recipe and Available Portions workflows
+- [x] Show `Original recipe deleted` when a Prepared Recipe no longer has its source Recipe
+- [x] Keep unallocated portions available by default and provide an optional Plan Portions flow
+- [x] Add a Prepared Recipe deletion warning with affected item and date counts
 - [ ] Implement the time-sorted Daily Plan without fixed meal sections, placing items without a time last
 - [ ] Implement the two-step Add Food modal with Ingredient and Prepared Recipe search
 - [ ] Implement change amount, full or partial move, remove, and Undo interactions

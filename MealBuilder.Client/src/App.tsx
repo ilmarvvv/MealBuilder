@@ -16,6 +16,9 @@ import RecipeDetailsPage from './pages/RecipeDetailsPage'
 import RecipeListPage from './pages/RecipeListPage'
 import RegisterPage from './pages/RegisterPage'
 import AccountPage from './pages/AccountPage'
+import PlannerPage from './pages/PlannerPage'
+import PrepareRecipePage from './pages/PrepareRecipePage'
+import PreparedRecipeDetailsPage from './pages/PreparedRecipeDetailsPage'
 
 function App() {
   return (
@@ -30,6 +33,15 @@ function App() {
 
         <Route element={<AuthenticatedRoute />}>
           <Route path="/" element={<HomePage />} />
+          <Route path="/planner" element={<PlannerPage />} />
+          <Route
+            path="/planner/prepare/:recipeId"
+            element={<PrepareRecipePage />}
+          />
+          <Route
+            path="/planner/prepared-recipes/:preparedRecipeId"
+            element={<PreparedRecipeDetailsPage />}
+          />
           <Route path="/account" element={<AccountPage />} />
 
           <Route path="/library" element={<LibraryLayout />}>

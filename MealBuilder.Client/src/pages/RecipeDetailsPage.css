@@ -27,11 +27,7 @@
   background:
     linear-gradient(
       135deg,
-      color-mix(
-        in srgb,
-        var(--color-accent-soft) 65%,
-        transparent
-      ),
+      color-mix(in srgb, var(--color-accent-soft) 65%, transparent),
       transparent 60%
     ),
     var(--color-surface);
@@ -76,6 +72,7 @@
   font-weight: 800;
 }
 
+.recipe-details__prepare,
 .recipe-details__edit {
   display: inline-flex;
   align-items: center;
@@ -89,9 +86,21 @@
   text-decoration: none;
 }
 
+.recipe-details__prepare:hover,
 .recipe-details__edit:hover {
   color: var(--color-on-accent);
   background: var(--color-accent-hover);
+}
+
+.recipe-details__edit {
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  background: var(--color-surface-muted);
+}
+
+.recipe-details__edit:hover {
+  color: var(--color-text);
+  background: var(--color-surface);
 }
 
 .recipe-details__delete {
@@ -110,18 +119,13 @@
   gap: var(--space-4);
   padding: var(--space-5);
   border: 1px solid
-    color-mix(
-      in srgb,
-      var(--color-danger) 60%,
-      var(--color-border)
-    );
+    color-mix(in srgb, var(--color-danger) 60%, var(--color-border));
   border-radius: var(--radius-large);
-  background:
-    color-mix(
-      in srgb,
-      var(--color-surface) 90%,
-      var(--color-danger) 10%
-    );
+  background: color-mix(
+    in srgb,
+    var(--color-surface) 90%,
+    var(--color-danger) 10%
+  );
   box-shadow: var(--shadow-small);
 }
 
@@ -160,12 +164,7 @@
 
 .recipe-delete-confirmation__confirm:not(:disabled):hover {
   color: var(--color-background);
-  background:
-    color-mix(
-      in srgb,
-      var(--color-danger) 82%,
-      var(--color-text)
-    );
+  background: color-mix(in srgb, var(--color-danger) 82%, var(--color-text));
 }
 
 .recipe-details__content {
@@ -241,11 +240,7 @@
   width: 2.25rem;
   height: 2.25rem;
   border: 1px solid
-    color-mix(
-      in srgb,
-      var(--color-accent) 45%,
-      var(--color-border)
-    );
+    color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
   border-radius: 50%;
   color: var(--color-accent);
   background: var(--color-accent-soft);
@@ -285,29 +280,30 @@
   }
 
   .recipe-details__actions {
-  align-items: stretch;
-  flex-direction: column;
+    align-items: stretch;
+    flex-direction: column;
   }
 
- .recipe-details__edit {
-   width: 100%;
+  .recipe-details__prepare,
+  .recipe-details__edit {
+    width: 100%;
   }
 
   .recipe-details__delete {
-  width: 100%;
-}
+    width: 100%;
+  }
 
-.recipe-delete-confirmation {
-  padding: var(--space-4);
-  border-radius: var(--radius-medium);
-}
+  .recipe-delete-confirmation {
+    padding: var(--space-4);
+    border-radius: var(--radius-medium);
+  }
 
-.recipe-delete-confirmation__actions {
-  align-items: stretch;
-  flex-direction: column-reverse;
-}
+  .recipe-delete-confirmation__actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
 
-.recipe-delete-confirmation__actions button {
-  width: 100%;
-}
+  .recipe-delete-confirmation__actions button {
+    width: 100%;
+  }
 }

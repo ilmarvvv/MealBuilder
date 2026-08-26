@@ -41,9 +41,9 @@ export default function AppLayout() {
                 Dashboard
               </NavLink>
 
-              <span className="app-navigation__link" aria-disabled="true">
+              <NavLink className="app-navigation__link" to="/planner">
                 Planner
-              </span>
+              </NavLink>
 
               <NavLink
                 className="app-navigation__link"
