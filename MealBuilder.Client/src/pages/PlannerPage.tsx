@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Link, useSearchParams } from 'react-router'
 import { getApiErrorMessages } from '../api/getApiErrorMessages'
-import { preparedRecipeApi } from '../api/preparedRecipeApi'
 import type { PreparedRecipeSummary } from '../api/mealPlanningTypes'
+import { preparedRecipeApi } from '../api/preparedRecipeApi'
+import DailyPlanSection from '../components/DailyPlanSection'
 import ErrorList from '../components/ErrorList'
 import LoadingIndicator from '../components/LoadingIndicator'
-import { Link } from 'react-router'
 import './PlannerPage.css'
 
 const numberFormatter = new Intl.NumberFormat('en', {
@@ -22,7 +23,34 @@ function formatDate(date: string) {
   return dateFormatter.format(new Date(`${date}T00:00:00Z`))
 }
 
+function getTodayDateValue() {
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = String(today.getMonth() + 1).padStart(2, '0')
+  const day = String(today.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}
+
+function isValidDateValue(value: string | null): value is string {
+  if (value === null || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return false
+  }
+
+  const parsedDate = new Date(`${value}T00:00:00Z`)
+
+  return (
+    !Number.isNaN(parsedDate.getTime()) &&
+    parsedDate.toISOString().slice(0, 10) === value
+  )
+}
+
 export default function PlannerPage() {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const requestedDate = searchParams.get('date')
+  const selectedDate = isValidDateValue(requestedDate)
+    ? requestedDate
+    : getTodayDateValue()
   const [preparedRecipes, setPreparedRecipes] = useState<
     PreparedRecipeSummary[]
   >([])
@@ -85,7 +113,21 @@ export default function PlannerPage() {
 
           <p>Select a day, plan food, and manage your prepared portions.</p>
         </div>
+
+        <label className="planner-page__date-picker">
+          <span>Selected date</span>
+
+          <input
+            type="date"
+            value={selectedDate}
+            onChange={(event) => {
+              setSearchParams({ date: event.target.value })
+            }}
+          />
+        </label>
       </header>
+
+      <DailyPlanSection date={selectedDate} />
 
       <section
         className="available-portions"

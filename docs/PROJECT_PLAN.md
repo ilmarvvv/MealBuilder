@@ -1335,7 +1335,7 @@ Complete Prepared Recipes, Daily Plans, and the Calendar through Domain, persist
 - [x] Show `Original recipe deleted` when a Prepared Recipe no longer has its source Recipe
 - [x] Keep unallocated portions available by default and provide an optional Plan Portions flow
 - [x] Add a Prepared Recipe deletion warning with affected item and date counts
-- [ ] Implement the time-sorted Daily Plan without fixed meal sections, placing items without a time last
+- [x] Implement the time-sorted Daily Plan without fixed meal sections, placing items without a time last
 - [ ] Implement the two-step Add Food modal with Ingredient and Prepared Recipe search
 - [ ] Implement change amount, full or partial move, remove, and Undo interactions
 - [ ] Implement Dashboard daily and weekly previews
