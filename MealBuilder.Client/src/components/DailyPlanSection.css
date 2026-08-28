@@ -175,3 +175,31 @@
     grid-template-columns: 1fr;
   }
 }
+
+.daily-plan-section__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.daily-plan-section__add {
+  color: var(--color-on-accent);
+  background: var(--color-accent);
+}
+
+.daily-plan-section__add:not(:disabled):hover {
+  color: var(--color-on-accent);
+  background: var(--color-accent-hover);
+}
+
+@media (max-width: 36rem) {
+  .daily-plan-section__actions {
+    align-items: stretch;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .daily-plan-section__add {
+    width: 100%;
+  }
+}

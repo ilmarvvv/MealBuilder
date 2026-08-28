@@ -9,10 +9,12 @@ import {
 import DailyNutritionSummary from './DailyNutritionSummary'
 import ErrorList from './ErrorList'
 import LoadingIndicator from './LoadingIndicator'
+import AddFoodModal from './AddFoodModal'
 import './DailyPlanSection.css'
 
 type DailyPlanSectionProps = {
   date: string
+  onFoodAdded: () => void
 }
 
 const numberFormatter = new Intl.NumberFormat('en', {
@@ -58,10 +60,14 @@ function formatItemAmount(item: DailyPlanItem) {
   return 'Amount unavailable'
 }
 
-export default function DailyPlanSection({ date }: DailyPlanSectionProps) {
+export default function DailyPlanSection({
+  date,
+  onFoodAdded,
+}: DailyPlanSectionProps) {
   const [dailyPlan, setDailyPlan] = useState<DailyPlan | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [errors, setErrors] = useState<string[]>([])
+  const [isAddFoodOpen, setIsAddFoodOpen] = useState(false)
 
   useEffect(() => {
     let isActive = true
@@ -135,11 +141,23 @@ export default function DailyPlanSection({ date }: DailyPlanSectionProps) {
           <h2 id="daily-plan-heading">{formatDate(date)}</h2>
         </div>
 
-        {!isLoading && dailyPlan !== null && (
-          <strong className="daily-plan-section__count">
-            {sortedItems.length} {sortedItems.length === 1 ? 'item' : 'items'}
-          </strong>
-        )}
+        <div className="daily-plan-section__actions">
+          {!isLoading && dailyPlan !== null && (
+            <strong className="daily-plan-section__count">
+              {sortedItems.length} {sortedItems.length === 1 ? 'item' : 'items'}
+            </strong>
+          )}
+
+          <button
+            className="daily-plan-section__add"
+            type="button"
+            onClick={() => {
+              setIsAddFoodOpen(true)
+            }}
+          >
+            + Add Food
+          </button>
+        </div>
       </header>
 
       <ErrorList messages={errors} />
@@ -222,6 +240,19 @@ export default function DailyPlanSection({ date }: DailyPlanSectionProps) {
           </>
         ))
       )}
+
+      <AddFoodModal
+        date={date}
+        isOpen={isAddFoodOpen}
+        onAdded={(updatedDailyPlan) => {
+          setDailyPlan(updatedDailyPlan)
+          setErrors([])
+          onFoodAdded()
+        }}
+        onClose={() => {
+          setIsAddFoodOpen(false)
+        }}
+      />
     </section>
   )
 }

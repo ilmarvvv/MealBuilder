@@ -1,0 +1,300 @@
+.add-food-modal {
+  width: min(calc(100% - 2rem), 48rem);
+  max-height: min(90vh, 52rem);
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-large);
+  color: var(--color-text);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-large);
+  overflow: hidden;
+}
+
+.add-food-modal::backdrop {
+  background: rgb(0 0 0 / 70%);
+  backdrop-filter: blur(3px);
+}
+
+.add-food-modal__layout {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  max-height: min(90vh, 52rem);
+}
+
+.add-food-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-accent-soft) 70%, transparent),
+      transparent 65%
+    ),
+    var(--color-surface);
+}
+
+.add-food-modal__header p {
+  margin: 0;
+  color: var(--color-accent);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.add-food-modal__header h2 {
+  margin-top: var(--space-1);
+}
+
+.add-food-modal__header span {
+  display: block;
+  margin-top: var(--space-1);
+  color: var(--color-text-muted);
+}
+
+.add-food-modal__close {
+  flex: 0 0 auto;
+  width: 2.75rem;
+  padding: 0;
+  border-color: var(--color-border);
+  color: var(--color-text);
+  background: var(--color-surface-muted);
+  font-size: 1.5rem;
+}
+
+.add-food-modal__body {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  overflow-y: auto;
+}
+
+.add-food-modal__tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  padding: var(--space-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-surface-muted);
+}
+
+.add-food-modal__tabs button {
+  color: var(--color-text-muted);
+  background: transparent;
+}
+
+.add-food-modal__tabs button[aria-pressed='true'] {
+  color: var(--color-on-accent);
+  background: var(--color-accent);
+}
+
+.add-food-modal__search,
+.add-food-modal__fields label {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.add-food-modal__search span,
+.add-food-modal__fields label > span {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.add-food-modal__search input,
+.add-food-modal__fields input {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-small);
+  color: var(--color-text);
+  background: var(--color-surface-muted);
+}
+
+.add-food-modal__results {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.add-food-modal__results button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  width: 100%;
+  min-height: 4rem;
+  border-color: var(--color-border);
+  color: var(--color-text);
+  background: var(--color-surface-muted);
+  text-align: left;
+}
+
+.add-food-modal__results button:not(:disabled):hover {
+  color: var(--color-text);
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.add-food-modal__results button > span:first-child {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.add-food-modal__results strong {
+  overflow-wrap: anywhere;
+}
+
+.add-food-modal__results small {
+  color: var(--color-text-muted);
+}
+
+.add-food-modal__results button > span:last-child {
+  flex: 0 0 auto;
+  color: var(--color-accent);
+  font-size: 0.875rem;
+  font-weight: 800;
+  text-align: right;
+}
+
+.add-food-modal__empty {
+  padding: var(--space-6);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-medium);
+  text-align: center;
+}
+
+.add-food-modal__empty p {
+  margin: var(--space-2) 0 0;
+  color: var(--color-text-muted);
+}
+
+.add-food-modal__form {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.add-food-modal__selection {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border: 1px solid
+    color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
+  border-radius: var(--radius-small);
+  background: var(--color-accent-soft);
+}
+
+.add-food-modal__selection span {
+  color: var(--color-accent);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.add-food-modal__selection strong {
+  font-size: 1.25rem;
+  overflow-wrap: anywhere;
+}
+
+.add-food-modal__selection small {
+  color: var(--color-text-muted);
+}
+
+.add-food-modal__fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.add-food-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
+.add-food-modal__actions button:first-child {
+  border-color: var(--color-border);
+  color: var(--color-text);
+  background: var(--color-surface-muted);
+}
+
+.add-food-modal__actions button:last-child {
+  color: var(--color-on-accent);
+  background: var(--color-accent);
+}
+
+.add-food-modal__success {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: 1px solid
+    color-mix(in srgb, var(--color-success) 50%, var(--color-border));
+  border-radius: var(--radius-medium);
+  background: color-mix(
+    in srgb,
+    var(--color-surface) 90%,
+    var(--color-success) 10%
+  );
+}
+
+.add-food-modal__success > p {
+  margin: 0;
+  color: var(--color-success);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.add-food-modal__success > span {
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 36rem) {
+  .add-food-modal {
+    width: calc(100% - 1rem);
+    max-height: calc(100vh - 1rem);
+    border-radius: var(--radius-medium);
+  }
+
+  .add-food-modal__layout {
+    max-height: calc(100vh - 1rem);
+  }
+
+  .add-food-modal__header,
+  .add-food-modal__body {
+    padding: var(--space-4);
+  }
+
+  .add-food-modal__tabs,
+  .add-food-modal__fields {
+    grid-template-columns: 1fr;
+  }
+
+  .add-food-modal__results button {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .add-food-modal__results button > span:last-child {
+    text-align: left;
+  }
+
+  .add-food-modal__actions {
+    flex-direction: column-reverse;
+  }
+
+  .add-food-modal__actions button {
+    width: 100%;
+  }
+}

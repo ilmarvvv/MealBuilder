@@ -57,6 +57,7 @@ export default function PlannerPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [errors, setErrors] = useState<string[]>([])
   const [showAllPreparedRecipes, setShowAllPreparedRecipes] = useState(false)
+  const [preparedRecipesRevision, setPreparedRecipesRevision] = useState(0)
 
   useEffect(() => {
     let isActive = true
@@ -89,7 +90,7 @@ export default function PlannerPage() {
     return () => {
       isActive = false
     }
-  }, [])
+  }, [preparedRecipesRevision])
 
   const availablePreparedRecipes = useMemo(
     () =>
@@ -127,7 +128,12 @@ export default function PlannerPage() {
         </label>
       </header>
 
-      <DailyPlanSection date={selectedDate} />
+      <DailyPlanSection
+        date={selectedDate}
+        onFoodAdded={() => {
+          setPreparedRecipesRevision((currentRevision) => currentRevision + 1)
+        }}
+      />
 
       <section
         className="available-portions"
