@@ -1,0 +1,76 @@
+.daily-plan-undo {
+  position: sticky;
+  bottom: var(--space-4);
+  z-index: 10;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-4);
+  border: 1px solid
+    color-mix(in srgb, var(--color-success) 50%, var(--color-border));
+  border-radius: var(--radius-medium);
+  background: color-mix(
+    in srgb,
+    var(--color-surface) 92%,
+    var(--color-success) 8%
+  );
+  box-shadow: var(--shadow-large);
+}
+
+.daily-plan-undo__message {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.daily-plan-undo__message p {
+  margin: 0;
+  color: var(--color-success);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.daily-plan-undo__message strong {
+  overflow-wrap: anywhere;
+}
+
+.daily-plan-undo__message span {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.daily-plan-undo__actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.daily-plan-undo__actions button:first-child {
+  border-color: var(--color-border);
+  color: var(--color-text);
+  background: var(--color-surface-muted);
+}
+
+.daily-plan-undo__actions button:last-child {
+  color: var(--color-on-accent);
+  background: var(--color-accent);
+}
+
+.daily-plan-undo > .error-list {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 36rem) {
+  .daily-plan-undo {
+    grid-template-columns: 1fr;
+  }
+
+  .daily-plan-undo__actions {
+    flex-direction: column-reverse;
+  }
+
+  .daily-plan-undo__actions button {
+    width: 100%;
+  }
+}

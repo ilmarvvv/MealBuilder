@@ -10,6 +10,8 @@ import DailyNutritionSummary from './DailyNutritionSummary'
 import ErrorList from './ErrorList'
 import LoadingIndicator from './LoadingIndicator'
 import AddFoodModal from './AddFoodModal'
+import DailyPlanItemActions from './DailyPlanItemActions'
+import DailyPlanUndoNotice from './DailyPlanUndoNotice'
 import './DailyPlanSection.css'
 
 type DailyPlanSectionProps = {
@@ -68,6 +70,9 @@ export default function DailyPlanSection({
   const [isLoading, setIsLoading] = useState(true)
   const [errors, setErrors] = useState<string[]>([])
   const [isAddFoodOpen, setIsAddFoodOpen] = useState(false)
+  const [removedItem, setRemovedItem] = useState<DailyPlanItem | null>(null)
+  const [isUndoing, setIsUndoing] = useState(false)
+  const [undoErrors, setUndoErrors] = useState<string[]>([])
 
   useEffect(() => {
     let isActive = true
@@ -102,6 +107,75 @@ export default function DailyPlanSection({
       isActive = false
     }
   }, [date])
+
+  useEffect(() => {
+    if (removedItem === null || isUndoing) {
+      return
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setRemovedItem(null)
+      setUndoErrors([])
+    }, 5000)
+
+    return () => {
+      window.clearTimeout(timeoutId)
+    }
+  }, [isUndoing, removedItem])
+
+  async function handleUndo() {
+    if (removedItem === null) {
+      return
+    }
+
+    setIsUndoing(true)
+    setUndoErrors([])
+
+    try {
+      let restoredDailyPlan: DailyPlan
+
+      if (removedItem.itemType === DailyPlanItemType.Ingredient) {
+        if (removedItem.ingredientId === null || removedItem.grams === null) {
+          setUndoErrors(['The removed Ingredient cannot be restored.'])
+          return
+        }
+
+        restoredDailyPlan = await dailyPlanApi.addIngredient(date, {
+          ingredientId: removedItem.ingredientId,
+          grams: removedItem.grams,
+          plannedTime: removedItem.plannedTime,
+        })
+      } else {
+        if (
+          removedItem.preparedRecipeId === null ||
+          removedItem.portions === null
+        ) {
+          setUndoErrors(['The removed Prepared Recipe cannot be restored.'])
+          return
+        }
+
+        restoredDailyPlan = await dailyPlanApi.addPreparedRecipe(date, {
+          preparedRecipeId: removedItem.preparedRecipeId,
+          portions: removedItem.portions,
+          plannedTime: removedItem.plannedTime,
+        })
+      }
+
+      setDailyPlan(restoredDailyPlan)
+      setRemovedItem(null)
+      setUndoErrors([])
+
+      if (removedItem.itemType === DailyPlanItemType.PreparedRecipe) {
+        onFoodAdded()
+      }
+    } catch (error) {
+      setUndoErrors(
+        getApiErrorMessages(error, 'Unable to restore the removed item.'),
+      )
+    } finally {
+      setIsUndoing(false)
+    }
+  }
 
   const sortedItems = useMemo(() => {
     if (dailyPlan === null) {
@@ -233,12 +307,47 @@ export default function DailyPlanSection({
                         <dd>{numberFormatter.format(item.nutrition.fat)} g</dd>
                       </div>
                     </dl>
+                    {dailyPlan.id !== null && (
+                      <DailyPlanItemActions
+                        dailyPlanId={dailyPlan.id}
+                        planDate={date}
+                        item={item}
+                        onPlanUpdated={(updatedDailyPlan) => {
+                          setDailyPlan(updatedDailyPlan)
+                          setErrors([])
+                        }}
+                        onMoved={(result) => {
+                          setDailyPlan(result.sourcePlan)
+                          setErrors([])
+                        }}
+                        onRemoved={(removedDailyPlanItem, updatedDailyPlan) => {
+                          setDailyPlan(updatedDailyPlan)
+                          setRemovedItem(removedDailyPlanItem)
+                          setIsUndoing(false)
+                          setUndoErrors([])
+                        }}
+                        onPreparedRecipesChanged={onFoodAdded}
+                      />
+                    )}
                   </div>
                 </li>
               ))}
             </ol>
           </>
         ))
+      )}
+
+      {removedItem !== null && (
+        <DailyPlanUndoNotice
+          itemName={removedItem.name}
+          isUndoing={isUndoing}
+          errors={undoErrors}
+          onUndo={handleUndo}
+          onDismiss={() => {
+            setRemovedItem(null)
+            setUndoErrors([])
+          }}
+        />
       )}
 
       <AddFoodModal

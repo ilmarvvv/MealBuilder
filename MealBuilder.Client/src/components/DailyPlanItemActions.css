@@ -1,0 +1,122 @@
+.daily-plan-item-actions {
+  display: grid;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.daily-plan-item-actions__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.daily-plan-item-actions__buttons button {
+  min-height: 2.5rem;
+  padding: var(--space-2) var(--space-3);
+  border-color: var(--color-border);
+  color: var(--color-text);
+  background: var(--color-surface);
+  font-size: 0.875rem;
+}
+
+.daily-plan-item-actions__buttons button:not(:disabled):hover {
+  color: var(--color-text);
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.daily-plan-item-actions__buttons .daily-plan-item-actions__remove {
+  margin-left: auto;
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+  background: transparent;
+}
+
+.daily-plan-item-actions__buttons
+  .daily-plan-item-actions__remove:not(:disabled):hover {
+  color: var(--color-background);
+  background: var(--color-danger);
+}
+
+.daily-plan-item-actions__editor {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: end;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-surface);
+}
+
+.daily-plan-item-actions__editor--move {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+}
+
+.daily-plan-item-actions__editor label {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.daily-plan-item-actions__editor label > span {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.daily-plan-item-actions__editor input {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-small);
+  color: var(--color-text);
+  background: var(--color-surface-muted);
+}
+
+.daily-plan-item-actions__editor-buttons {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.daily-plan-item-actions__editor-buttons button:first-child {
+  border-color: var(--color-border);
+  color: var(--color-text);
+  background: var(--color-surface-muted);
+}
+
+.daily-plan-item-actions__editor-buttons button:last-child {
+  color: var(--color-on-accent);
+  background: var(--color-accent);
+}
+
+@media (max-width: 48rem) {
+  .daily-plan-item-actions__editor,
+  .daily-plan-item-actions__editor--move {
+    grid-template-columns: 1fr;
+  }
+
+  .daily-plan-item-actions__editor-buttons {
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 30rem) {
+  .daily-plan-item-actions__buttons {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .daily-plan-item-actions__buttons .daily-plan-item-actions__remove {
+    margin-left: 0;
+  }
+
+  .daily-plan-item-actions__editor-buttons {
+    flex-direction: column-reverse;
+  }
+
+  .daily-plan-item-actions__editor-buttons button {
+    width: 100%;
+  }
+}
