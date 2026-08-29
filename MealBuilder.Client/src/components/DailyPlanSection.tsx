@@ -16,7 +16,9 @@ import './DailyPlanSection.css'
 
 type DailyPlanSectionProps = {
   date: string
+  calorieTarget?: number
   onFoodAdded: () => void
+  onPlanChanged: () => void
   openAddFoodInitially?: boolean
 }
 
@@ -65,13 +67,17 @@ function formatItemAmount(item: DailyPlanItem) {
 
 export default function DailyPlanSection({
   date,
+  calorieTarget,
   onFoodAdded,
+  onPlanChanged,
   openAddFoodInitially = false,
 }: DailyPlanSectionProps) {
   const [dailyPlan, setDailyPlan] = useState<DailyPlan | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [errors, setErrors] = useState<string[]>([])
   const [isAddFoodOpen, setIsAddFoodOpen] = useState(openAddFoodInitially)
+  const [isUpdatingWeeklyInclusion, setIsUpdatingWeeklyInclusion] =
+    useState(false)
   const [removedItem, setRemovedItem] = useState<DailyPlanItem | null>(null)
   const [isUndoing, setIsUndoing] = useState(false)
   const [undoErrors, setUndoErrors] = useState<string[]>([])
@@ -125,6 +131,38 @@ export default function DailyPlanSection({
     }
   }, [isUndoing, removedItem])
 
+  async function handleWeeklySummaryInclusionChange(
+    includeInWeeklySummary: boolean,
+  ) {
+    if (dailyPlan === null || dailyPlan.id === null) {
+      return
+    }
+
+    setIsUpdatingWeeklyInclusion(true)
+    setErrors([])
+
+    try {
+      const updatedDailyPlan = await dailyPlanApi.setWeeklySummaryInclusion(
+        dailyPlan.id,
+        {
+          includeInWeeklySummary,
+        },
+      )
+
+      setDailyPlan(updatedDailyPlan)
+      onPlanChanged()
+    } catch (error) {
+      setErrors(
+        getApiErrorMessages(
+          error,
+          'Unable to update the weekly summary setting.',
+        ),
+      )
+    } finally {
+      setIsUpdatingWeeklyInclusion(false)
+    }
+  }
+
   async function handleUndo() {
     if (removedItem === null) {
       return
@@ -166,6 +204,7 @@ export default function DailyPlanSection({
       setDailyPlan(restoredDailyPlan)
       setRemovedItem(null)
       setUndoErrors([])
+      onPlanChanged()
 
       if (removedItem.itemType === DailyPlanItemType.PreparedRecipe) {
         onFoodAdded()
@@ -253,8 +292,29 @@ export default function DailyPlanSection({
           </div>
         ) : (
           <>
+            <label className="daily-plan-weekly-inclusion">
+              <input
+                type="checkbox"
+                checked={dailyPlan.includeInWeeklySummary}
+                disabled={isUpdatingWeeklyInclusion}
+                onChange={(event) => {
+                  void handleWeeklySummaryInclusionChange(event.target.checked)
+                }}
+              />
+
+              <span>
+                <strong>Include this day in weekly summary</strong>
+
+                <small>
+                  {dailyPlan.includeInWeeklySummary
+                    ? 'This day contributes to weekly totals and averages.'
+                    : 'Excluded from weekly summary.'}
+                </small>
+              </span>
+            </label>
             <DailyNutritionSummary
               nutrition={dailyPlan.nutrition}
+              calorieTarget={calorieTarget}
               title="Daily Nutrition"
             />
 
@@ -317,16 +377,19 @@ export default function DailyPlanSection({
                         onPlanUpdated={(updatedDailyPlan) => {
                           setDailyPlan(updatedDailyPlan)
                           setErrors([])
+                          onPlanChanged()
                         }}
                         onMoved={(result) => {
                           setDailyPlan(result.sourcePlan)
                           setErrors([])
+                          onPlanChanged()
                         }}
                         onRemoved={(removedDailyPlanItem, updatedDailyPlan) => {
                           setDailyPlan(updatedDailyPlan)
                           setRemovedItem(removedDailyPlanItem)
                           setIsUndoing(false)
                           setUndoErrors([])
+                          onPlanChanged()
                         }}
                         onPreparedRecipesChanged={onFoodAdded}
                       />
@@ -359,6 +422,7 @@ export default function DailyPlanSection({
           setDailyPlan(updatedDailyPlan)
           setErrors([])
           onFoodAdded()
+          onPlanChanged()
         }}
         onClose={() => {
           setIsAddFoodOpen(false)

@@ -3,9 +3,11 @@ import { Link, useSearchParams } from 'react-router'
 import { getApiErrorMessages } from '../api/getApiErrorMessages'
 import type { PreparedRecipeSummary } from '../api/mealPlanningTypes'
 import { preparedRecipeApi } from '../api/preparedRecipeApi'
+import { profileApi } from '../api/profileApi'
 import DailyPlanSection from '../components/DailyPlanSection'
 import ErrorList from '../components/ErrorList'
 import LoadingIndicator from '../components/LoadingIndicator'
+import WeeklyPlannerSection from '../components/WeeklyPlannerSection'
 import './PlannerPage.css'
 
 const numberFormatter = new Intl.NumberFormat('en', {
@@ -59,6 +61,37 @@ export default function PlannerPage() {
   const [errors, setErrors] = useState<string[]>([])
   const [showAllPreparedRecipes, setShowAllPreparedRecipes] = useState(false)
   const [preparedRecipesRevision, setPreparedRecipesRevision] = useState(0)
+  const [weeklySummaryRevision, setWeeklySummaryRevision] = useState(0)
+  const [calorieTarget, setCalorieTarget] = useState<number>()
+  const [profileErrors, setProfileErrors] = useState<string[]>([])
+
+  useEffect(() => {
+    let isActive = true
+
+    async function loadCalorieTarget() {
+      setProfileErrors([])
+
+      try {
+        const profile = await profileApi.getCurrent()
+
+        if (isActive) {
+          setCalorieTarget(profile.dailyCalorieTarget)
+        }
+      } catch (error) {
+        if (isActive) {
+          setProfileErrors(
+            getApiErrorMessages(error, 'Unable to load your calorie target.'),
+          )
+        }
+      }
+    }
+
+    void loadCalorieTarget()
+
+    return () => {
+      isActive = false
+    }
+  }, [])
 
   useEffect(() => {
     let isActive = true
@@ -129,11 +162,25 @@ export default function PlannerPage() {
         </label>
       </header>
 
+      <ErrorList messages={profileErrors} />
+
+      <WeeklyPlannerSection
+        selectedDate={selectedDate}
+        refreshRevision={weeklySummaryRevision}
+        onDateSelected={(date) => {
+          setSearchParams({ date })
+        }}
+      />
+
       <DailyPlanSection
         date={selectedDate}
+        calorieTarget={calorieTarget}
         openAddFoodInitially={shouldOpenAddFood}
         onFoodAdded={() => {
           setPreparedRecipesRevision((currentRevision) => currentRevision + 1)
+        }}
+        onPlanChanged={() => {
+          setWeeklySummaryRevision((currentRevision) => currentRevision + 1)
         }}
       />
 

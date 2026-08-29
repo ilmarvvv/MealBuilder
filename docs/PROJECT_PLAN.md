@@ -1339,7 +1339,7 @@ Complete Prepared Recipes, Daily Plans, and the Calendar through Domain, persist
 - [x] Implement the two-step Add Food modal with Ingredient and Prepared Recipe search
 - [x] Implement change amount, full or partial move, remove, and Undo interactions
 - [x] Implement Dashboard daily and weekly previews
-- [ ] Implement the weekly Planner and included-day nutrition summaries with one active calorie-target line
+- [x] Implement the weekly Planner and included-day nutrition summaries with one active calorie-target line
 - [ ] Confirm the complete Meal Planning workflow works end to end
 
 ### Milestone 19: Final Transition
