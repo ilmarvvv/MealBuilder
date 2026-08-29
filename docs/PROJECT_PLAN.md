@@ -1340,18 +1340,20 @@ Complete Prepared Recipes, Daily Plans, and the Calendar through Domain, persist
 - [x] Implement change amount, full or partial move, remove, and Undo interactions
 - [x] Implement Dashboard daily and weekly previews
 - [x] Implement the weekly Planner and included-day nutrition summaries with one active calorie-target line
-- [ ] Confirm the complete Meal Planning workflow works end to end
+- [x] Confirm the complete Meal Planning workflow works end to end
 
 ### Milestone 19: Final Transition
 
 ### Goal
 
-Verify the new application, retire the completed Razor Pages prototype, and document the final project structure.
+Verify the new application through real use, retire the completed Razor Pages prototype, document the final project structure, and deploy version `1.0.0`.
 
 ### Required Sub-milestones
 
 #### Milestone 19.1: Final Application Verification
 
+- [ ] Use the application for one week and record any bugs or confusing workflows
+- [ ] Fix issues that block or significantly affect the version `1.0.0` release
 - [ ] Run all backend automated tests
 - [ ] Verify authentication and ownership behavior end to end
 - [ ] Verify Onboarding, calorie target, Ingredient, Recipe, Prepared Recipe, Daily Plan, and Calendar workflows
@@ -1371,6 +1373,15 @@ Verify the new application, retire the completed Razor Pages prototype, and docu
 - [ ] Document the final architecture and project responsibilities
 - [ ] Update deployment configuration and documentation
 - [ ] Update `docs/PROJECT_PLAN.md`
+
+#### Milestone 19.4: Production Deployment and Version 1.0.0
+
+- [ ] Choose hosting for the React client, ASP.NET Core API, and production database
+- [ ] Prepare secure production configuration, secrets, HTTPS, CORS, and database migrations
+- [ ] Deploy the client, API, and database
+- [ ] Verify registration, login, and all primary workflows in production
+- [ ] Confirm that no release-blocking errors appear in production logs
+- [ ] Create and publish the final version `1.0.0` release
 
 ## 7. Future Ideas
 
