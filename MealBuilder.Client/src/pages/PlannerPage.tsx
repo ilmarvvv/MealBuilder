@@ -48,6 +48,7 @@ function isValidDateValue(value: string | null): value is string {
 export default function PlannerPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const requestedDate = searchParams.get('date')
+  const shouldOpenAddFood = searchParams.get('addFood') === 'true'
   const selectedDate = isValidDateValue(requestedDate)
     ? requestedDate
     : getTodayDateValue()
@@ -130,6 +131,7 @@ export default function PlannerPage() {
 
       <DailyPlanSection
         date={selectedDate}
+        openAddFoodInitially={shouldOpenAddFood}
         onFoodAdded={() => {
           setPreparedRecipesRevision((currentRevision) => currentRevision + 1)
         }}

@@ -17,6 +17,7 @@ import './DailyPlanSection.css'
 type DailyPlanSectionProps = {
   date: string
   onFoodAdded: () => void
+  openAddFoodInitially?: boolean
 }
 
 const numberFormatter = new Intl.NumberFormat('en', {
@@ -65,11 +66,12 @@ function formatItemAmount(item: DailyPlanItem) {
 export default function DailyPlanSection({
   date,
   onFoodAdded,
+  openAddFoodInitially = false,
 }: DailyPlanSectionProps) {
   const [dailyPlan, setDailyPlan] = useState<DailyPlan | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [errors, setErrors] = useState<string[]>([])
-  const [isAddFoodOpen, setIsAddFoodOpen] = useState(false)
+  const [isAddFoodOpen, setIsAddFoodOpen] = useState(openAddFoodInitially)
   const [removedItem, setRemovedItem] = useState<DailyPlanItem | null>(null)
   const [isUndoing, setIsUndoing] = useState(false)
   const [undoErrors, setUndoErrors] = useState<string[]>([])
