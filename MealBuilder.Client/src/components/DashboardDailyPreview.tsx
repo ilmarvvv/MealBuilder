@@ -43,9 +43,6 @@ export default function DashboardDailyPreview({
   dailyPlan,
   calorieTarget,
 }: DashboardDailyPreviewProps) {
-  const previewItems = dailyPlan.items.slice(0, 4)
-  const remainingItemCount = dailyPlan.items.length - previewItems.length
-
   return (
     <section
       className="dashboard-daily-preview"
@@ -77,7 +74,7 @@ export default function DashboardDailyPreview({
           />
 
           <ul className="dashboard-daily-preview__items">
-            {previewItems.map((item) => (
+            {dailyPlan.items.map((item) => (
               <li key={item.id}>
                 <span
                   className={
@@ -102,13 +99,6 @@ export default function DashboardDailyPreview({
               </li>
             ))}
           </ul>
-
-          {remainingItemCount > 0 && (
-            <p className="dashboard-daily-preview__remaining">
-              + {remainingItemCount} more{' '}
-              {remainingItemCount === 1 ? 'item' : 'items'}
-            </p>
-          )}
         </>
       )}
 
