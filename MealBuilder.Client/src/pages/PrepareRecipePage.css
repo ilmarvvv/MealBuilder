@@ -211,6 +211,10 @@
   width: 100%;
 }
 
+.prepare-recipe-form__fields--planning {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .prepare-recipe-form__toggle {
   display: flex;
   align-items: flex-start;
@@ -268,7 +272,10 @@
 
 .prepare-recipe-form__allocation {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(8rem, 0.45fr);
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(8rem, 0.45fr)
+    minmax(8rem, 0.45fr);
   gap: var(--space-3);
   padding: var(--space-3);
   border: 1px solid var(--color-border);

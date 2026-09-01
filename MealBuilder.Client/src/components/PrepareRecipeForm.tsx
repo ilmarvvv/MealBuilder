@@ -23,6 +23,10 @@ function getTodayInputValue() {
   return new Date(now.getTime() - timezoneOffset).toISOString().slice(0, 10)
 }
 
+function toApiPlannedTime(value: string) {
+  return value === '' ? null : `${value}:00`
+}
+
 export default function PrepareRecipeForm({
   recipe,
   cancelPath,
@@ -33,6 +37,7 @@ export default function PrepareRecipeForm({
   const [automaticallyPlan, setAutomaticallyPlan] = useState(true)
   const [startDate, setStartDate] = useState(getTodayInputValue)
   const [plannedDays, setPlannedDays] = useState('1')
+  const [defaultPlannedTime, setDefaultPlannedTime] = useState('')
   const [allocations, setAllocations] = useState<
     PreparedRecipeAllocationInput[]
   >([])
@@ -84,7 +89,14 @@ export default function PrepareRecipeForm({
         plannedDays: numericPlannedDays,
       })
 
-      setAllocations(preview)
+      const apiPlannedTime = toApiPlannedTime(defaultPlannedTime)
+
+      setAllocations(
+        preview.map((allocation) => ({
+          ...allocation,
+          plannedTime: apiPlannedTime,
+        })),
+      )
     } catch (error) {
       setErrors(
         getApiErrorMessages(error, 'Unable to preview portion planning.'),
@@ -102,6 +114,18 @@ export default function PrepareRecipeForm({
       currentAllocations.map((currentAllocation, currentIndex) =>
         currentIndex === index ? allocation : currentAllocation,
       ),
+    )
+  }
+
+  function updateDefaultPlannedTime(value: string) {
+    const apiPlannedTime = toApiPlannedTime(value)
+
+    setDefaultPlannedTime(value)
+    setAllocations((currentAllocations) =>
+      currentAllocations.map((allocation) => ({
+        ...allocation,
+        plannedTime: apiPlannedTime,
+      })),
     )
   }
 
@@ -213,7 +237,7 @@ export default function PrepareRecipeForm({
 
         {automaticallyPlan ? (
           <>
-            <div className="prepare-recipe-form__fields">
+            <div className="prepare-recipe-form__fields prepare-recipe-form__fields--planning">
               <label>
                 <span>Start date</span>
 
@@ -242,6 +266,18 @@ export default function PrepareRecipeForm({
                   onChange={(event) => {
                     setPlannedDays(event.target.value)
                     clearPreview()
+                  }}
+                />
+              </label>
+
+              <label>
+                <span>Default time (optional)</span>
+
+                <input
+                  type="time"
+                  value={defaultPlannedTime}
+                  onChange={(event) => {
+                    updateDefaultPlannedTime(event.target.value)
                   }}
                 />
               </label>
@@ -314,6 +350,21 @@ export default function PrepareRecipeForm({
                       updateAllocation(index, {
                         ...allocation,
                         portions: Number(event.target.value),
+                      })
+                    }
+                  />
+                </label>
+
+                <label>
+                  <span>Time (optional)</span>
+
+                  <input
+                    type="time"
+                    value={allocation.plannedTime?.slice(0, 5) ?? ''}
+                    onChange={(event) =>
+                      updateAllocation(index, {
+                        ...allocation,
+                        plannedTime: toApiPlannedTime(event.target.value),
                       })
                     }
                   />

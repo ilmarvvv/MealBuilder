@@ -103,6 +103,7 @@ public sealed class PreparedRecipePlanningTests(
 
         var preparedDate = new DateOnly(2026, 8, 24);
         var secondDate = preparedDate.AddDays(2);
+        var firstPlannedTime = new TimeOnly(12, 30);
 
         var preparedRecipe =
             await MealPlanningTestHelper.CreatePreparedRecipeAsync(
@@ -114,11 +115,12 @@ public sealed class PreparedRecipePlanningTests(
                     Allocations:
                     [
                         new PreparedRecipeAllocationRequest(
-                        preparedDate,
-                        2.5m),
-                    new PreparedRecipeAllocationRequest(
-                        secondDate,
-                        1m)
+                            preparedDate,
+                            2.5m,
+                            firstPlannedTime),
+                        new PreparedRecipeAllocationRequest(
+                            secondDate,
+                            1m)
                     ]));
 
         Assert.Equal(5m, preparedRecipe.TotalPortions);
@@ -149,6 +151,9 @@ public sealed class PreparedRecipePlanningTests(
             (int?)preparedRecipe.Id,
             firstItem.PreparedRecipeId);
         Assert.Equal((decimal?)2.5m, firstItem.Portions);
+        Assert.Equal(
+            (TimeOnly?)firstPlannedTime,
+            firstItem.PlannedTime);
 
         var secondDailyPlan = await client
             .GetFromJsonAsync<DailyPlanResponse>(
@@ -162,5 +167,6 @@ public sealed class PreparedRecipePlanningTests(
             (int?)preparedRecipe.Id,
             secondItem.PreparedRecipeId);
         Assert.Equal((decimal?)1m, secondItem.Portions);
+        Assert.Null(secondItem.PlannedTime);
     }
 }

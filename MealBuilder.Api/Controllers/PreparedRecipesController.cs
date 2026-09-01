@@ -420,7 +420,8 @@ public sealed class PreparedRecipesController(
 
                 dailyPlan.AddPreparedRecipe(
                     preparedRecipe,
-                    allocation.Portions);
+                    allocation.Portions,
+                    allocation.PlannedTime);
 
                 dailyPlan.EnsureCanBeSaved();
             }

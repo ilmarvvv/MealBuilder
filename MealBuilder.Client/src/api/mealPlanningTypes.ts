@@ -11,6 +11,7 @@ export type DailyPlanItemType =
 export type PreparedRecipeAllocationInput = {
   date: string
   portions: number
+  plannedTime: string | null
 }
 
 export type PreparedRecipeAllocation = {
