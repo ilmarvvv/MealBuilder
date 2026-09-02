@@ -14,10 +14,7 @@ type IngredientFormProps = {
   onSubmit: (input: IngredientInput) => Promise<void>
 }
 
-type NutritionFieldName = Exclude<
-  keyof IngredientInput,
-  'name'
->
+type NutritionFieldName = Exclude<keyof IngredientInput, 'name'>
 
 type IngredientFormValues = {
   name: string
@@ -38,8 +35,8 @@ const nutritionFields: NutritionField[] = [
     max: 900,
   },
   {
-    name: 'proteinPer100g',
-    label: 'Protein',
+    name: 'fatPer100g',
+    label: 'Fat',
     unit: 'g',
     max: 100,
   },
@@ -62,8 +59,8 @@ const nutritionFields: NutritionField[] = [
     max: 100,
   },
   {
-    name: 'fatPer100g',
-    label: 'Fat',
+    name: 'proteinPer100g',
+    label: 'Protein',
     unit: 'g',
     max: 100,
   },
@@ -75,16 +72,12 @@ const nutritionFields: NutritionField[] = [
   },
 ]
 
-function createInitialValues(
-  input?: IngredientInput,
-): IngredientFormValues {
+function createInitialValues(input?: IngredientInput): IngredientFormValues {
   return {
     name: input?.name ?? '',
     caloriesPer100g: String(input?.caloriesPer100g ?? 0),
     proteinPer100g: String(input?.proteinPer100g ?? 0),
-    carbohydratesPer100g: String(
-      input?.carbohydratesPer100g ?? 0,
-    ),
+    carbohydratesPer100g: String(input?.carbohydratesPer100g ?? 0),
     sugarsPer100g: String(input?.sugarsPer100g ?? 0),
     fiberPer100g: String(input?.fiberPer100g ?? 0),
     fatPer100g: String(input?.fatPer100g ?? 0),
@@ -100,20 +93,14 @@ export default function IngredientForm({
   cancelTo,
   onSubmit,
 }: IngredientFormProps) {
-  const [values, setValues] = useState(() =>
-    createInitialValues(initialValues),
-  )
+  const [values, setValues] = useState(() => createInitialValues(initialValues))
   const [clientErrors, setClientErrors] = useState<string[]>([])
 
-  async function handleSubmit(
-    event: FormEvent<HTMLFormElement>,
-  ) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     const trimmedName = values.name.trim()
-    const carbohydrates = Number(
-      values.carbohydratesPer100g,
-    )
+    const carbohydrates = Number(values.carbohydratesPer100g)
     const sugars = Number(values.sugarsPer100g)
     const validationErrors: string[] = []
 
@@ -122,9 +109,7 @@ export default function IngredientForm({
     }
 
     if (sugars > carbohydrates) {
-      validationErrors.push(
-        'Sugars cannot exceed carbohydrates.',
-      )
+      validationErrors.push('Sugars cannot exceed carbohydrates.')
     }
 
     setClientErrors(validationErrors)
@@ -145,10 +130,7 @@ export default function IngredientForm({
     })
   }
 
-  function updateNutritionValue(
-    fieldName: NutritionFieldName,
-    value: string,
-  ) {
+  function updateNutritionValue(fieldName: NutritionFieldName, value: string) {
     setValues((currentValues) => ({
       ...currentValues,
       [fieldName]: value,
@@ -185,19 +167,13 @@ export default function IngredientForm({
 
       <section className="ingredient-form__section">
         <header>
-            <h3>Nutrition per 100 g</h3>
-          <p>
-            Values default to zero and can use up to two decimal
-            places.
-          </p>
+          <h3>Nutrition per 100 g</h3>
+          <p>Values default to zero and can use up to two decimal places.</p>
         </header>
 
         <div className="ingredient-form__nutrition-grid">
           {nutritionFields.map((field) => (
-            <label
-              className="ingredient-form__field"
-              key={field.name}
-            >
+            <label className="ingredient-form__field" key={field.name}>
               <span>{field.label}</span>
 
               <span className="ingredient-form__number-input">
@@ -211,10 +187,7 @@ export default function IngredientForm({
                   inputMode="decimal"
                   value={values[field.name]}
                   onChange={(event) =>
-                    updateNutritionValue(
-                      field.name,
-                      event.target.value,
-                    )
+                    updateNutritionValue(field.name, event.target.value)
                   }
                 />
 
@@ -228,10 +201,7 @@ export default function IngredientForm({
       <ErrorList messages={[...clientErrors, ...errors]} />
 
       <footer className="ingredient-form__actions">
-        <Link
-          className="ingredient-form__cancel"
-          to={cancelTo}
-        >
+        <Link className="ingredient-form__cancel" to={cancelTo}>
           Cancel
         </Link>
 
