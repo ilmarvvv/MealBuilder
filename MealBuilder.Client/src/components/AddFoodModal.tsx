@@ -4,7 +4,12 @@ import { getApiErrorMessages } from '../api/getApiErrorMessages'
 import { ingredientApi, type Ingredient } from '../api/ingredientApi'
 import type { DailyPlan, PreparedRecipeSummary } from '../api/mealPlanningTypes'
 import { preparedRecipeApi } from '../api/preparedRecipeApi'
-import type { RecipeNutrition } from '../api/recipeApi'
+import {
+  recipeApi,
+  type RecipeNutrition,
+  type RecipeSummary,
+} from '../api/recipeApi'
+import { useNavigate } from 'react-router'
 import DailyNutritionSummary from './DailyNutritionSummary'
 import ErrorList from './ErrorList'
 import LoadingIndicator from './LoadingIndicator'
@@ -17,7 +22,7 @@ type AddFoodModalProps = {
   onClose: () => void
 }
 
-type FoodSource = 'ingredients' | 'preparedRecipes'
+type FoodSource = 'ingredients' | 'recipes' | 'preparedRecipes'
 type AddFoodStep = 'select' | 'details' | 'success'
 
 type FoodSelection =
@@ -79,10 +84,12 @@ export default function AddFoodModal({
   onClose,
 }: AddFoodModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null)
+  const navigate = useNavigate()
 
   const [step, setStep] = useState<AddFoodStep>('select')
   const [source, setSource] = useState<FoodSource>('ingredients')
   const [ingredients, setIngredients] = useState<Ingredient[]>([])
+  const [recipes, setRecipes] = useState<RecipeSummary[]>([])
   const [preparedRecipes, setPreparedRecipes] = useState<
     PreparedRecipeSummary[]
   >([])
@@ -130,23 +137,21 @@ export default function AddFoodModal({
       setIsLoadingSources(true)
 
       try {
-        const [loadedIngredients, loadedPreparedRecipes] = await Promise.all([
-          ingredientApi.getAll(),
-          preparedRecipeApi.getAll(),
-        ])
+        const [loadedIngredients, loadedRecipes, loadedPreparedRecipes] =
+          await Promise.all([
+            ingredientApi.getAll(),
+            recipeApi.getAll(),
+            preparedRecipeApi.getAll(),
+          ])
 
         if (isActive) {
           setIngredients(loadedIngredients)
+          setRecipes(loadedRecipes)
           setPreparedRecipes(loadedPreparedRecipes)
         }
       } catch (error) {
         if (isActive) {
-          setErrors(
-            getApiErrorMessages(
-              error,
-              'Unable to load Ingredients and Available Portions.',
-            ),
-          )
+          setErrors(getApiErrorMessages(error, 'Unable to load food sources.'))
         }
       } finally {
         if (isActive) {
@@ -182,6 +187,17 @@ export default function AddFoodModal({
     [preparedRecipes, normalizedSearchTerm],
   )
 
+  const filteredRecipes = useMemo(
+    () =>
+      recipes.filter((recipe) =>
+        [recipe.name, recipe.description ?? '']
+          .join(' ')
+          .toLowerCase()
+          .includes(normalizedSearchTerm),
+      ),
+    [recipes, normalizedSearchTerm],
+  )
+
   const numericAmount = Number(amount)
 
   const nutritionPreview = useMemo(() => {
@@ -202,6 +218,11 @@ export default function AddFoodModal({
 
     return scaleNutrition(selection.value.nutritionPerPortion, numericAmount)
   }, [numericAmount, selection])
+
+  function prepareRecipe(recipeId: number) {
+    onClose()
+    navigate(`/planner/prepare/${recipeId}`)
+  }
 
   function selectIngredient(ingredient: Ingredient) {
     setSelection({
@@ -374,6 +395,17 @@ export default function AddFoodModal({
 
                   <button
                     type="button"
+                    aria-pressed={source === 'recipes'}
+                    onClick={() => {
+                      setSource('recipes')
+                      setSearchTerm('')
+                    }}
+                  >
+                    Recipes
+                  </button>
+
+                  <button
+                    type="button"
                     aria-pressed={source === 'preparedRecipes'}
                     onClick={() => {
                       setSource('preparedRecipes')
@@ -389,7 +421,9 @@ export default function AddFoodModal({
                     Search{' '}
                     {source === 'ingredients'
                       ? 'Ingredients'
-                      : 'Available Portions'}
+                      : source === 'recipes'
+                        ? 'Recipes'
+                        : 'Available Portions'}
                   </span>
 
                   <input
@@ -433,6 +467,42 @@ export default function AddFoodModal({
                                 ingredient.caloriesPer100g,
                               )}{' '}
                               kcal / 100 g
+                            </span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )
+                ) : source === 'recipes' ? (
+                  filteredRecipes.length === 0 ? (
+                    <div className="add-food-modal__empty">
+                      <h3>No Recipes found</h3>
+                      <p>Try a different search term or create a Recipe.</p>
+                    </div>
+                  ) : (
+                    <ul className="add-food-modal__results">
+                      {filteredRecipes.map((recipe) => (
+                        <li key={recipe.id}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              prepareRecipe(recipe.id)
+                            }}
+                          >
+                            <span>
+                              <strong>{recipe.name}</strong>
+                              <small>
+                                {recipe.servings}{' '}
+                                {recipe.servings === 1 ? 'serving' : 'servings'}{' '}
+                                · Select to prepare
+                              </small>
+                            </span>
+
+                            <span>
+                              {numberFormatter.format(
+                                recipe.nutritionPerServing.calories,
+                              )}{' '}
+                              kcal / serving
                             </span>
                           </button>
                         </li>
