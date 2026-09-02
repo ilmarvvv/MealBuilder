@@ -357,16 +357,28 @@ export default function DailyPlanSection({
                       </div>
 
                       <div>
-                        <dt>Carbohydrates</dt>
+                        <dt>Carbohydrates / Sugars</dt>
                         <dd>
                           {numberFormatter.format(item.nutrition.carbohydrates)}{' '}
-                          g
+                          / {numberFormatter.format(item.nutrition.sugars)} g
+                        </dd>
+                      </div>
+
+                      <div>
+                        <dt>Fiber</dt>
+                        <dd>
+                          {numberFormatter.format(item.nutrition.fiber)} g
                         </dd>
                       </div>
 
                       <div>
                         <dt>Fat</dt>
                         <dd>{numberFormatter.format(item.nutrition.fat)} g</dd>
+                      </div>
+
+                      <div>
+                        <dt>Salt</dt>
+                        <dd>{numberFormatter.format(item.nutrition.salt)} g</dd>
                       </div>
                     </dl>
                     {dailyPlan.id !== null && (
