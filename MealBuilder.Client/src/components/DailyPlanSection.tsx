@@ -286,8 +286,8 @@ export default function DailyPlanSection({
             <h3>No food added for this day</h3>
 
             <p>
-              Add an Ingredient or available Prepared Recipe portions when you
-              are ready.
+              Add an Ingredient, prepare a Recipe, or assign Available Portions
+              to this day.
             </p>
           </div>
         ) : (

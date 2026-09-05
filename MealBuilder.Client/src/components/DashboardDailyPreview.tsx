@@ -63,7 +63,7 @@ export default function DashboardDailyPreview({
       {dailyPlan.items.length === 0 ? (
         <div className="dashboard-daily-preview__empty">
           <h3>No food planned for today</h3>
-          <p>Add your first Ingredient or Prepared Recipe.</p>
+          <p>Add an Ingredient, prepare a Recipe, or use Available Portions.</p>
         </div>
       ) : (
         <>
