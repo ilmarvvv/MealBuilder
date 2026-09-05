@@ -7,6 +7,7 @@ import { recipeApi } from '../api/recipeApi'
 import type { RecipeInput } from '../api/recipeApi'
 import LoadingIndicator from '../components/LoadingIndicator'
 import RecipeForm from '../components/RecipeForm'
+import useIngredientRefresh from '../hooks/useIngredientRefresh'
 import './RecipeFormPage.css'
 
 export default function CreateRecipePage() {
@@ -16,6 +17,10 @@ export default function CreateRecipePage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
+  const ingredientRefreshErrors = useIngredientRefresh({
+    enabled: !isLoading && !isSubmitting,
+    onRefreshed: setIngredients,
+  })
 
   useEffect(() => {
     let isActive = true
@@ -79,7 +84,7 @@ export default function CreateRecipePage() {
 
       <RecipeForm
         ingredients={ingredients}
-        errors={errors}
+        errors={[...errors, ...ingredientRefreshErrors]}
         isSubmitting={isSubmitting}
         submitLabel="Create Recipe"
         cancelPath="/library/recipes"
