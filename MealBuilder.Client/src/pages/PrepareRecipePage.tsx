@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router'
 import { getApiErrorMessages } from '../api/getApiErrorMessages'
 import { recipeApi } from '../api/recipeApi'
 import type { Recipe } from '../api/recipeApi'
@@ -13,10 +13,32 @@ const numberFormatter = new Intl.NumberFormat('en', {
   maximumFractionDigits: 2,
 })
 
+function isValidDateValue(value: string | null): value is string {
+  if (value === null || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return false
+  }
+
+  const parsedDate = new Date(`${value}T00:00:00Z`)
+
+  return (
+    !Number.isNaN(parsedDate.getTime()) &&
+    parsedDate.toISOString().slice(0, 10) === value
+  )
+}
+
 export default function PrepareRecipePage() {
   const { recipeId } = useParams()
   const parsedRecipeId = Number(recipeId)
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const requestedPlannerDate = searchParams.get('date')
+  const openedFromPlanner = searchParams.get('returnTo') === 'planner'
+  const plannerDate =
+    openedFromPlanner && isValidDateValue(requestedPlannerDate)
+      ? requestedPlannerDate
+      : null
+  const plannerPath =
+    plannerDate === null ? null : `/planner?date=${plannerDate}`
 
   const [recipe, setRecipe] = useState<Recipe | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -67,7 +89,9 @@ export default function PrepareRecipePage() {
   if (errors.length > 0 || !recipe) {
     return (
       <section className="prepare-recipe-page">
-        <Link to="/library/recipes">&larr; Back to Recipes</Link>
+        <Link to={plannerPath ?? '/library/recipes'}>
+          &larr; {plannerPath === null ? 'Back to Recipes' : 'Back to Planner'}
+        </Link>
 
         <ErrorList messages={errors} />
       </section>
@@ -75,11 +99,14 @@ export default function PrepareRecipePage() {
   }
 
   const recipeDetailsPath = `/library/recipes/${recipe.id}`
+  const returnPath = plannerPath ?? recipeDetailsPath
+  const returnLabel =
+    plannerPath === null ? 'Back to Recipe' : 'Back to Planner'
 
   return (
     <section className="prepare-recipe-page">
-      <Link className="prepare-recipe-page__back" to={recipeDetailsPath}>
-        &larr; Back to Recipe
+      <Link className="prepare-recipe-page__back" to={returnPath}>
+        &larr; {returnLabel}
       </Link>
 
       <header className="prepare-recipe-page__header">
@@ -140,7 +167,8 @@ export default function PrepareRecipePage() {
 
         <PrepareRecipeForm
           recipe={recipe}
-          cancelPath={recipeDetailsPath}
+          initialDate={plannerDate ?? undefined}
+          cancelPath={returnPath}
           onPrepared={(preparedRecipe) => {
             navigate(`/planner?date=${preparedRecipe.preparedDate}`, {
               replace: true,

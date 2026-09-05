@@ -221,7 +221,13 @@ export default function AddFoodModal({
 
   function prepareRecipe(recipeId: number) {
     onClose()
-    navigate(`/planner/prepare/${recipeId}`)
+
+    const searchParams = new URLSearchParams({
+      date,
+      returnTo: 'planner',
+    })
+
+    navigate(`/planner/prepare/${recipeId}?${searchParams.toString()}`)
   }
 
   function selectIngredient(ingredient: Ingredient) {

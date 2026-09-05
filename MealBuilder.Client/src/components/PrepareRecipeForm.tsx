@@ -12,6 +12,7 @@ import ErrorList from './ErrorList'
 
 type PrepareRecipeFormProps = {
   recipe: Recipe
+  initialDate?: string
   cancelPath: string
   onPrepared: (preparedRecipe: PreparedRecipe) => void
 }
@@ -29,13 +30,16 @@ function toApiPlannedTime(value: string) {
 
 export default function PrepareRecipeForm({
   recipe,
+  initialDate,
   cancelPath,
   onPrepared,
 }: PrepareRecipeFormProps) {
-  const [preparedDate, setPreparedDate] = useState(getTodayInputValue)
+  const defaultDate = initialDate ?? getTodayInputValue()
+
+  const [preparedDate, setPreparedDate] = useState(defaultDate)
   const [totalPortions, setTotalPortions] = useState(String(recipe.servings))
   const [automaticallyPlan, setAutomaticallyPlan] = useState(true)
-  const [startDate, setStartDate] = useState(getTodayInputValue)
+  const [startDate, setStartDate] = useState(defaultDate)
   const [plannedDays, setPlannedDays] = useState('1')
   const [defaultPlannedTime, setDefaultPlannedTime] = useState('')
   const [allocations, setAllocations] = useState<
