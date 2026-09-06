@@ -1,5 +1,6 @@
 import { Link } from 'react-router'
 import type { Ingredient } from '../api/ingredientApi'
+import RecipeIngredientSelect from './RecipeIngredientSelect'
 
 export type RecipeIngredientFormRow = {
   key: string
@@ -11,10 +12,7 @@ type RecipeIngredientsSectionProps = {
   ingredients: Ingredient[]
   rows: RecipeIngredientFormRow[]
   disabled: boolean
-  onChange: (
-    key: string,
-    values: Partial<RecipeIngredientFormRow>,
-  ) => void
+  onChange: (key: string, values: Partial<RecipeIngredientFormRow>) => void
   onAdd: () => void
   onRemove: (key: string) => void
   onMove: (key: string, direction: -1 | 1) => void
@@ -33,15 +31,11 @@ export default function RecipeIngredientsSection({
     <section className="recipe-form-section">
       <header className="recipe-form-section__header">
         <div>
-          <p className="recipe-form-section__eyebrow">
-            Step 2
-          </p>
+          <p className="recipe-form-section__eyebrow">Step 2</p>
 
           <h3>Ingredients</h3>
 
-          <p>
-            Select each Ingredient and enter its weight in grams.
-          </p>
+          <p>Select each Ingredient and enter its weight in grams.</p>
         </div>
 
         <Link
@@ -59,59 +53,23 @@ export default function RecipeIngredientsSection({
           const selectedByOtherRows = new Set(
             rows
               .filter((otherRow) => otherRow.key !== row.key)
-              .map((otherRow) =>
-                Number(otherRow.ingredientId),
-              )
-              .filter((ingredientId) =>
-                Number.isInteger(ingredientId),
-              ),
+              .map((otherRow) => Number(otherRow.ingredientId))
+              .filter((ingredientId) => Number.isInteger(ingredientId)),
           )
 
           return (
-            <div
-              className="recipe-form-row"
-              key={row.key}
-            >
-              <span
-                className="recipe-form-row__number"
-                aria-hidden="true"
-              >
+            <div className="recipe-form-row" key={row.key}>
+              <span className="recipe-form-row__number" aria-hidden="true">
                 {index + 1}
               </span>
 
-              <label className="recipe-form-field">
-                <span>Ingredient</span>
-
-                <select
-                  value={row.ingredientId}
-                  disabled={disabled}
-                  required
-                  onChange={(event) =>
-                    onChange(row.key, {
-                      ingredientId: event.target.value,
-                    })
-                  }
-                >
-                  <option value="">
-                    Select an Ingredient
-                  </option>
-
-                  {ingredients.map((ingredient) => (
-                    <option
-                      key={ingredient.id}
-                      value={ingredient.id}
-                      disabled={selectedByOtherRows.has(
-                        ingredient.id,
-                      )}
-                    >
-                      {ingredient.name}
-                      {ingredient.isBuiltIn
-                        ? ' - Built-in'
-                        : ' - Mine'}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <RecipeIngredientSelect
+                ingredients={ingredients}
+                value={row.ingredientId}
+                disabled={disabled}
+                excludedIds={selectedByOtherRows}
+                onChange={(ingredientId) => onChange(row.key, { ingredientId })}
+              />
 
               <label className="recipe-form-field recipe-form-field--grams">
                 <span>Grams</span>
@@ -146,9 +104,7 @@ export default function RecipeIngredientsSection({
                 <button
                   type="button"
                   aria-label={`Move Ingredient ${index + 1} down`}
-                  disabled={
-                    disabled || index === rows.length - 1
-                  }
+                  disabled={disabled || index === rows.length - 1}
                   onClick={() => onMove(row.key, 1)}
                 >
                   &darr;
