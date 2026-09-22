@@ -1,11 +1,11 @@
 import { Link } from 'react-router'
 import type { WeeklyDay, WeeklySummary } from '../api/mealPlanningTypes'
-import DailyNutritionSummary from './DailyNutritionSummary'
 import './DashboardWeeklyPreview.css'
 
 type DashboardWeeklyPreviewProps = {
   weeklySummary: WeeklySummary
-  calorieTarget: number
+  selectedDate: string
+  onDateSelected: (date: string) => void
 }
 
 type DayStatus = 'empty' | 'included' | 'excluded'
@@ -55,7 +55,8 @@ function getDayStatusLabel(status: DayStatus) {
 
 export default function DashboardWeeklyPreview({
   weeklySummary,
-  calorieTarget,
+  selectedDate,
+  onDateSelected,
 }: DashboardWeeklyPreviewProps) {
   const dateRange = `${dayFormatter.format(
     parseDate(weeklySummary.startDate),
@@ -68,12 +69,20 @@ export default function DashboardWeeklyPreview({
     >
       <header className="dashboard-weekly-preview__header">
         <div>
-          <p>Current Week</p>
-          <h2 id="dashboard-weekly-preview-heading">Weekly Preview</h2>
+          <h1 id="dashboard-weekly-preview-heading">This Week</h1>
           <span>{dateRange}</span>
         </div>
 
-        <strong>{weeklySummary.includedDayCount} of 7 days included</strong>
+        <strong className="dashboard-weekly-preview__included-count">
+          {weeklySummary.includedDayCount} of 7 days included
+        </strong>
+
+        <Link
+          className="dashboard-weekly-preview__open"
+          to={`/planner?date=${selectedDate}`}
+        >
+          Open Weekly Planner
+        </Link>
       </header>
 
       <ul className="dashboard-weekly-preview__days">
@@ -82,44 +91,31 @@ export default function DashboardWeeklyPreview({
           const parsedDate = parseDate(day.date)
 
           return (
-            <li key={day.date} data-status={status}>
-              <time dateTime={day.date}>
-                <strong>{weekdayFormatter.format(parsedDate)}</strong>
-                <span>{dayFormatter.format(parsedDate)}</span>
-              </time>
+            <li key={day.date}>
+              <button
+                className="dashboard-weekly-preview__day"
+                type="button"
+                data-status={status}
+                aria-pressed={day.date === selectedDate}
+                onClick={() => onDateSelected(day.date)}
+              >
+                <time dateTime={day.date}>
+                  <strong>{weekdayFormatter.format(parsedDate)}</strong>
+                  <span>{dayFormatter.format(parsedDate)}</span>
+                </time>
 
-              <strong>
-                {day.hasPlan
-                  ? `${calorieFormatter.format(day.nutrition.calories)} kcal`
-                  : '—'}
-              </strong>
+                <strong>
+                  {day.hasPlan
+                    ? `${calorieFormatter.format(day.nutrition.calories)} kcal`
+                    : '—'}
+                </strong>
 
-              <small>{getDayStatusLabel(status)}</small>
+                <small>{getDayStatusLabel(status)}</small>
+              </button>
             </li>
           )
         })}
       </ul>
-
-      {weeklySummary.includedDayCount > 0 ? (
-        <DailyNutritionSummary
-          nutrition={weeklySummary.averageNutrition}
-          calorieTarget={calorieTarget}
-          title="Average per Included Day"
-        />
-      ) : (
-        <div className="dashboard-weekly-preview__empty">
-          <h3>No included days yet</h3>
-          <p>
-            Add food to a day or include an existing day in the weekly summary.
-          </p>
-        </div>
-      )}
-
-      <div className="dashboard-weekly-preview__actions">
-        <Link to={`/planner?date=${weeklySummary.startDate}`}>
-          Open Weekly Planner
-        </Link>
-      </div>
     </section>
   )
 }

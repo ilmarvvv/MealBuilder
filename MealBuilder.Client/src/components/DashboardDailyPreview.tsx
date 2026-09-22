@@ -17,6 +17,44 @@ const numberFormatter = new Intl.NumberFormat('en', {
   maximumFractionDigits: 2,
 })
 
+const dateFormatter = new Intl.DateTimeFormat('en', {
+  weekday: 'long',
+  month: 'long',
+  day: 'numeric',
+  year: 'numeric',
+})
+
+const weekdayFormatter = new Intl.DateTimeFormat('en', {
+  weekday: 'long',
+})
+
+function getDayLabel(date: string) {
+  const selectedDate = new Date(`${date}T00:00:00`)
+  const today = new Date()
+
+  today.setHours(0, 0, 0, 0)
+
+  const yesterday = new Date(today)
+  yesterday.setDate(yesterday.getDate() - 1)
+
+  const tomorrow = new Date(today)
+  tomorrow.setDate(tomorrow.getDate() + 1)
+
+  if (selectedDate.getTime() === today.getTime()) {
+    return 'Today'
+  }
+
+  if (selectedDate.getTime() === tomorrow.getTime()) {
+    return 'Tomorrow'
+  }
+
+  if (selectedDate.getTime() === yesterday.getTime()) {
+    return 'Yesterday'
+  }
+
+  return weekdayFormatter.format(selectedDate)
+}
+
 function formatTime(plannedTime: string | null) {
   return plannedTime === null ? 'No time' : plannedTime.slice(0, 5)
 }
@@ -43,6 +81,8 @@ export default function DashboardDailyPreview({
   dailyPlan,
   calorieTarget,
 }: DashboardDailyPreviewProps) {
+  const dayLabel = getDayLabel(date)
+
   return (
     <section
       className="dashboard-daily-preview"
@@ -50,8 +90,13 @@ export default function DashboardDailyPreview({
     >
       <header className="dashboard-daily-preview__header">
         <div>
-          <p>Today</p>
-          <h2 id="dashboard-daily-preview-heading">Today&apos;s Plan</h2>
+          <h2 id="dashboard-daily-preview-heading">{dayLabel}&apos;s Plan</h2>
+
+          <p>
+            <time dateTime={date}>
+              {dateFormatter.format(new Date(`${date}T00:00:00`))}
+            </time>
+          </p>
         </div>
 
         <strong>
@@ -62,7 +107,7 @@ export default function DashboardDailyPreview({
 
       {dailyPlan.items.length === 0 ? (
         <div className="dashboard-daily-preview__empty">
-          <h3>No food planned for today</h3>
+          <h3>No food planned for this day</h3>
           <p>Add an Ingredient, prepare a Recipe, or use Available Portions.</p>
         </div>
       ) : (
@@ -70,7 +115,7 @@ export default function DashboardDailyPreview({
           <DailyNutritionSummary
             nutrition={dailyPlan.nutrition}
             calorieTarget={calorieTarget}
-            title="Today's Nutrition"
+            title="Nutrition"
           />
 
           <ul className="dashboard-daily-preview__items">
