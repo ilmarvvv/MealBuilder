@@ -9,11 +9,12 @@ import './WeeklyPlannerSection.css'
 
 type WeeklyPlannerSectionProps = {
   selectedDate: string
+  todayDate: string
   refreshRevision: number
   onDateSelected: (date: string) => void
 }
 
-type DayStatus = 'empty' | 'included' | 'excluded'
+type DayStatus = 'empty' | 'included' | 'excluded' | 'upcoming'
 
 const weekRangeFormatter = new Intl.DateTimeFormat('en', {
   month: 'short',
@@ -69,12 +70,16 @@ function getWeekStart(date: string) {
   return formatDateValue(selectedDate)
 }
 
-function getDayStatus(day: WeeklyDay): DayStatus {
+function getDayStatus(day: WeeklyDay, todayDate: string): DayStatus {
   if (!day.hasPlan) {
-    return 'empty'
+    return day.date > todayDate ? 'upcoming' : 'empty'
   }
 
-  return day.includeInWeeklySummary ? 'included' : 'excluded'
+  if (!day.includeInWeeklySummary) {
+    return 'excluded'
+  }
+
+  return day.date > todayDate ? 'upcoming' : 'included'
 }
 
 function getDayStatusLabel(status: DayStatus) {
@@ -86,11 +91,16 @@ function getDayStatusLabel(status: DayStatus) {
     return 'Excluded'
   }
 
+  if (status === 'upcoming') {
+    return 'Upcoming'
+  }
+
   return 'Empty'
 }
 
 export default function WeeklyPlannerSection({
   selectedDate,
+  todayDate,
   refreshRevision,
   onDateSelected,
 }: WeeklyPlannerSectionProps) {
@@ -109,7 +119,10 @@ export default function WeeklyPlannerSection({
       setErrors([])
 
       try {
-        const loadedWeeklySummary = await dailyPlanApi.getWeek(weekStartDate)
+        const loadedWeeklySummary = await dailyPlanApi.getWeek(
+          weekStartDate,
+          todayDate,
+        )
 
         if (isActive) {
           setWeeklySummary(loadedWeeklySummary)
@@ -132,7 +145,7 @@ export default function WeeklyPlannerSection({
     return () => {
       isActive = false
     }
-  }, [refreshRevision, weekStartDate])
+  }, [refreshRevision, todayDate, weekStartDate])
 
   const weekRange = `${weekRangeFormatter.format(
     parseDate(weekStartDate),
@@ -181,17 +194,19 @@ export default function WeeklyPlannerSection({
           <>
             <div className="weekly-planner__summary-header">
               <strong>
-                {weeklySummary.includedDayCount} of 7 days included
+                {weeklySummary.includedDayCount}{' '}
+                {weeklySummary.includedDayCount === 1 ? 'day' : 'days'} counted
               </strong>
 
               <span>
-                Empty and excluded days do not affect weekly calculations.
+                Future, empty, and excluded days do not affect weekly
+                calculations.
               </span>
             </div>
 
             <ul className="weekly-planner__days">
               {weeklySummary.days.map((day) => {
-                const status = getDayStatus(day)
+                const status = getDayStatus(day, todayDate)
                 const isSelected = day.date === selectedDate
                 const parsedDate = parseDate(day.date)
 

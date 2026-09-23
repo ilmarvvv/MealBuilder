@@ -5,10 +5,11 @@ import './DashboardWeeklyPreview.css'
 type DashboardWeeklyPreviewProps = {
   weeklySummary: WeeklySummary
   selectedDate: string
+  todayDate: string
   onDateSelected: (date: string) => void
 }
 
-type DayStatus = 'empty' | 'included' | 'excluded'
+type DayStatus = 'empty' | 'included' | 'excluded' | 'upcoming'
 
 const weekdayFormatter = new Intl.DateTimeFormat('en', {
   weekday: 'short',
@@ -33,12 +34,16 @@ function parseDate(date: string) {
   return new Date(`${date}T00:00:00`)
 }
 
-function getDayStatus(day: WeeklyDay): DayStatus {
+function getDayStatus(day: WeeklyDay, todayDate: string): DayStatus {
   if (!day.hasPlan) {
-    return 'empty'
+    return day.date > todayDate ? 'upcoming' : 'empty'
   }
 
-  return day.includeInWeeklySummary ? 'included' : 'excluded'
+  if (!day.includeInWeeklySummary) {
+    return 'excluded'
+  }
+
+  return day.date > todayDate ? 'upcoming' : 'included'
 }
 
 function getDayStatusLabel(status: DayStatus) {
@@ -50,12 +55,17 @@ function getDayStatusLabel(status: DayStatus) {
     return 'Excluded'
   }
 
+  if (status === 'upcoming') {
+    return 'Upcoming'
+  }
+
   return 'Empty'
 }
 
 export default function DashboardWeeklyPreview({
   weeklySummary,
   selectedDate,
+  todayDate,
   onDateSelected,
 }: DashboardWeeklyPreviewProps) {
   const dateRange = `${dayFormatter.format(
@@ -74,7 +84,8 @@ export default function DashboardWeeklyPreview({
         </div>
 
         <strong className="dashboard-weekly-preview__included-count">
-          {weeklySummary.includedDayCount} of 7 days included
+          {weeklySummary.includedDayCount}{' '}
+          {weeklySummary.includedDayCount === 1 ? 'day' : 'days'} counted
         </strong>
 
         <Link
@@ -87,7 +98,7 @@ export default function DashboardWeeklyPreview({
 
       <ul className="dashboard-weekly-preview__days">
         {weeklySummary.days.map((day) => {
-          const status = getDayStatus(day)
+          const status = getDayStatus(day, todayDate)
           const parsedDate = parseDate(day.date)
 
           return (

@@ -8,6 +8,7 @@ public static class WeeklySummaryResponseMapper
 {
     public static WeeklySummaryResponse ToResponse(
         DateOnly startDate,
+        DateOnly throughDate,
         IReadOnlyCollection<DailyPlan> dailyPlans)
     {
         ArgumentNullException.ThrowIfNull(dailyPlans);
@@ -32,18 +33,22 @@ public static class WeeklySummaryResponseMapper
             })
             .ToArray();
 
-        var includedDayCount = dailyPlans.Count(
-            dailyPlan =>
+        var includedDailyPlans = dailyPlans
+            .Where(dailyPlan =>
+                dailyPlan.Date <= throughDate &&
                 !dailyPlan.IsEmpty &&
-                dailyPlan.IncludeInWeeklySummary);
+                dailyPlan.IncludeInWeeklySummary)
+            .ToArray();
+
+        var includedDayCount = includedDailyPlans.Length;
 
         var totalNutrition =
             DailyPlanNutritionCalculator
-                .CalculateWeeklyTotal(dailyPlans);
+                .CalculateWeeklyTotal(includedDailyPlans);
 
         var averageNutrition =
             DailyPlanNutritionCalculator
-                .CalculateWeeklyAverage(dailyPlans);
+                .CalculateWeeklyAverage(includedDailyPlans);
 
         return new WeeklySummaryResponse(
             startDate,

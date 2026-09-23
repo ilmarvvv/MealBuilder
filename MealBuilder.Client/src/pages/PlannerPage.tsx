@@ -49,11 +49,12 @@ function isValidDateValue(value: string | null): value is string {
 
 export default function PlannerPage() {
   const [searchParams, setSearchParams] = useSearchParams()
+  const [todayDate] = useState(getTodayDateValue)
   const requestedDate = searchParams.get('date')
   const shouldOpenAddFood = searchParams.get('addFood') === 'true'
   const selectedDate = isValidDateValue(requestedDate)
     ? requestedDate
-    : getTodayDateValue()
+    : todayDate
   const [preparedRecipes, setPreparedRecipes] = useState<
     PreparedRecipeSummary[]
   >([])
@@ -166,6 +167,7 @@ export default function PlannerPage() {
 
       <WeeklyPlannerSection
         selectedDate={selectedDate}
+        todayDate={todayDate}
         refreshRevision={weeklySummaryRevision}
         onDateSelected={(date) => {
           setSearchParams({ date })

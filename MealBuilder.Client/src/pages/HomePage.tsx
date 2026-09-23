@@ -49,7 +49,7 @@ export default function HomePage() {
       try {
         const [loadedProfile, loadedWeeklySummary] = await Promise.all([
           profileApi.getCurrent(),
-          dailyPlanApi.getWeek(weekStartDate),
+          dailyPlanApi.getWeek(weekStartDate, todayDate),
         ])
 
         if (!isCancelled) {
@@ -72,7 +72,7 @@ export default function HomePage() {
     return () => {
       isCancelled = true
     }
-  }, [weekStartDate])
+  }, [todayDate, weekStartDate])
 
   useEffect(() => {
     let isCancelled = false
@@ -130,6 +130,7 @@ export default function HomePage() {
           <DashboardWeeklyPreview
             weeklySummary={weeklySummary}
             selectedDate={selectedDate}
+            todayDate={todayDate}
             onDateSelected={selectDate}
           />
 

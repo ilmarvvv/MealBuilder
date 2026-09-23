@@ -16,8 +16,10 @@ export const dailyPlanApi = {
     return apiRequest<DailyPlan>(`/api/daily-plans/${date}`)
   },
 
-  getWeek(startDate: string) {
-    return apiRequest<WeeklySummary>(`/api/daily-plans/week/${startDate}`)
+  getWeek(startDate: string, throughDate: string) {
+    return apiRequest<WeeklySummary>(
+      `/api/daily-plans/week/${startDate}?throughDate=${throughDate}`,
+    )
   },
 
   addIngredient(date: string, input: AddDailyPlanIngredientInput) {

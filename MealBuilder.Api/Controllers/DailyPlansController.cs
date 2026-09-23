@@ -59,6 +59,7 @@ public sealed class DailyPlansController(
     [HttpGet("week/{startDate}")]
     public async Task<ActionResult<WeeklySummaryResponse>> GetWeek(
         DateOnly startDate,
+        [FromQuery] DateOnly? throughDate,
         CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
@@ -66,6 +67,15 @@ public sealed class DailyPlansController(
         if (userId is null)
         {
             return Unauthorized();
+        }
+
+        if (throughDate is null)
+        {
+            ModelState.AddModelError(
+                nameof(throughDate),
+                "The through date is required.");
+
+            return ValidationProblem(ModelState);
         }
 
         if (startDate.DayOfWeek != DayOfWeek.Monday)
@@ -108,6 +118,7 @@ public sealed class DailyPlansController(
         return Ok(
             WeeklySummaryResponseMapper.ToResponse(
                 startDate,
+                throughDate.Value,
                 dailyPlans));
     }
 

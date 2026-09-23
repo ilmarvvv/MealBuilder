@@ -29,6 +29,7 @@ public sealed class WeeklySummaryTests(
         var ingredient = builtInIngredients[0];
         var ingredientId = ingredient.Id;
         var weekStart = new DateOnly(2026, 8, 24);
+        var throughDate = weekStart.AddDays(6);
         var secondDate = weekStart.AddDays(1);
         var disabledDate = weekStart.AddDays(2);
 
@@ -69,7 +70,8 @@ public sealed class WeeklySummaryTests(
 
         var weeklySummary = await client
             .GetFromJsonAsync<WeeklySummaryResponse>(
-                $"/api/daily-plans/week/{weekStart:yyyy-MM-dd}");
+                $"/api/daily-plans/week/{weekStart:yyyy-MM-dd}" +
+                $"?throughDate={throughDate:yyyy-MM-dd}");
 
         Assert.NotNull(weeklySummary);
         Assert.Equal(weekStart, weeklySummary.StartDate);
@@ -124,6 +126,76 @@ public sealed class WeeklySummaryTests(
         Assert.False(emptyDay.HasPlan);
         Assert.False(emptyDay.IncludeInWeeklySummary);
         Assert.Null(emptyDay.DailyPlanId);
+    }
+
+    [Fact]
+    public async Task GetWeek_DoesNotCountDaysAfterThroughDate()
+    {
+        using var client = factory.CreateHttpsClient();
+
+        await RecipeTestHelper.RegisterUserAsync(client);
+
+        var builtInIngredients =
+            await RecipeTestHelper.GetBuiltInIngredientsAsync(client);
+
+        Assert.NotEmpty(builtInIngredients);
+
+        var ingredient = builtInIngredients[0];
+        var ingredientId = ingredient.Id;
+        var weekStart = new DateOnly(2026, 8, 24);
+        var throughDate = weekStart.AddDays(1);
+        var futureDate = weekStart.AddDays(2);
+
+        await AddIngredientAsync(
+            client,
+            weekStart,
+            ingredientId,
+            100m);
+
+        await AddIngredientAsync(
+            client,
+            throughDate,
+            ingredientId,
+            200m);
+
+        var futurePlan = await AddIngredientAsync(
+            client,
+            futureDate,
+            ingredientId,
+            300m);
+
+        var weeklySummary = await client
+            .GetFromJsonAsync<WeeklySummaryResponse>(
+                $"/api/daily-plans/week/{weekStart:yyyy-MM-dd}" +
+                $"?throughDate={throughDate:yyyy-MM-dd}");
+
+        Assert.NotNull(weeklySummary);
+        Assert.Equal(2, weeklySummary.IncludedDayCount);
+
+        var expectedTotal = CalculateNutrition(
+            ingredient,
+            grams: 300m);
+
+        var expectedAverage = CalculateNutrition(
+            ingredient,
+            grams: 300m,
+            divisor: 2);
+
+        Assert.Equal(
+            expectedTotal,
+            weeklySummary.TotalNutrition);
+
+        Assert.Equal(
+            expectedAverage,
+            weeklySummary.AverageNutrition);
+
+        var futureDay = weeklySummary.Days[2];
+
+        Assert.True(futureDay.HasPlan);
+        Assert.True(futureDay.IncludeInWeeklySummary);
+        Assert.Equal(
+            futurePlan.Nutrition,
+            futureDay.Nutrition);
     }
 
     private static async Task<DailyPlanResponse>
