@@ -430,8 +430,15 @@ export default function DailyPlanSection({
       <AddFoodModal
         date={date}
         isOpen={isAddFoodOpen}
-        onAdded={(updatedDailyPlan) => {
-          setDailyPlan(updatedDailyPlan)
+        onAdded={(updatedDailyPlans) => {
+          const updatedSelectedPlan = updatedDailyPlans.find(
+            (updatedDailyPlan) => updatedDailyPlan.date === date,
+          )
+
+          if (updatedSelectedPlan !== undefined) {
+            setDailyPlan(updatedSelectedPlan)
+          }
+
           setErrors([])
           onFoodAdded()
           onPlanChanged()

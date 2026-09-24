@@ -9,6 +9,12 @@ import {
   type RecipeNutrition,
   type RecipeSummary,
 } from '../api/recipeApi'
+import IngredientPlanningFields from './IngredientPlanningFields'
+import {
+  createIngredientPlanningEntry,
+  type IngredientPlanningEntry,
+  type IngredientPlanningMode,
+} from './ingredientPlanning'
 import { useNavigate } from 'react-router'
 import DailyNutritionSummary from './DailyNutritionSummary'
 import ErrorList from './ErrorList'
@@ -18,7 +24,7 @@ import './AddFoodModal.css'
 type AddFoodModalProps = {
   date: string
   isOpen: boolean
-  onAdded: (dailyPlan: DailyPlan) => void
+  onAdded: (dailyPlans: DailyPlan[]) => void
   onClose: () => void
 }
 
@@ -97,6 +103,12 @@ export default function AddFoodModal({
   const [selection, setSelection] = useState<FoodSelection | null>(null)
   const [amount, setAmount] = useState('')
   const [plannedTime, setPlannedTime] = useState('')
+  const [ingredientPlanningMode, setIngredientPlanningMode] =
+    useState<IngredientPlanningMode>('single')
+  const [ingredientPlanningEntries, setIngredientPlanningEntries] = useState<
+    IngredientPlanningEntry[]
+  >([])
+  const [lastAddedDayCount, setLastAddedDayCount] = useState(1)
   const [lastAddedName, setLastAddedName] = useState<string | null>(null)
   const [isLoadingSources, setIsLoadingSources] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -132,6 +144,9 @@ export default function AddFoodModal({
       setSelection(null)
       setAmount('')
       setPlannedTime('')
+      setIngredientPlanningMode('single')
+      setIngredientPlanningEntries([])
+      setLastAddedDayCount(1)
       setLastAddedName(null)
       setErrors([])
       setIsLoadingSources(true)
@@ -201,23 +216,38 @@ export default function AddFoodModal({
   const numericAmount = Number(amount)
 
   const nutritionPreview = useMemo(() => {
-    if (
-      selection === null ||
-      !Number.isFinite(numericAmount) ||
-      numericAmount <= 0
-    ) {
+    if (selection === null) {
       return null
     }
 
     if (selection.kind === 'ingredient') {
+      if (ingredientPlanningMode === 'multiple') {
+        return null
+      }
+
+      const grams = Number(ingredientPlanningEntries[0]?.grams)
+
+      if (!Number.isFinite(grams) || grams <= 0) {
+        return null
+      }
+
       return scaleNutrition(
         getIngredientNutrition(selection.value),
-        numericAmount / 100,
+        grams / 100,
       )
     }
 
+    if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
+      return null
+    }
+
     return scaleNutrition(selection.value.nutritionPerPortion, numericAmount)
-  }, [numericAmount, selection])
+  }, [
+    ingredientPlanningEntries,
+    ingredientPlanningMode,
+    numericAmount,
+    selection,
+  ])
 
   function prepareRecipe(recipeId: number) {
     onClose()
@@ -235,7 +265,9 @@ export default function AddFoodModal({
       kind: 'ingredient',
       value: ingredient,
     })
-    setAmount('100')
+    setIngredientPlanningMode('single')
+    setIngredientPlanningEntries([createIngredientPlanningEntry(date)])
+    setAmount('')
     setPlannedTime('')
     setErrors([])
     setStep('details')
@@ -246,6 +278,8 @@ export default function AddFoodModal({
       kind: 'preparedRecipe',
       value: preparedRecipe,
     })
+    setIngredientPlanningMode('single')
+    setIngredientPlanningEntries([])
     setAmount('1')
     setPlannedTime('')
     setErrors([])
@@ -257,6 +291,8 @@ export default function AddFoodModal({
     setSelection(null)
     setAmount('')
     setPlannedTime('')
+    setIngredientPlanningMode('single')
+    setIngredientPlanningEntries([])
     setErrors([])
   }
 
@@ -265,7 +301,10 @@ export default function AddFoodModal({
     setSearchTerm('')
     setSelection(null)
     setAmount('')
+    setLastAddedDayCount(1)
     setPlannedTime('')
+    setIngredientPlanningMode('single')
+    setIngredientPlanningEntries([])
     setLastAddedName(null)
     setErrors([])
   }
@@ -273,47 +312,95 @@ export default function AddFoodModal({
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
-    if (
-      selection === null ||
-      !Number.isFinite(numericAmount) ||
-      numericAmount <= 0
-    ) {
-      setErrors(['Enter an amount greater than zero.'])
+    if (selection === null) {
+      setErrors(['Select food before continuing.'])
       return
     }
 
-    if (
-      selection.kind === 'preparedRecipe' &&
-      numericAmount > selection.value.availablePortions
-    ) {
-      setErrors([
-        `Only ${numberFormatter.format(
-          selection.value.availablePortions,
-        )} portions are available.`,
-      ])
-      return
-    }
+    const parsedIngredientEntries = ingredientPlanningEntries.map((entry) => ({
+      date: entry.date,
+      grams: Number(entry.grams),
+      plannedTime: entry.plannedTime === '' ? null : `${entry.plannedTime}:00`,
+    }))
 
-    const apiPlannedTime = plannedTime === '' ? null : `${plannedTime}:00`
+    if (selection.kind === 'ingredient') {
+      if (
+        parsedIngredientEntries.length === 0 ||
+        parsedIngredientEntries.some(
+          (entry) =>
+            entry.date === '' ||
+            !Number.isFinite(entry.grams) ||
+            entry.grams <= 0 ||
+            entry.grams > 100000,
+        )
+      ) {
+        setErrors([
+          'Enter a valid date and an amount between 0.01 and 100000 grams for every day.',
+        ])
+        return
+      }
+
+      const uniqueDates = new Set(
+        parsedIngredientEntries.map((entry) => entry.date),
+      )
+
+      if (uniqueDates.size !== parsedIngredientEntries.length) {
+        setErrors(['Each date can only appear once.'])
+        return
+      }
+    } else {
+      if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
+        setErrors(['Enter an amount greater than zero.'])
+        return
+      }
+
+      if (numericAmount > selection.value.availablePortions) {
+        setErrors([
+          `Only ${numberFormatter.format(
+            selection.value.availablePortions,
+          )} portions are available.`,
+        ])
+        return
+      }
+    }
 
     setIsSubmitting(true)
     setErrors([])
 
     try {
-      const updatedDailyPlan =
-        selection.kind === 'ingredient'
-          ? await dailyPlanApi.addIngredient(date, {
-              ingredientId: selection.value.id,
-              grams: numericAmount,
-              plannedTime: apiPlannedTime,
-            })
-          : await dailyPlanApi.addPreparedRecipe(date, {
-              preparedRecipeId: selection.value.id,
-              portions: numericAmount,
-              plannedTime: apiPlannedTime,
-            })
+      let updatedDailyPlans: DailyPlan[]
 
-      if (selection.kind === 'preparedRecipe') {
+      if (selection.kind === 'ingredient') {
+        if (ingredientPlanningMode === 'multiple') {
+          updatedDailyPlans = await dailyPlanApi.addIngredientBatch({
+            ingredientId: selection.value.id,
+            entries: parsedIngredientEntries,
+          })
+        } else {
+          const entry = parsedIngredientEntries[0]
+
+          const updatedDailyPlan = await dailyPlanApi.addIngredient(
+            entry.date,
+            {
+              ingredientId: selection.value.id,
+              grams: entry.grams,
+              plannedTime: entry.plannedTime,
+            },
+          )
+
+          updatedDailyPlans = [updatedDailyPlan]
+        }
+      } else {
+        const apiPlannedTime = plannedTime === '' ? null : `${plannedTime}:00`
+
+        const updatedDailyPlan = await dailyPlanApi.addPreparedRecipe(date, {
+          preparedRecipeId: selection.value.id,
+          portions: numericAmount,
+          plannedTime: apiPlannedTime,
+        })
+
+        updatedDailyPlans = [updatedDailyPlan]
+
         const selectedPreparedRecipe = selection.value
 
         setPreparedRecipes((currentPreparedRecipes) =>
@@ -334,7 +421,8 @@ export default function AddFoodModal({
       }
 
       setLastAddedName(selection.value.name)
-      onAdded(updatedDailyPlan)
+      setLastAddedDayCount(updatedDailyPlans.length)
+      onAdded(updatedDailyPlans)
       setStep('success')
     } catch (error) {
       setErrors(
@@ -567,41 +655,45 @@ export default function AddFoodModal({
                 )}
               </div>
 
-              <div className="add-food-modal__fields">
-                <label>
-                  <span>
-                    {selection.kind === 'ingredient' ? 'Grams' : 'Portions'}
-                  </span>
+              {selection.kind === 'ingredient' ? (
+                <IngredientPlanningFields
+                  selectedDate={date}
+                  mode={ingredientPlanningMode}
+                  entries={ingredientPlanningEntries}
+                  onModeChange={setIngredientPlanningMode}
+                  onEntriesChange={setIngredientPlanningEntries}
+                />
+              ) : (
+                <div className="add-food-modal__fields">
+                  <label>
+                    <span>Portions</span>
 
-                  <input
-                    type="number"
-                    min="0.01"
-                    max={
-                      selection.kind === 'preparedRecipe'
-                        ? selection.value.availablePortions
-                        : undefined
-                    }
-                    step="0.01"
-                    required
-                    value={amount}
-                    onChange={(event) => {
-                      setAmount(event.target.value)
-                    }}
-                  />
-                </label>
+                    <input
+                      type="number"
+                      min="0.01"
+                      max={selection.value.availablePortions}
+                      step="0.01"
+                      required
+                      value={amount}
+                      onChange={(event) => {
+                        setAmount(event.target.value)
+                      }}
+                    />
+                  </label>
 
-                <label>
-                  <span>Time (optional)</span>
+                  <label>
+                    <span>Time (optional)</span>
 
-                  <input
-                    type="time"
-                    value={plannedTime}
-                    onChange={(event) => {
-                      setPlannedTime(event.target.value)
-                    }}
-                  />
-                </label>
-              </div>
+                    <input
+                      type="time"
+                      value={plannedTime}
+                      onChange={(event) => {
+                        setPlannedTime(event.target.value)
+                      }}
+                    />
+                  </label>
+                </div>
+              )}
 
               {nutritionPreview !== null && (
                 <DailyNutritionSummary
@@ -620,7 +712,16 @@ export default function AddFoodModal({
                 </button>
 
                 <button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? 'Adding...' : 'Add to Daily Plan'}
+                  {isSubmitting
+                    ? 'Adding...'
+                    : selection.kind === 'ingredient' &&
+                        ingredientPlanningMode === 'multiple'
+                      ? `Add to ${ingredientPlanningEntries.length} ${
+                          ingredientPlanningEntries.length === 1
+                            ? 'Day'
+                            : 'Days'
+                        }`
+                      : 'Add to Daily Plan'}
                 </button>
               </div>
             </form>
@@ -630,7 +731,11 @@ export default function AddFoodModal({
             <div className="add-food-modal__success">
               <p>Added successfully</p>
               <h3>{lastAddedName}</h3>
-              <span>Daily Plan nutrition and items have been updated.</span>
+              <span>
+                {lastAddedDayCount === 1
+                  ? 'Daily Plan nutrition and items have been updated.'
+                  : `Added to ${lastAddedDayCount} days. Weekly planning has been updated.`}
+              </span>
 
               <div className="add-food-modal__actions">
                 <button type="button" onClick={addAnother}>

@@ -202,6 +202,127 @@ public sealed class DailyPlansController(
         }
     }
 
+    [HttpPost("ingredients/batch")]
+    public async Task<
+        ActionResult<IReadOnlyList<DailyPlanResponse>>>
+        AddIngredientBatch(
+            AddDailyPlanIngredientBatchRequest request,
+            CancellationToken cancellationToken)
+    {
+        var userId = userManager.GetUserId(User);
+
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        var hasDuplicateDates = request.Entries
+            .GroupBy(entry => entry.Date)
+            .Any(group => group.Count() > 1);
+
+        if (hasDuplicateDates)
+        {
+            ModelState.AddModelError(
+                nameof(request.Entries),
+                "Each date can only appear once.");
+
+            return ValidationProblem(ModelState);
+        }
+
+        var ingredient = await dbContext.Ingredients
+            .SingleOrDefaultAsync(
+                ingredient =>
+                    ingredient.Id == request.IngredientId &&
+                    (ingredient.OwnerId == null ||
+                     ingredient.OwnerId == userId),
+                cancellationToken);
+
+        if (ingredient is null)
+        {
+            ModelState.AddModelError(
+                nameof(request.IngredientId),
+                "The ingredient was not found.");
+
+            return ValidationProblem(ModelState);
+        }
+
+        await using var transaction =
+            await dbContext.Database.BeginTransactionAsync(
+                cancellationToken);
+
+        try
+        {
+            var requestedDates = request.Entries
+                .Select(entry => entry.Date)
+                .ToArray();
+
+            var dailyPlansByDate = await dbContext.DailyPlans
+                .Where(dailyPlan =>
+                    dailyPlan.OwnerId == userId &&
+                    requestedDates.Contains(dailyPlan.Date))
+                .Include(dailyPlan => dailyPlan.Items)
+                    .ThenInclude(item => item.Ingredient)
+                .Include(dailyPlan => dailyPlan.Items)
+                    .ThenInclude(item => item.PreparedRecipe)
+                        .ThenInclude(preparedRecipe =>
+                            preparedRecipe!.Ingredients)
+                .OrderBy(dailyPlan => dailyPlan.Date)
+                .AsSplitQuery()
+                .ToDictionaryAsync(
+                    dailyPlan => dailyPlan.Date,
+                    cancellationToken);
+
+            foreach (var entry in request.Entries)
+            {
+                if (!dailyPlansByDate.TryGetValue(
+                        entry.Date,
+                        out var dailyPlan))
+                {
+                    dailyPlan = DailyPlan.Create(
+                        userId,
+                        entry.Date);
+
+                    dailyPlansByDate.Add(
+                        entry.Date,
+                        dailyPlan);
+
+                    dbContext.DailyPlans.Add(dailyPlan);
+                }
+
+                dailyPlan.AddIngredient(
+                    ingredient,
+                    entry.Grams,
+                    entry.PlannedTime);
+
+                dailyPlan.EnsureCanBeSaved();
+            }
+
+            await dbContext.SaveChangesAsync(
+                cancellationToken);
+
+            await transaction.CommitAsync(
+                cancellationToken);
+
+            var response = dailyPlansByDate.Values
+                .OrderBy(dailyPlan => dailyPlan.Date)
+                .Select(DailyPlanResponseMapper.ToResponse)
+                .ToArray();
+
+            return Ok(response);
+        }
+        catch (Exception exception)
+            when (exception is ArgumentException or
+                  InvalidOperationException or
+                  OverflowException)
+        {
+            ModelState.AddModelError(
+                nameof(request),
+                exception.Message);
+
+            return ValidationProblem(ModelState);
+        }
+    }
+
     [HttpPost("{date}/prepared-recipes")]
     public async Task<ActionResult<DailyPlanResponse>>
         AddPreparedRecipe(

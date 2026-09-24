@@ -106,6 +106,17 @@ export type AddDailyPlanIngredientInput = {
   plannedTime: string | null
 }
 
+export type AddDailyPlanIngredientBatchEntryInput = {
+  date: string
+  grams: number
+  plannedTime: string | null
+}
+
+export type AddDailyPlanIngredientBatchInput = {
+  ingredientId: number
+  entries: AddDailyPlanIngredientBatchEntryInput[]
+}
+
 export type AddDailyPlanPreparedRecipeInput = {
   preparedRecipeId: number
   portions: number

@@ -2,6 +2,7 @@ import { apiRequest } from './apiClient'
 import type {
   AddDailyPlanIngredientInput,
   AddDailyPlanPreparedRecipeInput,
+  AddDailyPlanIngredientBatchInput,
   DailyPlan,
   DailyPlanInclusionInput,
   DailyPlanItemAmountInput,
@@ -24,6 +25,16 @@ export const dailyPlanApi = {
 
   addIngredient(date: string, input: AddDailyPlanIngredientInput) {
     return apiRequest<DailyPlan>(`/api/daily-plans/${date}/ingredients`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(input),
+    })
+  },
+
+  addIngredientBatch(input: AddDailyPlanIngredientBatchInput) {
+    return apiRequest<DailyPlan[]>('/api/daily-plans/ingredients/batch', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
