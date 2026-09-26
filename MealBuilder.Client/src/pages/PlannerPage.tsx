@@ -141,28 +141,6 @@ export default function PlannerPage() {
 
   return (
     <section className="planner-page">
-      <header className="planner-page__header">
-        <div>
-          <p className="planner-page__eyebrow">Meal planning</p>
-
-          <h1>Planner</h1>
-
-          <p>Select a day, plan food, and manage your prepared portions.</p>
-        </div>
-
-        <label className="planner-page__date-picker">
-          <span>Selected date</span>
-
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={(event) => {
-              setSearchParams({ date: event.target.value })
-            }}
-          />
-        </label>
-      </header>
-
       <ErrorList messages={profileErrors} />
 
       <WeeklyPlannerSection

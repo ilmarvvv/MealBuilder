@@ -6,36 +6,6 @@
   padding-block: var(--space-6);
 }
 
-.planner-page__header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--space-5);
-  padding: var(--space-5);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-large);
-  background:
-    linear-gradient(
-      135deg,
-      color-mix(in srgb, var(--color-accent-soft) 70%, transparent),
-      transparent 60%
-    ),
-    var(--color-surface);
-  box-shadow: var(--shadow-small);
-}
-
-.planner-page__header h1 {
-  margin-top: var(--space-2);
-  font-size: clamp(2rem, 5vw, 3rem);
-}
-
-.planner-page__header p:last-child {
-  max-width: 42rem;
-  margin-bottom: 0;
-  color: var(--color-text-muted);
-}
-
-.planner-page__eyebrow,
 .available-portions__eyebrow {
   margin: 0;
   color: var(--color-accent);
@@ -182,7 +152,6 @@
     padding-block: var(--space-4);
   }
 
-  .planner-page__header,
   .available-portions {
     padding: var(--space-4);
     border-radius: var(--radius-medium);
@@ -233,44 +202,4 @@
   color: var(--color-on-accent);
   border-color: var(--color-accent);
   background: var(--color-accent);
-}
-
-.planner-page__date-picker {
-  display: grid;
-  flex: 0 0 auto;
-  gap: var(--space-1);
-  min-width: 12rem;
-}
-
-.planner-page__date-picker span {
-  color: var(--color-text-muted);
-  font-size: 0.75rem;
-  font-weight: 700;
-}
-
-.planner-page__date-picker input {
-  width: 100%;
-  min-height: 2.75rem;
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-small);
-  color: var(--color-text);
-  background: var(--color-surface-muted);
-}
-
-.planner-page__date-picker input:focus {
-  border-color: var(--color-focus);
-  outline: 2px solid color-mix(in srgb, var(--color-focus) 35%, transparent);
-  outline-offset: 2px;
-}
-
-@media (max-width: 40rem) {
-  .planner-page__header {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .planner-page__date-picker {
-    width: 100%;
-  }
 }

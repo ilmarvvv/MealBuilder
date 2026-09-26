@@ -159,29 +159,45 @@ export default function WeeklyPlannerSection({
       <header className="weekly-planner__header">
         <div>
           <p>Weekly details</p>
-          <h2 id="weekly-planner-heading">{weekRange}</h2>
+          <h1 id="weekly-planner-heading">{weekRange}</h1>
         </div>
 
-        <div className="weekly-planner__navigation">
-          <button
-            type="button"
-            aria-label="Open previous week"
-            onClick={() => {
-              onDateSelected(addDays(selectedDate, -7))
-            }}
-          >
-            ← Previous
-          </button>
+        <div className="weekly-planner__controls">
+          <label className="weekly-planner__date-picker">
+            <span>Selected date</span>
 
-          <button
-            type="button"
-            aria-label="Open next week"
-            onClick={() => {
-              onDateSelected(addDays(selectedDate, 7))
-            }}
-          >
-            Next →
-          </button>
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(event) => {
+                if (event.target.value !== '') {
+                  onDateSelected(event.target.value)
+                }
+              }}
+            />
+          </label>
+
+          <div className="weekly-planner__navigation">
+            <button
+              type="button"
+              aria-label="Open previous week"
+              onClick={() => {
+                onDateSelected(addDays(selectedDate, -7))
+              }}
+            >
+              ← Previous
+            </button>
+
+            <button
+              type="button"
+              aria-label="Open next week"
+              onClick={() => {
+                onDateSelected(addDays(selectedDate, 7))
+              }}
+            >
+              Next →
+            </button>
+          </div>
         </div>
       </header>
 
@@ -246,19 +262,17 @@ export default function WeeklyPlannerSection({
             {weeklySummary.includedDayCount > 0 ? (
               <div className="weekly-planner__nutrition">
                 <DailyNutritionSummary
-                  nutrition={weeklySummary.totalNutrition}
-                  title="Weekly Total"
-                />
-
-                <DailyNutritionSummary
                   nutrition={weeklySummary.averageNutrition}
                   title="Average per Included Day"
                 />
               </div>
             ) : (
               <div className="weekly-planner__empty">
-                <h3>No included days</h3>
-                <p>Add food to a day or include an existing non-empty day.</p>
+                <h3>No counted days</h3>
+                <p>
+                  Add food to today or an earlier day, or include an existing
+                  non-empty day.
+                </p>
               </div>
             )}
           </>

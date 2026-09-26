@@ -26,8 +26,43 @@
   text-transform: uppercase;
 }
 
-.weekly-planner__header h2 {
+.weekly-planner__header h1 {
   margin-top: var(--space-2);
+  font-size: clamp(1.5rem, 4vw, 2rem);
+}
+
+.weekly-planner__controls {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+
+.weekly-planner__date-picker {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 12rem;
+}
+
+.weekly-planner__date-picker span {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.weekly-planner__date-picker input {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-small);
+  color: var(--color-text);
+  background: var(--color-surface-muted);
+}
+
+.weekly-planner__date-picker input:focus {
+  border-color: var(--color-focus);
+  outline: 2px solid color-mix(in srgb, var(--color-focus) 35%, transparent);
+  outline-offset: 2px;
 }
 
 .weekly-planner__navigation {
@@ -128,8 +163,7 @@
 
 .weekly-planner__nutrition {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-4);
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .weekly-planner__empty {
@@ -148,10 +182,6 @@
   .weekly-planner__days {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
-
-  .weekly-planner__nutrition {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 40rem) {
@@ -164,6 +194,15 @@
   .weekly-planner__summary-header {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .weekly-planner__controls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .weekly-planner__date-picker {
+    width: 100%;
   }
 
   .weekly-planner__navigation button {
