@@ -66,10 +66,16 @@ export default function IngredientPlanningFields({
   function addEntry() {
     const lastEntry = entries[entries.length - 1]
     const previousDate = lastEntry?.date || selectedDate
+    const previousGrams = lastEntry?.grams ?? '100'
+    const previousPlannedTime = lastEntry?.plannedTime ?? ''
 
     onEntriesChange([
       ...entries,
-      createIngredientPlanningEntry(addDays(previousDate, 1)),
+      createIngredientPlanningEntry(
+        addDays(previousDate, 1),
+        previousGrams,
+        previousPlannedTime,
+      ),
     ])
   }
 
