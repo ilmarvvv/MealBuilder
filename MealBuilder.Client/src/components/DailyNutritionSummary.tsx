@@ -50,7 +50,7 @@ export default function DailyNutritionSummary({
         </div>
 
         <div>
-          <dt>Carbohydrates / Sugars</dt>
+          <dt>Carbs / Sugars</dt>
           <dd>
             {formatNumber(nutrition.carbohydrates)} /{' '}
             {formatNumber(nutrition.sugars)} g
