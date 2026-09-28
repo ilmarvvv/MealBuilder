@@ -1648,6 +1648,10 @@ This section contains ideas that may be useful for the project in the future, bu
 
 - [ ] Improve UI
 
+- [ ] Rework the calorie progress indicator to use percentage-based ranges
+  - Calculate calorie statuses from the percentage of the user's daily target instead of fixed calorie differences.
+  - Ensure the ranges scale consistently for users with different daily calorie targets.
+
 - [ ] Add automated tests for calculation logic
   - Test `RecipeCalculationService`.
   - Test `MenuCalculationService`.
