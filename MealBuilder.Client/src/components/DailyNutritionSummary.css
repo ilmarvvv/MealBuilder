@@ -1,10 +1,43 @@
 .daily-nutrition-summary {
+  --calorie-status-color: var(--color-text);
+  --calorie-progress-base-color: var(--color-accent);
+
   display: grid;
   gap: var(--space-4);
   padding: var(--space-4);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-medium);
   background: var(--color-surface-muted);
+}
+
+.daily-nutrition-summary--below {
+  --calorie-status-color: #8a857d;
+  --calorie-progress-base-color: #8a857d;
+}
+
+.daily-nutrition-summary--within {
+  --calorie-status-color: #22c55e;
+  --calorie-progress-base-color: var(--color-accent);
+}
+
+.daily-nutrition-summary--slightly-above {
+  --calorie-status-color: #ffd54f;
+  --calorie-progress-base-color: var(--color-accent);
+}
+
+.daily-nutrition-summary--noticeably-above {
+  --calorie-status-color: #f04444;
+  --calorie-progress-base-color: var(--color-accent);
+}
+
+.daily-nutrition-summary--significantly-above {
+  --calorie-status-color: #dc2626;
+  --calorie-progress-base-color: var(--color-accent);
+}
+
+.daily-nutrition-summary--far-above {
+  --calorie-status-color: #a61b1b;
+  --calorie-progress-base-color: var(--color-accent);
 }
 
 .daily-nutrition-summary h3 {
@@ -18,37 +51,61 @@
   gap: var(--space-4);
 }
 
-.daily-nutrition-summary__calories span {
+.daily-nutrition-summary__calories > span {
   color: var(--color-text-muted);
 }
 
 .daily-nutrition-summary__calories strong {
-  color: var(--color-text);
   font-size: 1.125rem;
+  white-space: nowrap;
 }
 
-.daily-nutrition-summary progress {
+.daily-nutrition-summary__calorie-current {
+  color: var(--calorie-status-color);
+}
+
+.daily-nutrition-summary__calorie-target {
+  color: var(--color-text);
+}
+
+.daily-nutrition-summary__progress-group {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.daily-nutrition-summary__progress {
+  position: relative;
   width: 100%;
   height: 0.65rem;
   overflow: hidden;
-  border: 0;
   border-radius: 999px;
   background: var(--color-border);
-  accent-color: var(--color-accent);
 }
 
-.daily-nutrition-summary progress::-webkit-progress-bar {
-  background: var(--color-border);
+.daily-nutrition-summary__progress-base,
+.daily-nutrition-summary__progress-overflow {
+  position: absolute;
+  top: 0;
+  bottom: 0;
 }
 
-.daily-nutrition-summary progress::-webkit-progress-value {
+.daily-nutrition-summary__progress-base {
+  left: 0;
+  border-radius: inherit;
+  background: var(--calorie-progress-base-color);
+}
+
+.daily-nutrition-summary__progress-overflow {
   border-radius: 999px;
-  background: var(--color-accent);
+  background: var(--calorie-status-color);
 }
 
-.daily-nutrition-summary progress::-moz-progress-bar {
-  border-radius: 999px;
-  background: var(--color-accent);
+.daily-nutrition-summary__status {
+  margin: 0;
+  color: var(--calorie-status-color);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-align: right;
 }
 
 .daily-nutrition-summary__values {
@@ -95,6 +152,10 @@
     align-items: flex-start;
     flex-direction: column;
     gap: var(--space-1);
+  }
+
+  .daily-nutrition-summary__status {
+    text-align: left;
   }
 
   .daily-nutrition-summary__values {
