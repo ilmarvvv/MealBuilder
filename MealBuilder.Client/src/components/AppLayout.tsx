@@ -45,10 +45,7 @@ export default function AppLayout() {
                 Planner
               </NavLink>
 
-              <NavLink
-                className="app-navigation__link"
-                to="/library/ingredients"
-              >
+              <NavLink className="app-navigation__link" to="/library">
                 Library
               </NavLink>
             </div>
