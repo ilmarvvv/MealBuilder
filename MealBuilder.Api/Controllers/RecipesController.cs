@@ -1,5 +1,6 @@
 ﻿using MealBuilder.Api.Contracts.Recipes;
 using MealBuilder.Api.Mappings;
+using MealBuilder.Api.Contracts.Common;
 using MealBuilder.Domain.Ingredients;
 using MealBuilder.Domain.Recipes;
 using MealBuilder.Infrastructure.Data;
@@ -44,6 +45,64 @@ public sealed class RecipesController(
         return Ok(recipes
             .Select(RecipeResponseMapper.ToSummaryResponse)
             .ToArray());
+    }
+
+    [HttpGet("page")]
+    public async Task<ActionResult<PagedResponse<RecipeSummaryResponse>>> GetPage(
+    [FromQuery] PaginationQuery pagination,
+    CancellationToken cancellationToken)
+    {
+        var userId = userManager.GetUserId(User);
+
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        var normalizedSearch = pagination.Search?.Trim();
+
+        var query = dbContext.Recipes
+            .AsNoTracking()
+            .Where(recipe => recipe.OwnerId == userId);
+
+        if (!string.IsNullOrWhiteSpace(normalizedSearch))
+        {
+            query = query.Where(recipe =>
+                EF.Functions.Like(
+                    recipe.Name,
+                    $"%{normalizedSearch}%") ||
+                (recipe.Description != null &&
+                 EF.Functions.Like(
+                     recipe.Description,
+                     $"%{normalizedSearch}%")));
+        }
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var recipes = await query
+            .Include(recipe => recipe.Ingredients)
+                .ThenInclude(recipeIngredient =>
+                    recipeIngredient.Ingredient)
+            .OrderBy(recipe => recipe.Name)
+            .ThenBy(recipe => recipe.Id)
+            .Skip((pagination.Page - 1) * pagination.PageSize)
+            .Take(pagination.PageSize)
+            .AsSplitQuery()
+            .ToListAsync(cancellationToken);
+
+        var totalPages = totalCount == 0
+            ? 0
+            : (int)Math.Ceiling(
+                totalCount / (double)pagination.PageSize);
+
+        return Ok(new PagedResponse<RecipeSummaryResponse>(
+            recipes
+                .Select(RecipeResponseMapper.ToSummaryResponse)
+                .ToArray(),
+            pagination.Page,
+            pagination.PageSize,
+            totalCount,
+            totalPages));
     }
 
     [HttpGet("{id:int}")]

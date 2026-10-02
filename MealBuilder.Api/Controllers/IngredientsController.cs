@@ -1,4 +1,5 @@
 ﻿using MealBuilder.Api.Contracts.Ingredients;
+using MealBuilder.Api.Contracts.Common;
 using MealBuilder.Domain.Ingredients;
 using MealBuilder.Infrastructure.Data;
 using MealBuilder.Infrastructure.Identity;
@@ -39,6 +40,80 @@ public sealed class IngredientsController(
         return Ok(ingredients
             .Select(ToResponse)
             .ToArray());
+    }
+
+    [HttpGet("page")]
+    public async Task<ActionResult<PagedResponse<IngredientResponse>>> GetPage(
+    [FromQuery] PaginationQuery pagination,
+    CancellationToken cancellationToken,
+    [FromQuery] IngredientOwnershipFilter ownership =
+        IngredientOwnershipFilter.All)
+    {
+        var userId = userManager.GetUserId(User);
+
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        if (!Enum.IsDefined(ownership))
+        {
+            ModelState.AddModelError(
+                nameof(ownership),
+                "The selected ownership filter is invalid.");
+
+            return ValidationProblem(ModelState);
+        }
+
+        var normalizedSearch = pagination.Search?.Trim();
+
+        var query = dbContext.Ingredients
+            .AsNoTracking()
+            .Where(ingredient =>
+                ingredient.OwnerId == null ||
+                ingredient.OwnerId == userId);
+
+        query = ownership switch
+        {
+            IngredientOwnershipFilter.BuiltIn =>
+                query.Where(ingredient => ingredient.OwnerId == null),
+
+            IngredientOwnershipFilter.Mine =>
+                query.Where(ingredient => ingredient.OwnerId == userId),
+
+            _ => query
+        };
+
+        if (!string.IsNullOrWhiteSpace(normalizedSearch))
+        {
+            query = query.Where(ingredient =>
+                EF.Functions.Like(
+                    ingredient.Name,
+                    $"%{normalizedSearch}%"));
+        }
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var ingredients = await query
+            .OrderBy(ingredient => ingredient.Name)
+            .ThenBy(ingredient => ingredient.Id)
+            .Skip((pagination.Page - 1) * pagination.PageSize)
+            .Take(pagination.PageSize)
+            .ToListAsync(cancellationToken);
+
+        var totalPages = totalCount == 0
+            ? 0
+            : (int)Math.Ceiling(
+                totalCount / (double)pagination.PageSize);
+
+        return Ok(new PagedResponse<IngredientResponse>(
+            ingredients
+                .Select(ToResponse)
+                .ToArray(),
+            pagination.Page,
+            pagination.PageSize,
+            totalCount,
+            totalPages));
     }
 
     [HttpGet("{id:int}")]

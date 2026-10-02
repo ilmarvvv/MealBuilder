@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
+using MealBuilder.Api.Contracts.Common;
 using MealBuilder.Api.Contracts.Recipes;
 using MealBuilder.Api.Tests.Infrastructure;
 
@@ -164,6 +165,61 @@ public sealed class RecipeTests(
         Assert.Equal(
             HttpStatusCode.NotFound,
             deletedRecipeResponse.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetPage_WithSearchAndPage_ReturnsMatchingRecipes()
+    {
+        using var client = factory.CreateHttpsClient();
+
+        await RecipeTestHelper.RegisterUserAsync(client);
+
+        var builtInIngredients =
+            await RecipeTestHelper.GetBuiltInIngredientsAsync(client);
+
+        var recipeNames = new[]
+        {
+        "Pagination recipe A",
+        "Pagination recipe B",
+        "Pagination recipe C"
+    };
+
+        foreach (var recipeName in recipeNames)
+        {
+            var request = RecipeTestHelper.CreateValidRequest(
+                builtInIngredients[0].Id,
+                recipeName);
+
+            await RecipeTestHelper.CreateRecipeAsync(
+                client,
+                request);
+        }
+
+        var pageResponse = await client.GetAsync(
+            "/api/recipes/page" +
+            "?search=Pagination%20recipe" +
+            "&page=2" +
+            "&pageSize=2");
+
+        Assert.Equal(
+            HttpStatusCode.OK,
+            pageResponse.StatusCode);
+
+        var page = await pageResponse.Content
+            .ReadFromJsonAsync<PagedResponse<RecipeSummaryResponse>>();
+
+        Assert.NotNull(page);
+        Assert.Equal(2, page.Page);
+        Assert.Equal(2, page.PageSize);
+        Assert.Equal(3, page.TotalCount);
+        Assert.Equal(2, page.TotalPages);
+
+        var recipe = Assert.Single(page.Items);
+
+        Assert.Equal(
+            "Pagination recipe C",
+            recipe.Name);
+        Assert.Equal(1, recipe.IngredientCount);
     }
 
     [Fact]

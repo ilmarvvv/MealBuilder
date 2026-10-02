@@ -1,6 +1,7 @@
 ﻿using MealBuilder.Api.Contracts.Authentication;
 using MealBuilder.Api.Contracts.Ingredients;
 using MealBuilder.Api.Tests.Infrastructure;
+using MealBuilder.Api.Contracts.Common;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Net.Http.Json;
@@ -222,6 +223,67 @@ public sealed class IngredientTests(
             .ReadFromJsonAsync<IngredientResponse>();
 
         Assert.Equal(expectedIngredient, ingredientDetails);
+    }
+
+    [Fact]
+    public async Task GetPage_WithSearchOwnershipAndPage_ReturnsMatchingIngredients()
+    {
+        using var client = factory.CreateHttpsClient();
+
+        await RegisterUserAsync(client);
+
+        var ingredientNames = new[]
+        {
+            "Pagination ingredient A",
+            "Pagination ingredient B",
+            "Pagination ingredient C"
+        };
+
+        foreach (var ingredientName in ingredientNames)
+        {
+            var request = new IngredientRequest(
+                Name: ingredientName,
+                CaloriesPer100g: 100m,
+                ProteinPer100g: 10m,
+                FatPer100g: 5m,
+                CarbohydratesPer100g: 12m,
+                SugarsPer100g: 3m,
+                FiberPer100g: 2m,
+                SaltPer100g: 0.5m);
+
+            var response = await client.PostWithCsrfAsync(
+                "/api/ingredients",
+                request);
+
+            response.EnsureSuccessStatusCode();
+        }
+
+        var pageResponse = await client.GetAsync(
+            "/api/ingredients/page" +
+            "?search=Pagination%20ingredient" +
+            "&ownership=Mine" +
+            "&page=2" +
+            "&pageSize=2");
+
+        Assert.Equal(
+            HttpStatusCode.OK,
+            pageResponse.StatusCode);
+
+        var page = await pageResponse.Content
+            .ReadFromJsonAsync<PagedResponse<IngredientResponse>>();
+
+        Assert.NotNull(page);
+        Assert.Equal(2, page.Page);
+        Assert.Equal(2, page.PageSize);
+        Assert.Equal(3, page.TotalCount);
+        Assert.Equal(2, page.TotalPages);
+
+        var ingredient = Assert.Single(page.Items);
+
+        Assert.Equal(
+            "Pagination ingredient C",
+            ingredient.Name);
+        Assert.False(ingredient.IsBuiltIn);
     }
 
     [Fact]

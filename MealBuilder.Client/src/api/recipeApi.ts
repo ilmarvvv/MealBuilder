@@ -1,4 +1,9 @@
 import { apiRequest } from './apiClient'
+import {
+  createPaginationSearchParams,
+  type PagedResponse,
+  type PaginationQuery,
+} from './pagination'
 
 export type RecipeNutrition = {
   calories: number
@@ -63,6 +68,14 @@ export type RecipeInput = {
 export const recipeApi = {
   getAll() {
     return apiRequest<RecipeSummary[]>('/api/recipes')
+  },
+
+  getPage(query: PaginationQuery = {}) {
+    const searchParams = createPaginationSearchParams(query)
+
+    return apiRequest<PagedResponse<RecipeSummary>>(
+      `/api/recipes/page?${searchParams.toString()}`,
+    )
   },
 
   getById(id: number) {

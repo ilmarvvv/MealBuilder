@@ -1,0 +1,11 @@
+.load-more {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--space-2);
+}
+
+.load-more button {
+  min-width: 10rem;
+  min-height: 2.75rem;
+  padding: var(--space-2) var(--space-5);
+}

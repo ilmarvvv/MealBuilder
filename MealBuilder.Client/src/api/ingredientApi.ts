@@ -1,4 +1,9 @@
 import { apiRequest } from './apiClient'
+import {
+  createPaginationSearchParams,
+  type PagedResponse,
+  type PaginationQuery,
+} from './pagination'
 
 export type Ingredient = {
   id: number
@@ -27,9 +32,25 @@ export type IngredientInput = {
   saltPer100g: number
 }
 
+export type IngredientOwnershipFilter = 'All' | 'BuiltIn' | 'Mine'
+
+export type IngredientPageQuery = PaginationQuery & {
+  ownership?: IngredientOwnershipFilter
+}
+
 export const ingredientApi = {
   getAll() {
     return apiRequest<Ingredient[]>('/api/ingredients')
+  },
+
+  getPage(query: IngredientPageQuery = {}) {
+    const searchParams = createPaginationSearchParams(query)
+
+    searchParams.set('ownership', query.ownership ?? 'All')
+
+    return apiRequest<PagedResponse<Ingredient>>(
+      `/api/ingredients/page?${searchParams.toString()}`,
+    )
   },
 
   getById(id: number) {
