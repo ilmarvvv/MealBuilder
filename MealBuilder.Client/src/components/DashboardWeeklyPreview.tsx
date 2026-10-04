@@ -1,5 +1,6 @@
 import { Link } from 'react-router'
 import type { WeeklyDay, WeeklySummary } from '../api/mealPlanningTypes'
+import { getIsoWeekNumber } from '../utils/isoWeek'
 import './DashboardWeeklyPreview.css'
 
 type DashboardWeeklyPreviewProps = {
@@ -71,6 +72,7 @@ export default function DashboardWeeklyPreview({
   const dateRange = `${dayFormatter.format(
     parseDate(weeklySummary.startDate),
   )} – ${rangeEndFormatter.format(parseDate(weeklySummary.endDate))}`
+  const weekNumber = getIsoWeekNumber(weeklySummary.startDate)
 
   return (
     <section
@@ -79,7 +81,7 @@ export default function DashboardWeeklyPreview({
     >
       <header className="dashboard-weekly-preview__header">
         <div>
-          <h1 id="dashboard-weekly-preview-heading">This Week</h1>
+          <h1 id="dashboard-weekly-preview-heading">Week {weekNumber}</h1>
           <span>{dateRange}</span>
         </div>
 

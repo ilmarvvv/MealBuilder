@@ -5,6 +5,7 @@ import type { WeeklyDay, WeeklySummary } from '../api/mealPlanningTypes'
 import DailyNutritionSummary from './DailyNutritionSummary'
 import ErrorList from './ErrorList'
 import LoadingIndicator from './LoadingIndicator'
+import { getIsoWeekNumber } from '../utils/isoWeek'
 import './WeeklyPlannerSection.css'
 
 type WeeklyPlannerSectionProps = {
@@ -151,6 +152,8 @@ export default function WeeklyPlannerSection({
     parseDate(weekStartDate),
   )} – ${weekEndFormatter.format(parseDate(weekEndDate))}`
 
+  const weekNumber = getIsoWeekNumber(weekStartDate)
+
   return (
     <section
       className="weekly-planner"
@@ -159,7 +162,9 @@ export default function WeeklyPlannerSection({
       <header className="weekly-planner__header">
         <div>
           <p>Weekly details</p>
-          <h1 id="weekly-planner-heading">{weekRange}</h1>
+          <h1 id="weekly-planner-heading">
+            Week {weekNumber}, {weekRange}
+          </h1>
         </div>
 
         <div className="weekly-planner__controls">
