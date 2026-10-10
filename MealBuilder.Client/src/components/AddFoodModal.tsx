@@ -52,8 +52,17 @@ const dateFormatter = new Intl.DateTimeFormat('en', {
   timeZone: 'UTC',
 })
 
+const weekdayFormatter = new Intl.DateTimeFormat('en', {
+  weekday: 'long',
+  timeZone: 'UTC',
+})
+
 function formatDate(date: string) {
   return dateFormatter.format(new Date(`${date}T00:00:00Z`))
+}
+
+function formatWeekday(date: string) {
+  return weekdayFormatter.format(new Date(`${date}T00:00:00Z`))
 }
 
 function getIngredientNutrition(ingredient: Ingredient): RecipeNutrition {
@@ -182,6 +191,61 @@ export default function AddFoodModal({
     }
   }, [isOpen])
 
+  useEffect(() => {
+    if (!isOpen || step !== 'select') {
+      return
+    }
+
+    let isActive = true
+    let refreshTimeout: number | undefined
+
+    async function refreshFoodSources() {
+      try {
+        const [loadedIngredients, loadedRecipes] = await Promise.all([
+          ingredientApi.getAll(),
+          recipeApi.getAll(),
+        ])
+
+        if (isActive) {
+          setIngredients(loadedIngredients)
+          setRecipes(loadedRecipes)
+          setErrors([])
+        }
+      } catch (error) {
+        if (isActive) {
+          setErrors(
+            getApiErrorMessages(
+              error,
+              'Unable to refresh Ingredients and Recipes.',
+            ),
+          )
+        }
+      }
+    }
+
+    function scheduleRefresh() {
+      window.clearTimeout(refreshTimeout)
+
+      if (document.visibilityState !== 'visible') {
+        return
+      }
+
+      refreshTimeout = window.setTimeout(() => {
+        void refreshFoodSources()
+      }, 100)
+    }
+
+    window.addEventListener('focus', scheduleRefresh)
+    document.addEventListener('visibilitychange', scheduleRefresh)
+
+    return () => {
+      isActive = false
+      window.clearTimeout(refreshTimeout)
+      window.removeEventListener('focus', scheduleRefresh)
+      document.removeEventListener('visibilitychange', scheduleRefresh)
+    }
+  }, [isOpen, step])
+
   const normalizedSearchTerm = searchTerm.trim().toLowerCase()
 
   const filteredIngredients = useMemo(
@@ -248,6 +312,21 @@ export default function AddFoodModal({
     numericAmount,
     selection,
   ])
+
+  function openCreatePage() {
+    const createPath =
+      source === 'ingredients'
+        ? '/library/ingredients/new'
+        : source === 'recipes'
+          ? '/library/recipes/new'
+          : null
+
+    if (createPath === null) {
+      return
+    }
+
+    window.open(createPath, '_blank', 'noopener,noreferrer')
+  }
 
   function prepareRecipe(recipeId: number) {
     onClose()
@@ -435,6 +514,20 @@ export default function AddFoodModal({
 
   const selectedName = selection?.value.name ?? ''
 
+  const searchPlaceholder =
+    source === 'ingredients'
+      ? 'Search ingredients'
+      : source === 'recipes'
+        ? 'Search recipes'
+        : 'Search available portions'
+
+  const createLabel =
+    source === 'ingredients'
+      ? 'Create Ingredient'
+      : source === 'recipes'
+        ? 'Create Recipe'
+        : null
+
   return (
     <dialog
       ref={dialogRef}
@@ -447,11 +540,11 @@ export default function AddFoodModal({
     >
       <div className="add-food-modal__layout">
         <header className="add-food-modal__header">
-          <div>
-            <p>Add to Daily Plan</p>
-            <h2 id="add-food-modal-title">Add Food</h2>
-            <span>{formatDate(date)}</span>
-          </div>
+          <span className="add-food-modal__weekday">{formatWeekday(date)}</span>
+
+          <h2 id="add-food-modal-title">Add Food</h2>
+
+          <span className="add-food-modal__date">{formatDate(date)}</span>
 
           <button
             className="add-food-modal__close"
@@ -463,178 +556,219 @@ export default function AddFoodModal({
           </button>
         </header>
 
-        <div className="add-food-modal__body">
+        <div
+          className={`add-food-modal__body${
+            step === 'select' && !isLoadingSources
+              ? ' add-food-modal__body--select'
+              : ''
+          }`}
+        >
           <ErrorList messages={errors} />
 
           {step === 'select' &&
             (isLoadingSources ? (
               <LoadingIndicator message="Loading food sources..." />
             ) : (
-              <>
-                <div
-                  className="add-food-modal__tabs"
-                  role="group"
-                  aria-label="Food source"
-                >
-                  <button
-                    type="button"
-                    aria-pressed={source === 'ingredients'}
-                    onClick={() => {
-                      setSource('ingredients')
-                      setSearchTerm('')
-                    }}
+              <div className="add-food-modal__select-layout">
+                <div className="add-food-modal__toolbar">
+                  <div
+                    className="add-food-modal__tabs"
+                    role="group"
+                    aria-label="Food source"
                   >
-                    Ingredients
-                  </button>
+                    <button
+                      type="button"
+                      aria-pressed={source === 'ingredients'}
+                      onClick={() => {
+                        setSource('ingredients')
+                        setSearchTerm('')
+                      }}
+                    >
+                      Ingredients
+                    </button>
 
-                  <button
-                    type="button"
-                    aria-pressed={source === 'recipes'}
-                    onClick={() => {
-                      setSource('recipes')
-                      setSearchTerm('')
-                    }}
-                  >
-                    Recipes
-                  </button>
+                    <button
+                      type="button"
+                      aria-pressed={source === 'recipes'}
+                      onClick={() => {
+                        setSource('recipes')
+                        setSearchTerm('')
+                      }}
+                    >
+                      Recipes
+                    </button>
 
-                  <button
-                    type="button"
-                    aria-pressed={source === 'preparedRecipes'}
-                    onClick={() => {
-                      setSource('preparedRecipes')
-                      setSearchTerm('')
-                    }}
-                  >
-                    Available Portions
-                  </button>
+                    <button
+                      type="button"
+                      aria-pressed={source === 'preparedRecipes'}
+                      onClick={() => {
+                        setSource('preparedRecipes')
+                        setSearchTerm('')
+                      }}
+                    >
+                      Available Portions
+                    </button>
+                  </div>
+
+                  <div className="add-food-modal__search-row">
+                    <label className="add-food-modal__search">
+                      <span
+                        className="add-food-modal__search-icon"
+                        aria-hidden="true"
+                      >
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        >
+                          <circle cx="11" cy="11" r="7" />
+                          <path d="m16 16 4 4" />
+                        </svg>
+                      </span>
+
+                      <input
+                        type="search"
+                        value={searchTerm}
+                        aria-label={searchPlaceholder}
+                        placeholder={searchPlaceholder}
+                        autoFocus
+                        onChange={(event) => {
+                          setSearchTerm(event.target.value)
+                        }}
+                      />
+                    </label>
+
+                    {createLabel !== null && (
+                      <button
+                        className="add-food-modal__create"
+                        type="button"
+                        aria-label={createLabel}
+                        onClick={openCreatePage}
+                      >
+                        <span aria-hidden="true">+</span>
+
+                        <span className="add-food-modal__create-desktop">
+                          {createLabel}
+                        </span>
+
+                        <span className="add-food-modal__create-mobile">
+                          Create
+                        </span>
+                      </button>
+                    )}
+                  </div>
                 </div>
 
-                <label className="add-food-modal__search">
-                  <span>
-                    Search{' '}
-                    {source === 'ingredients'
-                      ? 'Ingredients'
-                      : source === 'recipes'
-                        ? 'Recipes'
-                        : 'Available Portions'}
-                  </span>
+                <div className="add-food-modal__results-scroll">
+                  {source === 'ingredients' ? (
+                    filteredIngredients.length === 0 ? (
+                      <div className="add-food-modal__empty">
+                        <h3>No Ingredients found</h3>
+                        <p>Try a different search term.</p>
+                      </div>
+                    ) : (
+                      <ul className="add-food-modal__results">
+                        {filteredIngredients.map((ingredient) => (
+                          <li key={ingredient.id}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                selectIngredient(ingredient)
+                              }}
+                            >
+                              <span>
+                                <strong>{ingredient.name}</strong>
+                                <small>
+                                  {ingredient.isBuiltIn
+                                    ? 'Built-in Ingredient'
+                                    : 'Personal Ingredient'}
+                                </small>
+                              </span>
 
-                  <input
-                    type="search"
-                    value={searchTerm}
-                    placeholder="Enter a name"
-                    autoFocus
-                    onChange={(event) => {
-                      setSearchTerm(event.target.value)
-                    }}
-                  />
-                </label>
+                              <span>
+                                {numberFormatter.format(
+                                  ingredient.caloriesPer100g,
+                                )}{' '}
+                                kcal / 100 g
+                              </span>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )
+                  ) : source === 'recipes' ? (
+                    filteredRecipes.length === 0 ? (
+                      <div className="add-food-modal__empty">
+                        <h3>No Recipes found</h3>
+                        <p>Try a different search term or create a Recipe.</p>
+                      </div>
+                    ) : (
+                      <ul className="add-food-modal__results">
+                        {filteredRecipes.map((recipe) => (
+                          <li key={recipe.id}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                prepareRecipe(recipe.id)
+                              }}
+                            >
+                              <span>
+                                <strong>{recipe.name}</strong>
+                                <small>
+                                  {recipe.servings}{' '}
+                                  {recipe.servings === 1
+                                    ? 'serving'
+                                    : 'servings'}{' '}
+                                  · Select to prepare
+                                </small>
+                              </span>
 
-                {source === 'ingredients' ? (
-                  filteredIngredients.length === 0 ? (
+                              <span>
+                                {numberFormatter.format(
+                                  recipe.nutritionPerServing.calories,
+                                )}{' '}
+                                kcal / serving
+                              </span>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )
+                  ) : filteredPreparedRecipes.length === 0 ? (
                     <div className="add-food-modal__empty">
-                      <h3>No Ingredients found</h3>
-                      <p>Try a different search term.</p>
+                      <h3>No Available Portions</h3>
+                      <p>Prepare a Recipe or return planned portions first.</p>
                     </div>
                   ) : (
                     <ul className="add-food-modal__results">
-                      {filteredIngredients.map((ingredient) => (
-                        <li key={ingredient.id}>
+                      {filteredPreparedRecipes.map((preparedRecipe) => (
+                        <li key={preparedRecipe.id}>
                           <button
                             type="button"
                             onClick={() => {
-                              selectIngredient(ingredient)
+                              selectPreparedRecipe(preparedRecipe)
                             }}
                           >
                             <span>
-                              <strong>{ingredient.name}</strong>
-                              <small>
-                                {ingredient.isBuiltIn
-                                  ? 'Built-in Ingredient'
-                                  : 'Personal Ingredient'}
-                              </small>
+                              <strong>{preparedRecipe.name}</strong>
+                              <small>Prepared Recipe</small>
                             </span>
 
                             <span>
                               {numberFormatter.format(
-                                ingredient.caloriesPer100g,
+                                preparedRecipe.availablePortions,
                               )}{' '}
-                              kcal / 100 g
+                              portions available
                             </span>
                           </button>
                         </li>
                       ))}
                     </ul>
-                  )
-                ) : source === 'recipes' ? (
-                  filteredRecipes.length === 0 ? (
-                    <div className="add-food-modal__empty">
-                      <h3>No Recipes found</h3>
-                      <p>Try a different search term or create a Recipe.</p>
-                    </div>
-                  ) : (
-                    <ul className="add-food-modal__results">
-                      {filteredRecipes.map((recipe) => (
-                        <li key={recipe.id}>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              prepareRecipe(recipe.id)
-                            }}
-                          >
-                            <span>
-                              <strong>{recipe.name}</strong>
-                              <small>
-                                {recipe.servings}{' '}
-                                {recipe.servings === 1 ? 'serving' : 'servings'}{' '}
-                                · Select to prepare
-                              </small>
-                            </span>
-
-                            <span>
-                              {numberFormatter.format(
-                                recipe.nutritionPerServing.calories,
-                              )}{' '}
-                              kcal / serving
-                            </span>
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  )
-                ) : filteredPreparedRecipes.length === 0 ? (
-                  <div className="add-food-modal__empty">
-                    <h3>No Available Portions</h3>
-                    <p>Prepare a Recipe or return planned portions first.</p>
-                  </div>
-                ) : (
-                  <ul className="add-food-modal__results">
-                    {filteredPreparedRecipes.map((preparedRecipe) => (
-                      <li key={preparedRecipe.id}>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            selectPreparedRecipe(preparedRecipe)
-                          }}
-                        >
-                          <span>
-                            <strong>{preparedRecipe.name}</strong>
-                            <small>Prepared Recipe</small>
-                          </span>
-
-                          <span>
-                            {numberFormatter.format(
-                              preparedRecipe.availablePortions,
-                            )}{' '}
-                            portions available
-                          </span>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </>
+                  )}
+                </div>
+              </div>
             ))}
 
           {step === 'details' && selection !== null && (
