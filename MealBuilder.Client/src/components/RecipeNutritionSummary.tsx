@@ -12,6 +12,7 @@ type RecipeNutritionSummaryProps = {
 }
 
 type NutritionPanelProps = {
+  eyebrow: string
   title: string
   nutrition: RecipeNutrition
 }
@@ -24,15 +25,22 @@ function formatNumber(value: number) {
   return numberFormatter.format(value)
 }
 
-function NutritionPanel({ title, nutrition }: NutritionPanelProps) {
+function NutritionPanel({ eyebrow, title, nutrition }: NutritionPanelProps) {
   return (
     <article className="recipe-nutrition-panel">
-      <h4>{title}</h4>
+      <header>
+        <p className="recipe-nutrition-panel__eyebrow">{eyebrow}</p>
+        <h3>{title}</h3>
+      </header>
 
-      <p className="recipe-nutrition-panel__calories">
-        <strong>{formatNumber(nutrition.calories)}</strong>
-        <span>kcal</span>
-      </p>
+      <div className="recipe-nutrition-panel__calories">
+        <span>Calories</span>
+
+        <p>
+          <strong>{formatNumber(nutrition.calories)}</strong>
+          <span>kcal</span>
+        </p>
+      </div>
 
       <dl className="recipe-nutrition-panel__values">
         <div>
@@ -70,7 +78,7 @@ function NutritionPanel({ title, nutrition }: NutritionPanelProps) {
 export default function RecipeNutritionSummary({
   total,
   perServing,
-  eyebrow = 'Live calculation',
+  eyebrow = 'Recipe nutrition',
   title = 'Nutrition Summary',
   description = 'Calculated from the selected Ingredients.',
   totalTitle = 'Whole Recipe',
@@ -79,23 +87,27 @@ export default function RecipeNutritionSummary({
   return (
     <section
       className="recipe-nutrition-summary"
-      aria-labelledby="recipe-nutrition-title"
+      aria-label={title}
+      aria-describedby="recipe-nutrition-description"
     >
-      <header>
-        <div>
-          <p className="recipe-nutrition-summary__eyebrow">{eyebrow}</p>
+      <p
+        className="recipe-nutrition-summary__description"
+        id="recipe-nutrition-description"
+      >
+        {description}
+      </p>
 
-          <h3 id="recipe-nutrition-title">{title}</h3>
-        </div>
+      <NutritionPanel
+        eyebrow={eyebrow}
+        title={totalTitle}
+        nutrition={total}
+      />
 
-        <p>{description}</p>
-      </header>
-
-      <div className="recipe-nutrition-summary__panels">
-        <NutritionPanel title={totalTitle} nutrition={total} />
-
-        <NutritionPanel title={perServingTitle} nutrition={perServing} />
-      </div>
+      <NutritionPanel
+        eyebrow={eyebrow}
+        title={perServingTitle}
+        nutrition={perServing}
+      />
     </section>
   )
 }
