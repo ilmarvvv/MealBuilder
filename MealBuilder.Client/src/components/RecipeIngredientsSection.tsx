@@ -35,7 +35,7 @@ export default function RecipeIngredientsSection({
 
           <h3>Ingredients</h3>
 
-          <p>Select each Ingredient and enter its weight in grams.</p>
+          <p>Select each Ingredient and specify its amount.</p>
         </div>
 
         <Link
@@ -44,7 +44,7 @@ export default function RecipeIngredientsSection({
           target="_blank"
           rel="noreferrer"
         >
-          Create Ingredient
+          + Create Ingredient
         </Link>
       </header>
 
@@ -71,25 +71,30 @@ export default function RecipeIngredientsSection({
                 onChange={(ingredientId) => onChange(row.key, { ingredientId })}
               />
 
-              <label className="recipe-form-field recipe-form-field--grams">
-                <span>Grams</span>
+              <div className="recipe-form-field recipe-form-field--grams">
+                <div className="recipe-form-field__number-with-unit">
+                  <input
+                    type="number"
+                    min="0.01"
+                    max="100000"
+                    step="0.01"
+                    inputMode="decimal"
+                    aria-label={`Amount for Ingredient ${index + 1} in grams`}
+                    value={row.grams}
+                    disabled={disabled}
+                    required
+                    onChange={(event) =>
+                      onChange(row.key, {
+                        grams: event.target.value,
+                      })
+                    }
+                  />
 
-                <input
-                  type="number"
-                  min="0.01"
-                  max="100000"
-                  step="0.01"
-                  inputMode="decimal"
-                  value={row.grams}
-                  disabled={disabled}
-                  required
-                  onChange={(event) =>
-                    onChange(row.key, {
-                      grams: event.target.value,
-                    })
-                  }
-                />
-              </label>
+                  <span className="recipe-form-field__unit" aria-hidden="true">
+                    g
+                  </span>
+                </div>
+              </div>
 
               <div className="recipe-form-row__actions">
                 <button
@@ -130,7 +135,7 @@ export default function RecipeIngredientsSection({
         disabled={disabled}
         onClick={onAdd}
       >
-        + Add Ingredient
+        + Add another ingredient
       </button>
     </section>
   )
