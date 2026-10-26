@@ -77,8 +77,7 @@ export default function CreateRecipePage() {
         <h2>Add Recipe</h2>
 
         <p>
-          Combine Ingredients, add Cooking Steps, and review the calculated
-          nutrition values.
+          Add Ingredients, add a Description if you like, and review nutrition.
         </p>
       </header>
 

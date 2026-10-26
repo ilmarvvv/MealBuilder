@@ -50,17 +50,8 @@ public sealed class RecipeConfiguration
             .HasForeignKey(recipeIngredient => recipeIngredient.RecipeId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany(recipe => recipe.Steps)
-            .WithOne()
-            .HasForeignKey(recipeStep => recipeStep.RecipeId)
-            .OnDelete(DeleteBehavior.Cascade);
-
         builder.Navigation(recipe => recipe.Ingredients)
             .HasField("_ingredients")
-            .UsePropertyAccessMode(PropertyAccessMode.Field);
-
-        builder.Navigation(recipe => recipe.Steps)
-            .HasField("_steps")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

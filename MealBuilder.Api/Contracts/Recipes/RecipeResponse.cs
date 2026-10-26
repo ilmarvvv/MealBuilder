@@ -7,5 +7,4 @@ public sealed record RecipeResponse(
     int Servings,
     RecipeNutritionResponse TotalNutrition,
     RecipeNutritionResponse NutritionPerServing,
-    IReadOnlyList<RecipeIngredientResponse> Ingredients,
-    IReadOnlyList<RecipeStepResponse> Steps);
+    IReadOnlyList<RecipeIngredientResponse> Ingredients);

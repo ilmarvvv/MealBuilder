@@ -65,6 +65,13 @@
   grid-row: 1;
 }
 
+.recipe-form-field__label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
 .recipe-form-field {
   display: grid;
   align-content: start;
@@ -101,6 +108,10 @@
 .recipe-form-field--grams .recipe-form-field__number-with-unit input:focus {
   border-color: var(--color-accent);
   outline: none;
+}
+
+.recipe-form-field--grams input:focus::placeholder {
+  color: transparent;
 }
 
 .recipe-form-field--grams
@@ -334,11 +345,6 @@
   background: var(--color-background);
 }
 
-.recipe-form-row--step {
-  grid-template-columns: 2rem minmax(0, 1fr) auto;
-  align-items: start;
-}
-
 .recipe-form-row__number {
   display: inline-flex;
   align-items: center;
@@ -435,10 +441,6 @@
     grid-column: 2 / -1;
     justify-content: flex-end;
   }
-
-  .recipe-form-row--step {
-    grid-template-columns: 2rem minmax(0, 1fr);
-  }
 }
 
 @media (max-width: 35rem) {
@@ -465,8 +467,7 @@
     grid-row: auto;
   }
 
-  .recipe-form-row,
-  .recipe-form-row--step {
+  .recipe-form-row {
     grid-template-columns: 1fr;
   }
 

@@ -2,24 +2,12 @@ import { useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link } from 'react-router'
 import type { Ingredient } from '../api/ingredientApi'
-import type {
-  RecipeIngredientInput,
-  RecipeInput,
-  RecipeStepInput,
-} from '../api/recipeApi'
-import {
-  calculateRecipeNutrition,
-} from '../utils/recipeNutrition'
+import type { RecipeIngredientInput, RecipeInput } from '../api/recipeApi'
+import { calculateRecipeNutrition } from '../utils/recipeNutrition'
 import ErrorList from './ErrorList'
 import RecipeIngredientsSection from './RecipeIngredientsSection'
-import type {
-  RecipeIngredientFormRow,
-} from './RecipeIngredientsSection'
+import type { RecipeIngredientFormRow } from './RecipeIngredientsSection'
 import RecipeNutritionSummary from './RecipeNutritionSummary'
-import RecipeStepsSection from './RecipeStepsSection'
-import type {
-  RecipeStepFormRow,
-} from './RecipeStepsSection'
 import './RecipeForm.css'
 
 type RecipeFormProps = {
@@ -59,24 +47,6 @@ function createIngredientRows(
   }))
 }
 
-function createStepRows(
-  initialValues?: RecipeInput,
-): RecipeStepFormRow[] {
-  if (!initialValues || initialValues.steps.length === 0) {
-    return [
-      {
-        key: createRowKey('step'),
-        instruction: '',
-      },
-    ]
-  }
-
-  return initialValues.steps.map((step) => ({
-    key: createRowKey('step'),
-    instruction: step.instruction,
-  }))
-}
-
 function moveRow<T extends { key: string }>(
   rows: T[],
   key: string,
@@ -85,11 +55,7 @@ function moveRow<T extends { key: string }>(
   const currentIndex = rows.findIndex((row) => row.key === key)
   const nextIndex = currentIndex + direction
 
-  if (
-    currentIndex < 0 ||
-    nextIndex < 0 ||
-    nextIndex >= rows.length
-  ) {
+  if (currentIndex < 0 || nextIndex < 0 || nextIndex >= rows.length) {
     return rows
   }
 
@@ -116,27 +82,18 @@ export default function RecipeForm({
   const [description, setDescription] = useState(
     initialValues?.description ?? '',
   )
-  const [servings, setServings] = useState(
-    String(initialValues?.servings ?? 1),
+  const [servings, setServings] = useState(String(initialValues?.servings ?? 1))
+  const [ingredientRows, setIngredientRows] = useState(() =>
+    createIngredientRows(initialValues),
   )
-  const [ingredientRows, setIngredientRows] = useState(
-    () => createIngredientRows(initialValues),
-  )
-  const [stepRows, setStepRows] = useState(
-    () => createStepRows(initialValues),
-  )
-  const [validationErrors, setValidationErrors] = useState<
-    string[]
-  >([])
+  const [validationErrors, setValidationErrors] = useState<string[]>([])
 
   const nutrition = useMemo(
     () =>
       calculateRecipeNutrition(
         ingredientRows.map((row) => ({
           ingredientId:
-            row.ingredientId === ''
-              ? null
-              : Number(row.ingredientId),
+            row.ingredientId === '' ? null : Number(row.ingredientId),
           grams: Number(row.grams),
         })),
         ingredients,
@@ -161,22 +118,6 @@ export default function RecipeForm({
     )
   }
 
-  function updateStepRow(
-    key: string,
-    values: Partial<RecipeStepFormRow>,
-  ) {
-    setStepRows((currentRows) =>
-      currentRows.map((row) =>
-        row.key === key
-          ? {
-              ...row,
-              ...values,
-            }
-          : row,
-      ),
-    )
-  }
-
   function buildInput(): RecipeInput | null {
     const nextErrors: string[] = []
     const normalizedName = name.trim()
@@ -186,15 +127,11 @@ export default function RecipeForm({
     if (normalizedName.length === 0) {
       nextErrors.push('Recipe name is required.')
     } else if (normalizedName.length > 100) {
-      nextErrors.push(
-        'Recipe name cannot exceed 100 characters.',
-      )
+      nextErrors.push('Recipe name cannot exceed 100 characters.')
     }
 
-    if (normalizedDescription.length > 1000) {
-      nextErrors.push(
-        'Recipe description cannot exceed 1000 characters.',
-      )
+    if (normalizedDescription.length > 2000) {
+      nextErrors.push('Recipe description cannot exceed 2000 characters.')
     }
 
     if (
@@ -202,9 +139,7 @@ export default function RecipeForm({
       parsedServings < 1 ||
       parsedServings > 100
     ) {
-      nextErrors.push(
-        'Servings must be a whole number between 1 and 100.',
-      )
+      nextErrors.push('Servings must be a whole number between 1 and 100.')
     }
 
     const recipeIngredients: RecipeIngredientInput[] = []
@@ -215,17 +150,11 @@ export default function RecipeForm({
       const grams = Number(row.grams)
 
       if (!Number.isInteger(ingredientId) || ingredientId <= 0) {
-        nextErrors.push(
-          'Every Ingredient row must select an Ingredient.',
-        )
+        nextErrors.push('Every Ingredient row must select an Ingredient.')
         continue
       }
 
-      if (
-        !Number.isFinite(grams) ||
-        grams <= 0 ||
-        grams > 100000
-      ) {
+      if (!Number.isFinite(grams) || grams <= 0 || grams > 100000) {
         nextErrors.push(
           'Ingredient grams must be greater than 0 and no more than 100000.',
         )
@@ -233,9 +162,7 @@ export default function RecipeForm({
       }
 
       if (selectedIngredientIds.has(ingredientId)) {
-        nextErrors.push(
-          'An Ingredient can only be added once.',
-        )
+        nextErrors.push('An Ingredient can only be added once.')
         continue
       }
 
@@ -244,23 +171,6 @@ export default function RecipeForm({
       recipeIngredients.push({
         ingredientId,
         grams,
-      })
-    }
-
-    const recipeSteps: RecipeStepInput[] = []
-
-    for (const row of stepRows) {
-      const instruction = row.instruction.trim()
-
-      if (instruction.length === 0) {
-        nextErrors.push(
-          'Every Cooking Step must contain an instruction.',
-        )
-        continue
-      }
-
-      recipeSteps.push({
-        instruction,
       })
     }
 
@@ -273,18 +183,13 @@ export default function RecipeForm({
     return {
       name: normalizedName,
       description:
-        normalizedDescription.length === 0
-          ? null
-          : normalizedDescription,
+        normalizedDescription.length === 0 ? null : normalizedDescription,
       servings: parsedServings,
       ingredients: recipeIngredients,
-      steps: recipeSteps,
     }
   }
 
-  async function handleSubmit(
-    event: FormEvent<HTMLFormElement>,
-  ) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     const input = buildInput()
@@ -307,15 +212,12 @@ export default function RecipeForm({
       <section className="recipe-form-section">
         <header className="recipe-form-section__header">
           <div>
-            <p className="recipe-form-section__eyebrow">
-              Step 1
-            </p>
+            <p className="recipe-form-section__eyebrow">Step 1</p>
 
             <h3>Details</h3>
 
             <p>
-              Give the Recipe a clear name and define its
-              number of servings.
+              Give the Recipe a clear name and define its number of servings.
             </p>
           </div>
         </header>
@@ -330,26 +232,26 @@ export default function RecipeForm({
               value={name}
               disabled={isSubmitting}
               required
-              onChange={(event) =>
-                setName(event.target.value)
-              }
+              onChange={(event) => setName(event.target.value)}
             />
           </label>
 
           <label className="recipe-form-field">
-            <span>Description</span>
+            <span className="recipe-form-field__label">
+              <span>Description</span>
+              <small>Optional</small>
+            </span>
 
             <textarea
-              rows={3}
-              maxLength={1000}
+              rows={8}
+              maxLength={2000}
+              placeholder="A short description or preparation notes..."
               value={description}
               disabled={isSubmitting}
-              onChange={(event) =>
-                setDescription(event.target.value)
-              }
+              onChange={(event) => setDescription(event.target.value)}
             />
 
-            <small>{description.length} / 1000</small>
+            <small>{description.length} / 2000</small>
           </label>
 
           <label className="recipe-form-field recipe-form-field--servings">
@@ -364,9 +266,7 @@ export default function RecipeForm({
               value={servings}
               disabled={isSubmitting}
               required
-              onChange={(event) =>
-                setServings(event.target.value)
-              }
+              onChange={(event) => setServings(event.target.value)}
             />
           </label>
         </div>
@@ -401,50 +301,17 @@ export default function RecipeForm({
         }
       />
 
-      <RecipeStepsSection
-        rows={stepRows}
-        disabled={isSubmitting}
-        onChange={updateStepRow}
-        onAdd={() =>
-          setStepRows((currentRows) => [
-            ...currentRows,
-            {
-              key: createRowKey('step'),
-              instruction: '',
-            },
-          ])
-        }
-        onRemove={(key) =>
-          setStepRows((currentRows) =>
-            currentRows.length === 1
-              ? currentRows
-              : currentRows.filter((row) => row.key !== key),
-          )
-        }
-        onMove={(key, direction) =>
-          setStepRows((currentRows) =>
-            moveRow(currentRows, key, direction),
-          )
-        }
-      />
-
       <RecipeNutritionSummary
         total={nutrition.total}
         perServing={nutrition.perServing}
       />
 
       <footer className="recipe-form__actions">
-        <Link
-          className="recipe-form__cancel"
-          to={cancelPath}
-        >
+        <Link className="recipe-form__cancel" to={cancelPath}>
           Cancel
         </Link>
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-        >
+        <button type="submit" disabled={isSubmitting}>
           {isSubmitting ? 'Saving...' : submitLabel}
         </button>
       </footer>

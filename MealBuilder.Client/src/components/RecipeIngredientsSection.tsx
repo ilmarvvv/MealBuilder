@@ -80,6 +80,7 @@ export default function RecipeIngredientsSection({
                     step="0.01"
                     inputMode="decimal"
                     aria-label={`Amount for Ingredient ${index + 1} in grams`}
+                    placeholder="0"
                     value={row.grams}
                     disabled={disabled}
                     required

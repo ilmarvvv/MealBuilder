@@ -53,13 +53,6 @@ internal static class RecipeTestHelper
                 new RecipeIngredientRequest(
                     IngredientId: ingredientId,
                     Grams: 200m)
-            ],
-            Steps:
-            [
-                new RecipeStepRequest(
-                    "Prepare the ingredient."),
-                new RecipeStepRequest(
-                    "Cook and serve.")
             ]);
     }
 

@@ -644,7 +644,7 @@ namespace MealBuilder.Infrastructure.Data.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(1000)
+                        .HasMaxLength(2000)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
@@ -708,37 +708,6 @@ namespace MealBuilder.Infrastructure.Data.Migrations
                             t.HasCheckConstraint("CK_RecipeIngredients_Grams", "Grams > 0 AND Grams <= 100000");
 
                             t.HasCheckConstraint("CK_RecipeIngredients_Position", "Position > 0");
-                        });
-                });
-
-            modelBuilder.Entity("MealBuilder.Domain.Recipes.RecipeStep", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Instruction")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Position")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(1);
-
-                    b.Property<int>("RecipeId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RecipeId", "Position");
-
-                    b.ToTable("RecipeSteps", null, t =>
-                        {
-                            t.HasCheckConstraint("CK_RecipeSteps_Instruction", "length(trim(Instruction)) BETWEEN 1 AND 2000");
-
-                            t.HasCheckConstraint("CK_RecipeSteps_Position", "Position > 0");
                         });
                 });
 
@@ -1034,15 +1003,6 @@ namespace MealBuilder.Infrastructure.Data.Migrations
                     b.Navigation("Ingredient");
                 });
 
-            modelBuilder.Entity("MealBuilder.Domain.Recipes.RecipeStep", b =>
-                {
-                    b.HasOne("MealBuilder.Domain.Recipes.Recipe", null)
-                        .WithMany("Steps")
-                        .HasForeignKey("RecipeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -1107,8 +1067,6 @@ namespace MealBuilder.Infrastructure.Data.Migrations
             modelBuilder.Entity("MealBuilder.Domain.Recipes.Recipe", b =>
                 {
                     b.Navigation("Ingredients");
-
-                    b.Navigation("Steps");
                 });
 #pragma warning restore 612, 618
         }

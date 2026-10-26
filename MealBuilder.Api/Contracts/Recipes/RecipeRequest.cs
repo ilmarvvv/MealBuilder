@@ -16,8 +16,4 @@ public sealed record RecipeRequest(
 
     [Required]
     [MinLength(1)]
-    RecipeIngredientRequest[] Ingredients,
-
-    [Required]
-    [MinLength(1)]
-    RecipeStepRequest[] Steps);
+    RecipeIngredientRequest[] Ingredients);

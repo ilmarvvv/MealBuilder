@@ -38,15 +38,6 @@ public static class RecipeResponseMapper
                     recipeIngredient.Position))
             .ToArray();
 
-        var steps = recipe.Steps
-            .OrderBy(recipeStep => recipeStep.Position)
-            .Select(recipeStep =>
-                new RecipeStepResponse(
-                    recipeStep.Id,
-                    recipeStep.Instruction,
-                    recipeStep.Position))
-            .ToArray();
-
         return new RecipeResponse(
             recipe.Id,
             recipe.Name,
@@ -54,8 +45,7 @@ public static class RecipeResponseMapper
             recipe.Servings,
             ToNutritionResponse(totalNutrition),
             ToNutritionResponse(nutritionPerServing),
-            ingredients,
-            steps);
+            ingredients);
     }
 
     private static RecipeNutritionResponse ToNutritionResponse(

@@ -22,8 +22,6 @@ namespace MealBuilder.Infrastructure.Data
         public DbSet<RecipeIngredient> RecipeIngredients =>
             Set<RecipeIngredient>();
 
-        public DbSet<RecipeStep> RecipeSteps => Set<RecipeStep>();
-
         public DbSet<PreparedRecipe> PreparedRecipes =>
             Set<PreparedRecipe>();
 

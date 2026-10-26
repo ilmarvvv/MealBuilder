@@ -143,11 +143,6 @@ export default function PrepareRecipePage() {
               <dt>Ingredients</dt>
               <dd>{recipe.ingredients.length}</dd>
             </div>
-
-            <div>
-              <dt>Cooking steps</dt>
-              <dd>{recipe.steps.length}</dd>
-            </div>
           </dl>
 
           <section>

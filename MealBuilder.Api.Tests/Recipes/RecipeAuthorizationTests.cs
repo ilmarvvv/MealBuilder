@@ -42,10 +42,6 @@ public sealed class RecipeAuthorizationTests(
                 "/api/recipes/1/ingredients",
                 new RecipeIngredientRequest(1, 100m));
 
-        var addStepResponse = await client.PostWithCsrfAsync(
-            "/api/recipes/1/steps",
-            new RecipeStepRequest("Anonymous step."));
-
         Assert.All(
             new[]
             {
@@ -54,8 +50,7 @@ public sealed class RecipeAuthorizationTests(
                 createResponse,
                 updateResponse,
                 deleteResponse,
-                addIngredientResponse,
-                addStepResponse
+                addIngredientResponse
             },
             response => Assert.Equal(
                 HttpStatusCode.Unauthorized,
@@ -121,20 +116,13 @@ public sealed class RecipeAuthorizationTests(
                     ingredients[0].Id,
                     100m));
 
-        var addStepResponse =
-            await otherUserClient.PostWithCsrfAsync(
-                $"/api/recipes/{recipe.Id}/steps",
-                new RecipeStepRequest(
-                    "Unauthorized step."));
-
         Assert.All(
             new[]
             {
                 detailsResponse,
                 updateResponse,
                 deleteResponse,
-                addIngredientResponse,
-                addStepResponse
+                addIngredientResponse
             },
             response => Assert.Equal(
                 HttpStatusCode.NotFound,

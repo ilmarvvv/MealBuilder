@@ -54,10 +54,7 @@ export default function RecipeListPage() {
     const normalizedQuery = searchQuery.trim().toLowerCase()
 
     return recipes.filter((recipe) => {
-      const searchableText = [
-        recipe.name,
-        recipe.description ?? '',
-      ]
+      const searchableText = [recipe.name, recipe.description ?? '']
         .join(' ')
         .toLowerCase()
 
@@ -75,14 +72,12 @@ export default function RecipeListPage() {
         <div>
           <h2>Recipes</h2>
           <p>
-            Create reusable Recipes with Ingredients and Cooking Steps.
+            Create reusable Recipes with Ingredients and an optional
+            Description.
           </p>
         </div>
 
-        <Link
-          className="recipe-list__add"
-          to="/library/recipes/new"
-        >
+        <Link className="recipe-list__add" to="/library/recipes/new">
           + Add Recipe
         </Link>
       </header>
@@ -95,9 +90,7 @@ export default function RecipeListPage() {
             type="search"
             placeholder="Search by name or description..."
             value={searchQuery}
-            onChange={(event) =>
-              setSearchQuery(event.target.value)
-            }
+            onChange={(event) => setSearchQuery(event.target.value)}
           />
         </label>
       </div>
@@ -108,9 +101,7 @@ export default function RecipeListPage() {
         (visibleRecipes.length === 0 ? (
           <div className="recipe-list__empty">
             <h3>
-              {recipes.length === 0
-                ? 'No Recipes yet'
-                : 'No matching Recipes'}
+              {recipes.length === 0 ? 'No Recipes yet' : 'No matching Recipes'}
             </h3>
 
             <p>
@@ -123,9 +114,7 @@ export default function RecipeListPage() {
           <>
             <p className="recipe-list__result-count">
               {visibleRecipes.length}{' '}
-              {visibleRecipes.length === 1
-                ? 'Recipe'
-                : 'Recipes'}
+              {visibleRecipes.length === 1 ? 'Recipe' : 'Recipes'}
             </p>
 
             <ul className="recipe-grid">
@@ -140,17 +129,12 @@ export default function RecipeListPage() {
                         <div>
                           <h3>{recipe.name}</h3>
 
-                          <p>
-                            {recipe.description ??
-                              'No description'}
-                          </p>
+                          <p>{recipe.description ?? 'No description'}</p>
                         </div>
 
                         <span className="recipe-card__badge">
                           {recipe.servings}{' '}
-                          {recipe.servings === 1
-                            ? 'serving'
-                            : 'servings'}
+                          {recipe.servings === 1 ? 'serving' : 'servings'}
                         </span>
                       </header>
 
@@ -178,8 +162,7 @@ export default function RecipeListPage() {
                           <dt>Carbohydrates</dt>
                           <dd>
                             {nutritionNumberFormatter.format(
-                              recipe.nutritionPerServing
-                                .carbohydrates,
+                              recipe.nutritionPerServing.carbohydrates,
                             )}{' '}
                             g
                           </dd>

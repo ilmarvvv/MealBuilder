@@ -347,7 +347,6 @@ public sealed class PreparedRecipesController(
             .Include(recipe => recipe.Ingredients)
                 .ThenInclude(recipeIngredient =>
                     recipeIngredient.Ingredient)
-            .Include(recipe => recipe.Steps)
             .AsSplitQuery()
             .SingleOrDefaultAsync(cancellationToken);
 
@@ -474,7 +473,6 @@ public sealed class PreparedRecipesController(
             .Include(recipe => recipe.Ingredients)
                 .ThenInclude(recipeIngredient =>
                     recipeIngredient.Ingredient)
-            .Include(recipe => recipe.Steps)
             .AsSplitQuery()
             .SingleOrDefaultAsync(cancellationToken);
 

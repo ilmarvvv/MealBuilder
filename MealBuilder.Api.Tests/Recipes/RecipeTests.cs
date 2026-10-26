@@ -53,11 +53,6 @@ public sealed class RecipeTests(
                 Assert.Equal(1, ingredient.Position);
             });
 
-        Assert.Collection(
-            createdRecipe.Steps,
-            firstStep => Assert.Equal(1, firstStep.Position),
-            secondStep => Assert.Equal(2, secondStep.Position));
-
         var listResponse = await client.GetAsync(
             "/api/recipes");
 
@@ -94,12 +89,6 @@ public sealed class RecipeTests(
                 new RecipeIngredientRequest(
                     builtInIngredients[0].Id,
                     50m)
-            ],
-            Steps =
-            [
-                new RecipeStepRequest("First updated step."),
-                new RecipeStepRequest("Second updated step."),
-                new RecipeStepRequest("Third updated step.")
             ]
         };
 
@@ -137,20 +126,6 @@ public sealed class RecipeTests(
                 Assert.Equal(50m, secondIngredient.Grams);
                 Assert.Equal(2, secondIngredient.Position);
             });
-
-        Assert.Collection(
-            updatedRecipe.Steps,
-            firstStep =>
-            {
-                Assert.Equal(
-                    "First updated step.",
-                    firstStep.Instruction);
-                Assert.Equal(1, firstStep.Position);
-            },
-            secondStep =>
-                Assert.Equal(2, secondStep.Position),
-            thirdStep =>
-                Assert.Equal(3, thirdStep.Position));
 
         var deleteResponse = await client.DeleteWithCsrfAsync(
             $"/api/recipes/{createdRecipe.Id}");
@@ -253,12 +228,6 @@ public sealed class RecipeTests(
                 new RecipeIngredientRequest(
                     secondIngredient.Id,
                     secondGrams)
-            ],
-            Steps:
-            [
-                new RecipeStepRequest("First step."),
-                new RecipeStepRequest("Second step."),
-                new RecipeStepRequest("Third step.")
             ]);
 
         var recipe = await RecipeTestHelper.CreateRecipeAsync(
@@ -281,12 +250,6 @@ public sealed class RecipeTests(
                     ingredient.IngredientId);
                 Assert.Equal(2, ingredient.Position);
             });
-
-        Assert.Collection(
-            recipe.Steps,
-            step => Assert.Equal(1, step.Position),
-            step => Assert.Equal(2, step.Position),
-            step => Assert.Equal(3, step.Position));
 
         var expectedTotal = new RecipeNutritionResponse(
             Calories: CalculateNutrition(

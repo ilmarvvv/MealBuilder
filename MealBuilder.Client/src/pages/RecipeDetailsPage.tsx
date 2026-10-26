@@ -111,8 +111,6 @@ export default function RecipeDetailsPage() {
           <p className="recipe-details__eyebrow">Personal Recipe</p>
 
           <h2>{recipe.name}</h2>
-
-          <p>{recipe.description ?? 'No description'}</p>
         </div>
 
         <div className="recipe-details__actions">
@@ -193,7 +191,11 @@ export default function RecipeDetailsPage() {
         perServing={recipe.nutritionPerServing}
       />
 
-      <div className="recipe-details__content">
+      <div
+        className={`recipe-details__content${
+          !recipe.description ? ' recipe-details__content--single' : ''
+        }`}
+      >
         <section className="recipe-details__section">
           <h3>Ingredients</h3>
 
@@ -210,18 +212,12 @@ export default function RecipeDetailsPage() {
           </ol>
         </section>
 
-        <section className="recipe-details__section">
-          <h3>Cooking Steps</h3>
-
-          <ol className="recipe-details__steps">
-            {recipe.steps.map((step) => (
-              <li key={step.id}>
-                <span>{step.position}</span>
-                <p>{step.instruction}</p>
-              </li>
-            ))}
-          </ol>
-        </section>
+        {recipe.description && (
+          <section className="recipe-details__section">
+            <h3>Description</h3>
+            <p className="recipe-details__description">{recipe.description}</p>
+          </section>
+        )}
       </div>
     </article>
   )

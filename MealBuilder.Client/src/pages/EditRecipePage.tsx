@@ -20,9 +20,6 @@ function toRecipeInput(recipe: Recipe): RecipeInput {
       ingredientId: ingredient.ingredientId,
       grams: ingredient.grams,
     })),
-    steps: recipe.steps.map((step) => ({
-      instruction: step.instruction,
-    })),
   }
 }
 
@@ -131,7 +128,7 @@ export default function EditRecipePage() {
 
         <h2>Edit Recipe</h2>
 
-        <p>Update {recipe.name}, its Ingredients, and Cooking Steps.</p>
+        <p>Update the Ingredients and Description for {recipe.name}.</p>
       </header>
 
       <RecipeForm

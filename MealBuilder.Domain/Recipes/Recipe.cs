@@ -5,11 +5,10 @@ namespace MealBuilder.Domain.Recipes;
 public sealed class Recipe
 {
     public const int MaxNameLength = 100;
-    public const int MaxDescriptionLength = 1000;
+    public const int MaxDescriptionLength = 2000;
     public const int MaxServings = 100;
 
     private readonly List<RecipeIngredient> _ingredients = [];
-    private readonly List<RecipeStep> _steps = [];
 
     private Recipe()
     {
@@ -39,9 +38,6 @@ public sealed class Recipe
 
     public IReadOnlyCollection<RecipeIngredient> Ingredients =>
         _ingredients.AsReadOnly();
-
-    public IReadOnlyCollection<RecipeStep> Steps =>
-        _steps.AsReadOnly();
 
     public static Recipe Create(
         string ownerId,
@@ -129,84 +125,12 @@ public sealed class Recipe
         ReindexIngredients();
     }
 
-    public RecipeStep AddStep(string instruction)
-    {
-        var recipeStep = new RecipeStep(
-            instruction,
-            _steps.Count + 1);
-
-        _steps.Add(recipeStep);
-
-        return recipeStep;
-    }
-
-    public void UpdateStep(
-        int stepId,
-        string instruction)
-    {
-        var recipeStep = FindStep(stepId);
-        recipeStep.UpdateInstruction(instruction);
-    }
-
-    public void RemoveStep(int stepId)
-    {
-        var recipeStep = FindStep(stepId);
-
-        if (_steps.Count == 1)
-        {
-            throw new InvalidOperationException(
-                "A recipe must contain at least one cooking step.");
-        }
-
-        _steps.Remove(recipeStep);
-        ReindexSteps();
-    }
-
-    public void MoveStep(
-        int stepId,
-        int newPosition)
-    {
-        var recipeStep = FindStep(stepId);
-
-        ValidatePosition(
-            newPosition,
-            _steps.Count,
-            nameof(newPosition));
-
-        _steps.Remove(recipeStep);
-        _steps.Insert(newPosition - 1, recipeStep);
-
-        ReindexSteps();
-    }
-
     public void EnsureCanBeSaved()
     {
         if (_ingredients.Count == 0)
         {
             throw new InvalidOperationException(
                 "A recipe must contain at least one ingredient.");
-        }
-
-        if (_steps.Count == 0)
-        {
-            throw new InvalidOperationException(
-                "A recipe must contain at least one cooking step.");
-        }
-    }
-
-    private RecipeStep FindStep(int stepId)
-    {
-        return _steps.SingleOrDefault(
-            recipeStep => recipeStep.Id == stepId)
-            ?? throw new KeyNotFoundException(
-                $"Recipe step {stepId} was not found.");
-    }
-
-    private void ReindexSteps()
-    {
-        for (var index = 0; index < _steps.Count; index++)
-        {
-            _steps[index].SetPosition(index + 1);
         }
     }
 

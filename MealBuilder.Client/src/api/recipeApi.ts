@@ -22,12 +22,6 @@ export type RecipeIngredient = {
   position: number
 }
 
-export type RecipeStep = {
-  id: number
-  instruction: string
-  position: number
-}
-
 export type RecipeSummary = {
   id: number
   name: string
@@ -45,7 +39,6 @@ export type Recipe = {
   totalNutrition: RecipeNutrition
   nutritionPerServing: RecipeNutrition
   ingredients: RecipeIngredient[]
-  steps: RecipeStep[]
 }
 
 export type RecipeIngredientInput = {
@@ -53,16 +46,11 @@ export type RecipeIngredientInput = {
   grams: number
 }
 
-export type RecipeStepInput = {
-  instruction: string
-}
-
 export type RecipeInput = {
   name: string
   description: string | null
   servings: number
   ingredients: RecipeIngredientInput[]
-  steps: RecipeStepInput[]
 }
 
 export const recipeApi = {

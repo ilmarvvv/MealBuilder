@@ -125,7 +125,6 @@ public sealed class RecipesController(
             .Include(recipe => recipe.Ingredients)
                 .ThenInclude(recipeIngredient =>
                     recipeIngredient.Ingredient)
-            .Include(recipe => recipe.Steps)
             .AsSplitQuery()
             .SingleOrDefaultAsync(cancellationToken);
 
@@ -172,11 +171,6 @@ public sealed class RecipesController(
                 requestedIngredient.Grams);
         }
 
-        foreach (var requestedStep in request.Steps)
-        {
-            recipe.AddStep(requestedStep.Instruction);
-        }
-
         recipe.EnsureCanBeSaved();
 
         dbContext.Recipes.Add(recipe);
@@ -211,7 +205,6 @@ public sealed class RecipesController(
             .Include(recipe => recipe.Ingredients)
                 .ThenInclude(recipeIngredient =>
                     recipeIngredient.Ingredient)
-            .Include(recipe => recipe.Steps)
             .AsSplitQuery()
             .SingleOrDefaultAsync(cancellationToken);
 
@@ -239,10 +232,6 @@ public sealed class RecipesController(
             recipe,
             request,
             ingredientsById);
-
-        SynchronizeSteps(
-            recipe,
-            request);
 
         recipe.EnsureCanBeSaved();
 
@@ -331,43 +320,6 @@ public sealed class RecipesController(
             recipe.MoveIngredient(
                 requestedIngredient.IngredientId,
                 index + 1);
-        }
-    }
-
-    private static void SynchronizeSteps(
-        Recipe recipe,
-        RecipeRequest request)
-    {
-        var existingSteps = recipe.Steps
-            .OrderBy(step => step.Position)
-            .ToArray();
-
-        var sharedStepCount = Math.Min(
-            existingSteps.Length,
-            request.Steps.Length);
-
-        for (var index = 0;
-             index < sharedStepCount;
-             index++)
-        {
-            recipe.UpdateStep(
-                existingSteps[index].Id,
-                request.Steps[index].Instruction);
-        }
-
-        for (var index = sharedStepCount;
-             index < request.Steps.Length;
-             index++)
-        {
-            recipe.AddStep(
-                request.Steps[index].Instruction);
-        }
-
-        for (var index = existingSteps.Length - 1;
-             index >= request.Steps.Length;
-             index--)
-        {
-            recipe.RemoveStep(existingSteps[index].Id);
         }
     }
 

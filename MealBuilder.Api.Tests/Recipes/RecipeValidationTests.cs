@@ -12,7 +12,33 @@ public sealed class RecipeValidationTests(
     : IClassFixture<MealBuilderApiFactory>
 {
     [Fact]
-    public async Task Create_WithoutCookingSteps_ReturnsValidationError()
+    public async Task Create_WithDescriptionAtLimit_Succeeds()
+    {
+        using var client = factory.CreateHttpsClient();
+
+        await RecipeTestHelper.RegisterUserAsync(client);
+
+        var ingredients =
+            await RecipeTestHelper.GetBuiltInIngredientsAsync(client);
+
+        Assert.NotEmpty(ingredients);
+
+        var description = new string('a', 2000);
+        var request = RecipeTestHelper.CreateValidRequest(
+            ingredients[0].Id) with
+        {
+            Description = description
+        };
+
+        var recipe = await RecipeTestHelper.CreateRecipeAsync(
+            client,
+            request);
+
+        Assert.Equal(description, recipe.Description);
+    }
+
+    [Fact]
+    public async Task Create_WithDescriptionOverLimit_ReturnsValidationError()
     {
         using var client = factory.CreateHttpsClient();
 
@@ -26,7 +52,7 @@ public sealed class RecipeValidationTests(
         var request = RecipeTestHelper.CreateValidRequest(
             ingredients[0].Id) with
         {
-            Steps = []
+            Description = new string('a', 2001)
         };
 
         var response = await client.PostWithCsrfAsync(
@@ -42,7 +68,7 @@ public sealed class RecipeValidationTests(
 
         Assert.NotNull(problem);
         Assert.Contains(
-            nameof(RecipeRequest.Steps),
+            nameof(RecipeRequest.Description),
             problem.Errors.Keys);
     }
 
