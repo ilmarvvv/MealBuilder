@@ -128,8 +128,6 @@ export default function RecipeListPage() {
                       <header className="recipe-card__header">
                         <div>
                           <h3>{recipe.name}</h3>
-
-                          <p>{recipe.description ?? 'No description'}</p>
                         </div>
 
                         <span className="recipe-card__badge">
