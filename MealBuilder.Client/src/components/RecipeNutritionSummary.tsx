@@ -9,6 +9,7 @@ type RecipeNutritionSummaryProps = {
   description?: string
   totalTitle?: string
   perServingTitle?: string
+  perServingFirst?: boolean
 }
 
 type NutritionPanelProps = {
@@ -83,7 +84,16 @@ export default function RecipeNutritionSummary({
   description = 'Calculated from the selected Ingredients.',
   totalTitle = 'Whole Recipe',
   perServingTitle = 'Per Serving',
+  perServingFirst = false,
 }: RecipeNutritionSummaryProps) {
+  const panels = [
+    { key: 'total', title: totalTitle, nutrition: total },
+    { key: 'per-serving', title: perServingTitle, nutrition: perServing },
+  ]
+
+  if (perServingFirst) {
+    panels.reverse()
+  }
   return (
     <section
       className="recipe-nutrition-summary"
@@ -97,17 +107,14 @@ export default function RecipeNutritionSummary({
         {description}
       </p>
 
-      <NutritionPanel
-        eyebrow={eyebrow}
-        title={totalTitle}
-        nutrition={total}
-      />
-
-      <NutritionPanel
-        eyebrow={eyebrow}
-        title={perServingTitle}
-        nutrition={perServing}
-      />
+      {panels.map((panel) => (
+        <NutritionPanel
+          key={panel.key}
+          eyebrow={eyebrow}
+          title={panel.title}
+          nutrition={panel.nutrition}
+        />
+      ))}
     </section>
   )
 }

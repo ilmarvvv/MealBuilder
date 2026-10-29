@@ -20,6 +20,7 @@ export type RecipeIngredient = {
   ingredientName: string
   grams: number
   position: number
+  nutrition: RecipeNutrition
 }
 
 export type RecipeSummary = {

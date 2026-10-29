@@ -107,17 +107,15 @@ export default function RecipeDetailsPage() {
       </Link>
 
       <header className="recipe-details__header">
-        <div>
+        <div className="recipe-details__heading">
           <p className="recipe-details__eyebrow">Personal Recipe</p>
-
           <h2>{recipe.name}</h2>
-        </div>
-
-        <div className="recipe-details__actions">
           <span className="recipe-details__servings">
             {recipe.servings} {recipe.servings === 1 ? 'serving' : 'servings'}
           </span>
+        </div>
 
+        <div className="recipe-details__actions">
           <Link
             className="recipe-details__prepare"
             to={`/planner/prepare/${recipe.id}`}
@@ -131,20 +129,119 @@ export default function RecipeDetailsPage() {
           >
             Edit Recipe
           </Link>
-          <button
-            className="recipe-details__delete"
-            type="button"
-            aria-expanded={isDeleteConfirmationOpen}
-            aria-controls="delete-recipe-confirmation"
-            onClick={() => {
-              setDeleteErrors([])
-              setIsDeleteConfirmationOpen(true)
-            }}
-          >
-            Delete
-          </button>
         </div>
       </header>
+
+      <div className="recipe-details__content">
+        {recipe.description && (
+          <section className="recipe-details__section recipe-details__section--description">
+            <h3>Description</h3>
+            <p className="recipe-details__description">{recipe.description}</p>
+          </section>
+        )}
+
+        <section className="recipe-details__section recipe-details__section--ingredients">
+          <div className="recipe-details__ingredients-heading">
+            <h3>Ingredients</h3>
+            <span>Nutrition for the amount used</span>
+          </div>
+
+          <div
+            className="recipe-details__ingredients-rule"
+            aria-hidden="true"
+          />
+
+          <ol className="recipe-details__ingredients">
+            {recipe.ingredients.map((ingredient) => (
+              <li key={ingredient.ingredientId}>
+                <div className="recipe-details__ingredient-main">
+                  <Link to={`/library/ingredients/${ingredient.ingredientId}`}>
+                    {ingredient.ingredientName}
+                  </Link>
+
+                  <span className="recipe-details__ingredient-summary">
+                    {numberFormatter.format(ingredient.grams)} g
+                  </span>
+                </div>
+
+                <dl className="recipe-details__ingredient-metrics">
+                  <div>
+                    <dt>Calories</dt>
+                    <dd>
+                      {numberFormatter.format(ingredient.nutrition.calories)}{' '}
+                      kcal
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Protein</dt>
+                    <dd>
+                      {numberFormatter.format(ingredient.nutrition.protein)} g
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Carbs</dt>
+                    <dd>
+                      {numberFormatter.format(
+                        ingredient.nutrition.carbohydrates,
+                      )}{' '}
+                      g
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Sugars</dt>
+                    <dd>
+                      {numberFormatter.format(ingredient.nutrition.sugars)} g
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Fiber</dt>
+                    <dd>
+                      {numberFormatter.format(ingredient.nutrition.fiber)} g
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Fat</dt>
+                    <dd>
+                      {numberFormatter.format(ingredient.nutrition.fat)} g
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Salt</dt>
+                    <dd>
+                      {numberFormatter.format(ingredient.nutrition.salt)} g
+                    </dd>
+                  </div>
+                </dl>
+              </li>
+            ))}
+          </ol>
+        </section>
+      </div>
+
+      <div className="recipe-details__nutrition">
+        <h3>Nutrition</h3>
+        <div className="recipe-details__nutrition-rule" aria-hidden="true" />
+
+        <RecipeNutritionSummary
+          total={recipe.totalNutrition}
+          perServing={recipe.nutritionPerServing}
+          perServingFirst
+          title="Nutrition"
+        />
+      </div>
+
+      <button
+        className="recipe-details__delete"
+        type="button"
+        aria-expanded={isDeleteConfirmationOpen}
+        aria-controls="delete-recipe-confirmation"
+        onClick={() => {
+          setDeleteErrors([])
+          setIsDeleteConfirmationOpen(true)
+        }}
+      >
+        Delete
+      </button>
 
       {isDeleteConfirmationOpen && (
         <section
@@ -155,7 +252,6 @@ export default function RecipeDetailsPage() {
         >
           <div>
             <h3 id="delete-recipe-heading">Delete Recipe?</h3>
-
             <p>This will permanently delete {recipe.name}.</p>
           </div>
 
@@ -185,40 +281,6 @@ export default function RecipeDetailsPage() {
           </div>
         </section>
       )}
-
-      <RecipeNutritionSummary
-        total={recipe.totalNutrition}
-        perServing={recipe.nutritionPerServing}
-      />
-
-      <div
-        className={`recipe-details__content${
-          !recipe.description ? ' recipe-details__content--single' : ''
-        }`}
-      >
-        <section className="recipe-details__section">
-          <h3>Ingredients</h3>
-
-          <ol className="recipe-details__ingredients">
-            {recipe.ingredients.map((ingredient) => (
-              <li key={ingredient.ingredientId}>
-                <Link to={`/library/ingredients/${ingredient.ingredientId}`}>
-                  {ingredient.ingredientName}
-                </Link>
-
-                <strong>{numberFormatter.format(ingredient.grams)} g</strong>
-              </li>
-            ))}
-          </ol>
-        </section>
-
-        {recipe.description && (
-          <section className="recipe-details__section">
-            <h3>Description</h3>
-            <p className="recipe-details__description">{recipe.description}</p>
-          </section>
-        )}
-      </div>
     </article>
   )
 }

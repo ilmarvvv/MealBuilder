@@ -1,5 +1,6 @@
 ﻿using MealBuilder.Api.Contracts.Recipes;
 using MealBuilder.Domain.Recipes;
+using MealBuilder.Api.Mappings;
 using MealBuilder.Infrastructure.Data;
 using MealBuilder.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authorization;
@@ -72,7 +73,7 @@ public sealed class RecipeIngredientsController(
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return Ok(ToResponse(recipeIngredient));
+        return Ok(RecipeResponseMapper.ToIngredientResponse(recipeIngredient));
     }
 
     [HttpPut("{ingredientId:int}")]
@@ -118,7 +119,7 @@ public sealed class RecipeIngredientsController(
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return Ok(ToResponse(recipeIngredient));
+        return Ok(RecipeResponseMapper.ToIngredientResponse(recipeIngredient));
     }
 
     [HttpPut("{ingredientId:int}/position")]
@@ -222,15 +223,5 @@ public sealed class RecipeIngredientsController(
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return NoContent();
-    }
-
-    private static RecipeIngredientResponse ToResponse(
-        RecipeIngredient recipeIngredient)
-    {
-        return new RecipeIngredientResponse(
-            recipeIngredient.IngredientId,
-            recipeIngredient.Ingredient.Name,
-            recipeIngredient.Grams,
-            recipeIngredient.Position);
     }
 }

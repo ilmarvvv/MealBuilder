@@ -24,9 +24,11 @@ public static class RecipeNutritionCalculator
         return totals.DivideBy(recipe.Servings);
     }
 
-    private static RecipeNutrition CalculateIngredient(
+    public static RecipeNutrition CalculateIngredient(
         RecipeIngredient recipeIngredient)
     {
+        ArgumentNullException.ThrowIfNull(recipeIngredient);
+
         var ingredient = recipeIngredient.Ingredient;
         var multiplier = recipeIngredient.Grams / 100m;
 

@@ -30,12 +30,7 @@ public static class RecipeResponseMapper
 
         var ingredients = recipe.Ingredients
             .OrderBy(recipeIngredient => recipeIngredient.Position)
-            .Select(recipeIngredient =>
-                new RecipeIngredientResponse(
-                    recipeIngredient.IngredientId,
-                    recipeIngredient.Ingredient.Name,
-                    recipeIngredient.Grams,
-                    recipeIngredient.Position))
+            .Select(ToIngredientResponse)
             .ToArray();
 
         return new RecipeResponse(
@@ -46,6 +41,21 @@ public static class RecipeResponseMapper
             ToNutritionResponse(totalNutrition),
             ToNutritionResponse(nutritionPerServing),
             ingredients);
+    }
+
+    public static RecipeIngredientResponse ToIngredientResponse(
+    RecipeIngredient recipeIngredient)
+    {
+        ArgumentNullException.ThrowIfNull(recipeIngredient);
+
+        return new RecipeIngredientResponse(
+            recipeIngredient.IngredientId,
+            recipeIngredient.Ingredient.Name,
+            recipeIngredient.Grams,
+            recipeIngredient.Position,
+            ToNutritionResponse(
+                RecipeNutritionCalculator.CalculateIngredient(
+                    recipeIngredient)));
     }
 
     private static RecipeNutritionResponse ToNutritionResponse(
