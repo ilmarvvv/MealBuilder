@@ -1646,6 +1646,10 @@ This section contains ideas that may be useful for the project in the future, bu
 
 - [ ] Add search and filters
 
+- [ ] Suggest similar Ingredients and Recipes during creation
+  - While the user enters a name, show up to five similar existing items of the same type.
+  - Let the user select an editable existing item and open its edit form instead of creating a duplicate.
+
 - [ ] Improve UI
 
 - [ ] Rework the calorie progress indicator to use percentage-based ranges
