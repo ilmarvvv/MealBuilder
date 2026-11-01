@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router'
 import { getApiErrorMessages } from '../api/getApiErrorMessages'
 import { recipeApi } from '../api/recipeApi'
-import type { Recipe } from '../api/recipeApi'
+import type { Recipe, RecipeNutrition } from '../api/recipeApi'
 import ErrorList from '../components/ErrorList'
 import LoadingIndicator from '../components/LoadingIndicator'
 import PrepareRecipeForm from '../components/PrepareRecipeForm'
@@ -12,6 +12,21 @@ import './PrepareRecipePage.css'
 const numberFormatter = new Intl.NumberFormat('en', {
   maximumFractionDigits: 2,
 })
+
+function nutritionPerPortion(
+  total: RecipeNutrition,
+  portions: number,
+): RecipeNutrition {
+  return {
+    calories: total.calories / portions,
+    protein: total.protein / portions,
+    fat: total.fat / portions,
+    carbohydrates: total.carbohydrates / portions,
+    sugars: total.sugars / portions,
+    fiber: total.fiber / portions,
+    salt: total.salt / portions,
+  }
+}
 
 function isValidDateValue(value: string | null): value is string {
   if (value === null || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
@@ -41,6 +56,7 @@ export default function PrepareRecipePage() {
     plannerDate === null ? null : `/planner?date=${plannerDate}`
 
   const [recipe, setRecipe] = useState<Recipe | null>(null)
+  const [totalPortions, setTotalPortions] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [errors, setErrors] = useState<string[]>([])
 
@@ -51,6 +67,7 @@ export default function PrepareRecipePage() {
       setIsLoading(true)
       setErrors([])
       setRecipe(null)
+      setTotalPortions(null)
 
       if (!Number.isInteger(parsedRecipeId) || parsedRecipeId <= 0) {
         setErrors(['Recipe not found.'])
@@ -102,6 +119,11 @@ export default function PrepareRecipePage() {
   const returnPath = plannerPath ?? recipeDetailsPath
   const returnLabel =
     plannerPath === null ? 'Back to Recipe' : 'Back to Planner'
+  const portionCount = Number(totalPortions ?? recipe.servings)
+  const perPortionNutrition =
+    Number.isFinite(portionCount) && portionCount > 0
+      ? nutritionPerPortion(recipe.totalNutrition, portionCount)
+      : null
 
   return (
     <section className="prepare-recipe-page">
@@ -110,60 +132,65 @@ export default function PrepareRecipePage() {
       </Link>
 
       <header className="prepare-recipe-page__header">
-        <p className="prepare-recipe-page__eyebrow">Prepared Recipe</p>
-
-        <h1>Prepare {recipe.name}</h1>
-
-        <p>
-          Review the Recipe snapshot, choose the number of portions, and decide
-          whether to plan them now.
-        </p>
+        <h1>Prepare recipe</h1>
       </header>
 
       <div className="prepare-recipe-page__layout">
-        <aside className="prepare-recipe-page__snapshot">
-          <div>
-            <p className="prepare-recipe-page__eyebrow">Snapshot source</p>
+        <div className="prepare-recipe-page__sidebar">
+          <aside className="prepare-recipe-page__snapshot">
+            <div>
+              <p className="prepare-recipe-page__eyebrow">Recipe snapshot</p>
 
-            <h2>{recipe.name}</h2>
+              <h2>{recipe.name}</h2>
+            </div>
 
-            <p>
-              These Recipe values will be copied into an immutable Prepared
-              Recipe snapshot.
+            <p className="prepare-recipe-page__snapshot-meta">
+              {recipe.servings} recipe servings · {recipe.ingredients.length}{' '}
+              ingredients
             </p>
-          </div>
 
-          <dl className="prepare-recipe-page__facts">
-            <div>
-              <dt>Servings</dt>
-              <dd>{recipe.servings}</dd>
-            </div>
+            <section>
+              <h3>Ingredients</h3>
 
-            <div>
-              <dt>Ingredients</dt>
-              <dd>{recipe.ingredients.length}</dd>
-            </div>
-          </dl>
+              <ul className="prepare-recipe-page__ingredients">
+                {recipe.ingredients.map((ingredient) => (
+                  <li key={ingredient.ingredientId}>
+                    <span>{ingredient.ingredientName}</span>
 
-          <section>
-            <h3>Copied Ingredients</h3>
+                    <strong>
+                      {numberFormatter.format(ingredient.grams)} g
+                    </strong>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          </aside>
 
-            <ul className="prepare-recipe-page__ingredients">
-              {recipe.ingredients.map((ingredient) => (
-                <li key={ingredient.ingredientId}>
-                  <span>{ingredient.ingredientName}</span>
+          <section className="prepare-recipe-page__nutrition">
+            <h2>Nutrition</h2>
 
-                  <strong>{numberFormatter.format(ingredient.grams)} g</strong>
-                </li>
-              ))}
-            </ul>
+            {perPortionNutrition === null ? (
+              <p>
+                Enter a valid total portion count to see nutrition per portion.
+              </p>
+            ) : (
+              <RecipeNutritionSummary
+                total={recipe.totalNutrition}
+                perServing={perPortionNutrition}
+                title="Nutrition"
+                description="Whole recipe values and nutrition per prepared portion."
+                perServingTitle="Per Portion"
+                splitCarbsAndSugars
+              />
+            )}
           </section>
-        </aside>
+        </div>
 
         <PrepareRecipeForm
           recipe={recipe}
           initialDate={plannerDate ?? undefined}
           cancelPath={returnPath}
+          onTotalPortionsChange={setTotalPortions}
           onPrepared={(preparedRecipe) => {
             navigate(`/planner?date=${preparedRecipe.preparedDate}`, {
               replace: true,
@@ -171,11 +198,6 @@ export default function PrepareRecipePage() {
           }}
         />
       </div>
-
-      <RecipeNutritionSummary
-        total={recipe.totalNutrition}
-        perServing={recipe.nutritionPerServing}
-      />
     </section>
   )
 }

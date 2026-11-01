@@ -10,12 +10,14 @@ type RecipeNutritionSummaryProps = {
   totalTitle?: string
   perServingTitle?: string
   perServingFirst?: boolean
+  splitCarbsAndSugars?: boolean
 }
 
 type NutritionPanelProps = {
   eyebrow: string
   title: string
   nutrition: RecipeNutrition
+  splitCarbsAndSugars: boolean
 }
 
 const numberFormatter = new Intl.NumberFormat('en', {
@@ -26,7 +28,12 @@ function formatNumber(value: number) {
   return numberFormatter.format(value)
 }
 
-function NutritionPanel({ eyebrow, title, nutrition }: NutritionPanelProps) {
+function NutritionPanel({
+  eyebrow,
+  title,
+  nutrition,
+  splitCarbsAndSugars,
+}: NutritionPanelProps) {
   return (
     <article className="recipe-nutrition-panel">
       <header>
@@ -49,13 +56,27 @@ function NutritionPanel({ eyebrow, title, nutrition }: NutritionPanelProps) {
           <dd>{formatNumber(nutrition.protein)} g</dd>
         </div>
 
-        <div>
-          <dt>Carbohydrates / Sugars</dt>
-          <dd>
-            {formatNumber(nutrition.carbohydrates)} /{' '}
-            {formatNumber(nutrition.sugars)} g
-          </dd>
-        </div>
+        {splitCarbsAndSugars ? (
+          <>
+            <div>
+              <dt>Carbohydrates</dt>
+              <dd>{formatNumber(nutrition.carbohydrates)} g</dd>
+            </div>
+
+            <div>
+              <dt>Sugars</dt>
+              <dd>{formatNumber(nutrition.sugars)} g</dd>
+            </div>
+          </>
+        ) : (
+          <div>
+            <dt>Carbohydrates / Sugars</dt>
+            <dd>
+              {formatNumber(nutrition.carbohydrates)} /{' '}
+              {formatNumber(nutrition.sugars)} g
+            </dd>
+          </div>
+        )}
 
         <div>
           <dt>Fiber</dt>
@@ -85,6 +106,7 @@ export default function RecipeNutritionSummary({
   totalTitle = 'Whole Recipe',
   perServingTitle = 'Per Serving',
   perServingFirst = false,
+  splitCarbsAndSugars = false,
 }: RecipeNutritionSummaryProps) {
   const panels = [
     { key: 'total', title: totalTitle, nutrition: total },
@@ -113,6 +135,7 @@ export default function RecipeNutritionSummary({
           eyebrow={eyebrow}
           title={panel.title}
           nutrition={panel.nutrition}
+          splitCarbsAndSugars={splitCarbsAndSugars}
         />
       ))}
     </section>

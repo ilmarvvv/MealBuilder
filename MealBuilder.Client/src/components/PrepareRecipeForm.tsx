@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link } from 'react-router'
 import { getApiErrorMessages } from '../api/getApiErrorMessages'
@@ -14,6 +14,7 @@ type PrepareRecipeFormProps = {
   recipe: Recipe
   initialDate?: string
   cancelPath: string
+  onTotalPortionsChange: (value: string) => void
   onPrepared: (preparedRecipe: PreparedRecipe) => void
 }
 
@@ -28,19 +29,39 @@ function toApiPlannedTime(value: string) {
   return value === '' ? null : `${value}:00`
 }
 
+const portionFormatter = new Intl.NumberFormat('en', {
+  maximumFractionDigits: 2,
+})
+
+function describeDailyPortions(allocations: PreparedRecipeAllocationInput[]) {
+  const portions = allocations.map((allocation) => allocation.portions)
+  const minimum = Math.min(...portions)
+  const maximum = Math.max(...portions)
+
+  if (minimum === maximum) {
+    return `${portionFormatter.format(minimum)} portion${
+      minimum === 1 ? '' : 's'
+    } per day`
+  }
+
+  return `${portionFormatter.format(minimum)}–${portionFormatter.format(
+    maximum,
+  )} portions per day`
+}
+
 export default function PrepareRecipeForm({
   recipe,
   initialDate,
   cancelPath,
+  onTotalPortionsChange,
   onPrepared,
 }: PrepareRecipeFormProps) {
   const defaultDate = initialDate ?? getTodayInputValue()
 
   const [preparedDate, setPreparedDate] = useState(defaultDate)
   const [totalPortions, setTotalPortions] = useState(String(recipe.servings))
-  const [automaticallyPlan, setAutomaticallyPlan] = useState(true)
   const [startDate, setStartDate] = useState(defaultDate)
-  const [plannedDays, setPlannedDays] = useState('1')
+  const [plannedDays, setPlannedDays] = useState(String(recipe.servings))
   const [defaultPlannedTime, setDefaultPlannedTime] = useState('')
   const [allocations, setAllocations] = useState<
     PreparedRecipeAllocationInput[]
@@ -48,8 +69,23 @@ export default function PrepareRecipeForm({
   const [isPreviewing, setIsPreviewing] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
+  const [previewRetryCount, setPreviewRetryCount] = useState(0)
+  const previewRequestId = useRef(0)
+  const defaultPlannedTimeRef = useRef('')
 
   const numericTotalPortions = Number(totalPortions)
+
+  const numericPlannedDays = Number(plannedDays)
+  const hasValidPlanningInputs =
+    Number.isFinite(numericTotalPortions) &&
+    numericTotalPortions > 0 &&
+    Number.isInteger(numericPlannedDays) &&
+    numericPlannedDays >= 1 &&
+    numericPlannedDays <= 365 &&
+    preparedDate !== '' &&
+    startDate !== '' &&
+    startDate >= preparedDate &&
+    Math.round(numericTotalPortions * 100) >= numericPlannedDays
 
   const allocatedPortions = useMemo(
     () =>
@@ -63,52 +99,75 @@ export default function PrepareRecipeForm({
   const availableAfterPlanning = numericTotalPortions - allocatedPortions
 
   function clearPreview() {
+    previewRequestId.current += 1
     setAllocations([])
+    setIsPreviewing(false)
     setErrors([])
   }
 
-  async function handlePreview() {
-    const numericPlannedDays = Number(plannedDays)
-
-    if (
-      !Number.isFinite(numericTotalPortions) ||
-      numericTotalPortions <= 0 ||
-      !Number.isInteger(numericPlannedDays) ||
-      numericPlannedDays < 1 ||
-      numericPlannedDays > 365
-    ) {
-      setErrors(['Enter valid total portions and planned days.'])
+  useEffect(() => {
+    if (!hasValidPlanningInputs) {
       return
     }
 
-    setIsPreviewing(true)
-    setErrors([])
+    const requestId = ++previewRequestId.current
+    const timeoutId = window.setTimeout(async () => {
+      if (requestId !== previewRequestId.current) {
+        return
+      }
 
-    try {
-      const preview = await preparedRecipeApi.previewPlanning({
-        recipeId: recipe.id,
-        preparedDate,
-        totalPortions: numericTotalPortions,
-        startDate,
-        plannedDays: numericPlannedDays,
-      })
+      setIsPreviewing(true)
 
-      const apiPlannedTime = toApiPlannedTime(defaultPlannedTime)
+      try {
+        const preview = await preparedRecipeApi.previewPlanning({
+          recipeId: recipe.id,
+          preparedDate,
+          totalPortions: Number(totalPortions),
+          startDate,
+          plannedDays: Number(plannedDays),
+        })
 
-      setAllocations(
-        preview.map((allocation) => ({
-          ...allocation,
-          plannedTime: apiPlannedTime,
-        })),
-      )
-    } catch (error) {
-      setErrors(
-        getApiErrorMessages(error, 'Unable to preview portion planning.'),
-      )
-    } finally {
-      setIsPreviewing(false)
+        if (requestId !== previewRequestId.current) {
+          return
+        }
+
+        const plannedTime = toApiPlannedTime(defaultPlannedTimeRef.current)
+
+        setAllocations(
+          preview.map((allocation) => ({
+            ...allocation,
+            plannedTime,
+          })),
+        )
+      } catch (error) {
+        if (requestId === previewRequestId.current) {
+          setErrors(
+            getApiErrorMessages(error, 'Unable to update portion planning.'),
+          )
+        }
+      } finally {
+        if (requestId === previewRequestId.current) {
+          setIsPreviewing(false)
+        }
+      }
+    }, 250)
+
+    return () => {
+      window.clearTimeout(timeoutId)
+
+      if (previewRequestId.current === requestId) {
+        previewRequestId.current += 1
+      }
     }
-  }
+  }, [
+    hasValidPlanningInputs,
+    recipe.id,
+    preparedDate,
+    totalPortions,
+    startDate,
+    plannedDays,
+    previewRetryCount,
+  ])
 
   function updateAllocation(
     index: number,
@@ -125,6 +184,7 @@ export default function PrepareRecipeForm({
     const apiPlannedTime = toApiPlannedTime(value)
 
     setDefaultPlannedTime(value)
+    defaultPlannedTimeRef.current = value
     setAllocations((currentAllocations) =>
       currentAllocations.map((allocation) => ({
         ...allocation,
@@ -136,8 +196,8 @@ export default function PrepareRecipeForm({
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
-    if (automaticallyPlan && allocations.length === 0) {
-      setErrors(['Preview the portion plan before preparing the Recipe.'])
+    if (!hasValidPlanningInputs || isPreviewing || allocations.length === 0) {
+      setErrors(['Wait for a valid portion plan before preparing the Recipe.'])
       return
     }
 
@@ -154,7 +214,7 @@ export default function PrepareRecipeForm({
         recipeId: recipe.id,
         preparedDate,
         totalPortions: numericTotalPortions,
-        allocations: automaticallyPlan ? allocations : [],
+        allocations,
       })
 
       onPrepared(preparedRecipe)
@@ -173,8 +233,6 @@ export default function PrepareRecipeForm({
             <p>Preparation</p>
             <h2>Portions and date</h2>
           </div>
-
-          <span>1</span>
         </div>
 
         <div className="prepare-recipe-form__fields">
@@ -205,7 +263,10 @@ export default function PrepareRecipeForm({
               required
               value={totalPortions}
               onChange={(event) => {
-                setTotalPortions(event.target.value)
+                const value = event.target.value
+
+                setTotalPortions(value)
+                onTotalPortionsChange(value)
                 clearPreview()
               }}
             />
@@ -217,97 +278,103 @@ export default function PrepareRecipeForm({
         <div className="prepare-recipe-form__section-heading">
           <div>
             <p>Planning</p>
-            <h2>Choose how to use the portions</h2>
+            <h2>Split across days</h2>
           </div>
-
-          <span>2</span>
         </div>
 
-        <label className="prepare-recipe-form__toggle">
-          <input
-            type="checkbox"
-            checked={automaticallyPlan}
-            onChange={(event) => {
-              setAutomaticallyPlan(event.target.checked)
-              clearPreview()
-            }}
+        <div className="prepare-recipe-form__fields prepare-recipe-form__fields--planning">
+          <label>
+            <span>Start date</span>
+
+            <input
+              type="date"
+              min={preparedDate}
+              required
+              value={startDate}
+              onChange={(event) => {
+                setStartDate(event.target.value)
+                clearPreview()
+              }}
+            />
+          </label>
+
+          <label>
+            <span>Number of days</span>
+
+            <input
+              type="number"
+              min="1"
+              max="365"
+              step="1"
+              required
+              value={plannedDays}
+              onChange={(event) => {
+                setPlannedDays(event.target.value)
+                clearPreview()
+              }}
+            />
+          </label>
+
+          <label>
+            <span>Default time (optional)</span>
+
+            <input
+              type="time"
+              value={defaultPlannedTime}
+              onChange={(event) => {
+                updateDefaultPlannedTime(event.target.value)
+              }}
+            />
+          </label>
+        </div>
+
+        {!hasValidPlanningInputs && (
+          <ErrorList
+            messages={[
+              'Enter valid portions and dates. Each day needs at least 0.01 portion.',
+            ]}
           />
+        )}
 
-          <span>
-            <strong>Automatically Plan Portions</strong>
-            <small>Preview an even distribution across consecutive days.</small>
-          </span>
-        </label>
+        {hasValidPlanningInputs &&
+          allocations.length === 0 &&
+          errors.length === 0 && (
+            <p role="status">
+              {isPreviewing ? 'Updating plan...' : 'Calculating plan...'}
+            </p>
+          )}
 
-        {automaticallyPlan ? (
-          <>
-            <div className="prepare-recipe-form__fields prepare-recipe-form__fields--planning">
-              <label>
-                <span>Start date</span>
-
-                <input
-                  type="date"
-                  min={preparedDate}
-                  required
-                  value={startDate}
-                  onChange={(event) => {
-                    setStartDate(event.target.value)
-                    clearPreview()
-                  }}
-                />
-              </label>
-
-              <label>
-                <span>Number of days</span>
-
-                <input
-                  type="number"
-                  min="1"
-                  max="365"
-                  step="1"
-                  required
-                  value={plannedDays}
-                  onChange={(event) => {
-                    setPlannedDays(event.target.value)
-                    clearPreview()
-                  }}
-                />
-              </label>
-
-              <label>
-                <span>Default time (optional)</span>
-
-                <input
-                  type="time"
-                  value={defaultPlannedTime}
-                  onChange={(event) => {
-                    updateDefaultPlannedTime(event.target.value)
-                  }}
-                />
-              </label>
-            </div>
-
+        {hasValidPlanningInputs &&
+          allocations.length === 0 &&
+          errors.length > 0 && (
             <button
-              className="prepare-recipe-form__preview"
               type="button"
-              disabled={isPreviewing || isSubmitting}
-              onClick={handlePreview}
+              onClick={() => {
+                setErrors([])
+                setPreviewRetryCount((count) => count + 1)
+              }}
             >
-              {isPreviewing ? 'Creating preview...' : 'Preview planning'}
+              Retry planning
             </button>
-          </>
-        ) : (
-          <div className="prepare-recipe-form__available-note">
-            <strong>
-              All {totalPortions || '0'} portions will remain available.
-            </strong>
+          )}
 
-            <p>You can assign them to any valid date later from Planner.</p>
+        {allocations.length > 0 && (
+          <div
+            className="prepare-recipe-form__planning-total"
+            aria-live="polite"
+          >
+            <span>
+              {allocations.length} days · {describeDailyPortions(allocations)}
+            </span>
+
+            <strong>
+              {Math.max(0, availableAfterPlanning).toFixed(2)} available
+            </strong>
           </div>
         )}
       </section>
 
-      {automaticallyPlan && allocations.length > 0 && (
+      {allocations.length > 0 && (
         <section className="prepare-recipe-form__section">
           <div className="prepare-recipe-form__section-heading">
             <div>
@@ -315,17 +382,27 @@ export default function PrepareRecipeForm({
               <h2>Planned portions</h2>
             </div>
 
-            <span>{allocations.length}</span>
+            <small>{allocations.length} days</small>
           </div>
 
           <div className="prepare-recipe-form__allocations">
+            <div
+              className="prepare-recipe-form__allocation-head"
+              aria-hidden="true"
+            >
+              <span>Day</span>
+              <span>Date</span>
+              <span>Portions</span>
+              <span>Time</span>
+            </div>
             {allocations.map((allocation, index) => (
-              <div
-                className="prepare-recipe-form__allocation"
-                key={`${index}-${allocation.date}`}
-              >
+              <div className="prepare-recipe-form__allocation" key={index}>
+                <strong className="prepare-recipe-form__allocation-day">
+                  Day {index + 1}
+                </strong>
+
                 <label>
-                  <span>Day {index + 1}</span>
+                  <span>Date</span>
 
                   <input
                     type="date"
@@ -398,8 +475,9 @@ export default function PrepareRecipeForm({
           disabled={
             isSubmitting ||
             isPreviewing ||
-            !Number.isFinite(numericTotalPortions) ||
-            numericTotalPortions <= 0
+            !hasValidPlanningInputs ||
+            allocations.length === 0 ||
+            availableAfterPlanning < -0.001
           }
         >
           {isSubmitting ? 'Preparing...' : 'Prepare Recipe'}
