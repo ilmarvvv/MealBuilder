@@ -413,6 +413,13 @@
   min-width: 10rem;
 }
 
+.recipe-form__actions .recipe-form__submit--unchanged:disabled {
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  background: var(--color-surface-muted);
+  opacity: 1;
+}
+
 .recipe-form__cancel {
   display: inline-flex;
   align-items: center;

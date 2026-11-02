@@ -1526,6 +1526,11 @@ This section contains ideas that may be useful for the project in the future, bu
 - [ ] Add advanced recipe validation
   - Prevent the same ingredient from being added more than once inside the same recipe.
 
+- [ ] Prevent duplicate personal Recipe names
+  - Copy Recipe currently allows a new Recipe with the original name when another field changes.
+  - Decide whether names must be unique only when copying or across Create, Copy, and Edit for each user.
+  - Define how to compare names and handle existing duplicates before enforcing the rule in the API and form.
+
 ### Menu Planning Improvements
 
 - [ ] Preserve direct Ingredient Daily Plan history with snapshots

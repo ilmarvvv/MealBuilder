@@ -13,6 +13,7 @@ import './RecipeForm.css'
 type RecipeFormProps = {
   ingredients: Ingredient[]
   initialValues?: RecipeInput
+  requireChanges?: boolean
   errors?: string[]
   isSubmitting: boolean
   submitLabel: string
@@ -69,9 +70,34 @@ function moveRow<T extends { key: string }>(
   return reorderedRows
 }
 
+function areRecipeValuesUnchanged(
+  initialValues: RecipeInput,
+  name: string,
+  description: string,
+  servings: string,
+  ingredientRows: RecipeIngredientFormRow[],
+) {
+  return (
+    name.trim() === initialValues.name.trim() &&
+    description.trim() === (initialValues.description ?? '').trim() &&
+    Number(servings) === initialValues.servings &&
+    ingredientRows.length === initialValues.ingredients.length &&
+    ingredientRows.every((row, index) => {
+      const original = initialValues.ingredients[index]
+
+      return (
+        original !== undefined &&
+        Number(row.ingredientId) === original.ingredientId &&
+        Number(row.grams) === original.grams
+      )
+    })
+  )
+}
+
 export default function RecipeForm({
   ingredients,
   initialValues,
+  requireChanges = false,
   errors = [],
   isSubmitting,
   submitLabel,
@@ -101,6 +127,16 @@ export default function RecipeForm({
       ),
     [ingredientRows, ingredients, servings],
   )
+
+  const hasChanges =
+    initialValues === undefined ||
+    !areRecipeValuesUnchanged(
+      initialValues,
+      name,
+      description,
+      servings,
+      ingredientRows,
+    )
 
   function updateIngredientRow(
     key: string,
@@ -191,6 +227,10 @@ export default function RecipeForm({
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+
+    if (requireChanges && !hasChanges) {
+      return
+    }
 
     const input = buildInput()
 
@@ -311,7 +351,15 @@ export default function RecipeForm({
           Cancel
         </Link>
 
-        <button type="submit" disabled={isSubmitting}>
+        <button
+          type="submit"
+          className={
+            requireChanges && !hasChanges
+              ? 'recipe-form__submit--unchanged'
+              : undefined
+          }
+          disabled={isSubmitting || (requireChanges && !hasChanges)}
+        >
           {isSubmitting ? 'Saving...' : submitLabel}
         </button>
       </footer>

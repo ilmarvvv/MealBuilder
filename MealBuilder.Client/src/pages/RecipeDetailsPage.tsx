@@ -129,6 +129,13 @@ export default function RecipeDetailsPage() {
           >
             Edit Recipe
           </Link>
+
+          <Link
+            className="recipe-details__edit"
+            to={`/library/recipes/new?copyFrom=${recipe.id}`}
+          >
+            Copy Recipe
+          </Link>
         </div>
       </header>
 
