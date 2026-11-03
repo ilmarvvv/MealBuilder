@@ -3,7 +3,6 @@
   gap: var(--space-5);
   width: min(100% - 2rem, 75rem);
   margin-inline: auto;
-  padding-block: var(--space-6);
 }
 
 .available-portions__eyebrow {
@@ -148,10 +147,6 @@
 }
 
 @media (max-width: 40rem) {
-  .planner-page {
-    padding-block: var(--space-4);
-  }
-
   .available-portions {
     padding: var(--space-4);
     border-radius: var(--radius-medium);
